@@ -12,7 +12,7 @@ diff --git a/Lib/distutils/tests/test_build_ext.py b/Lib/distutils/tests/test_bu
 index 3ee567d..f0eb0ca 100644
 --- a/Lib/distutils/tests/test_build_ext.py
 +++ b/Lib/distutils/tests/test_build_ext.py
-@@ -115,6 +115,7 @@ def test_xx(self):
+@@ -115,6 +115,7 @@ class BuildExtTestCase(TempdirManager,
          """)
          assert_python_ok('-c', code)
  

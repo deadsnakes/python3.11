@@ -13,7 +13,7 @@ diff --git a/Lib/pydoc.py b/Lib/pydoc.py
 index 34a6087..b7e0db7 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -31,6 +31,10 @@ class or function within a module or module in a package.  If the
+@@ -31,6 +31,10 @@ to a file named "<name>.html".
  
  Module docs for core modules are assumed to be in
  

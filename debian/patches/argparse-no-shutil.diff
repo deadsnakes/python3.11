@@ -10,7 +10,7 @@ diff --git a/Lib/argparse.py b/Lib/argparse.py
 index cf887a2..79884ee 100644
 --- a/Lib/argparse.py
 +++ b/Lib/argparse.py
-@@ -175,9 +175,12 @@ def __init__(self,
+@@ -175,9 +175,12 @@ class HelpFormatter(object):
  
          # default setting for width
          if width is None:

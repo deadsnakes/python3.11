@@ -24,7 +24,7 @@ diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
 index 26696cf..b3f926c 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
-@@ -33,13 +33,13 @@
+@@ -33,13 +33,13 @@ SCHEME_KEYS = ('purelib', 'platlib', 'headers', 'scripts', 'data')
  # alter locations for packages installations in a single place.
  # Note that this module is depracated (PEP 632); all consumers
  # of this information should switch to using sysconfig directly.
@@ -50,7 +50,7 @@ index 26696cf..b3f926c 100644
          ]
  
      boolean_options = ['compile', 'force', 'skip-build']
-@@ -168,6 +171,7 @@ def initialize_options(self):
+@@ -168,6 +171,7 @@ class install(Command):
          self.exec_prefix = None
          self.home = None
          self.user = 0
@@ -58,7 +58,7 @@ index 26696cf..b3f926c 100644
  
          # These select only the installation base; it's up to the user to
          # specify the installation scheme (currently, that means supplying
-@@ -190,6 +194,9 @@ def initialize_options(self):
+@@ -190,6 +194,9 @@ class install(Command):
              self.install_userbase = USER_BASE
              self.install_usersite = USER_SITE
  
@@ -68,7 +68,7 @@ index 26696cf..b3f926c 100644
          self.compile = None
          self.optimize = None
  
-@@ -436,6 +443,7 @@ def finalize_unix(self):
+@@ -436,6 +443,7 @@ class install(Command):
              self.install_base = self.install_platbase = self.home
              self.select_scheme("unix_home")
          else:
@@ -76,7 +76,7 @@ index 26696cf..b3f926c 100644
              if self.prefix is None:
                  if self.exec_prefix is not None:
                      raise DistutilsOptionError(
-@@ -450,7 +458,26 @@ def finalize_unix(self):
+@@ -450,7 +458,26 @@ class install(Command):
  
              self.install_base = self.prefix
              self.install_platbase = self.exec_prefix
@@ -181,7 +181,7 @@ diff --git a/Lib/distutils/tests/test_bdist_dumb.py b/Lib/distutils/tests/test_b
 index bb860c8..c13a1df 100644
 --- a/Lib/distutils/tests/test_bdist_dumb.py
 +++ b/Lib/distutils/tests/test_bdist_dumb.py
-@@ -85,7 +85,7 @@ def test_simple_built(self):
+@@ -85,7 +85,7 @@ class BuildDumbTestCase(support.TempdirManager,
              fp.close()
  
          contents = sorted(filter(None, map(os.path.basename, contents)))
@@ -194,7 +194,7 @@ diff --git a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_inst
 index b2a3887..2a28fd4 100644
 --- a/Lib/distutils/tests/test_install.py
 +++ b/Lib/distutils/tests/test_install.py
-@@ -205,7 +205,7 @@ def test_record(self):
+@@ -205,7 +205,7 @@ class InstallTestCase(support.TempdirManager,
          found = [os.path.basename(line) for line in content.splitlines()]
          expected = ['hello.py', 'hello.%s.pyc' % sys.implementation.cache_tag,
                      'sayhi',
@@ -203,7 +203,7 @@ index b2a3887..2a28fd4 100644
          self.assertEqual(found, expected)
  
      def test_record_extensions(self):
-@@ -238,7 +238,7 @@ def test_record_extensions(self):
+@@ -238,7 +238,7 @@ class InstallTestCase(support.TempdirManager,
  
          found = [os.path.basename(line) for line in content.splitlines()]
          expected = [_make_ext_name('xx'),
@@ -216,7 +216,7 @@ diff --git a/Lib/pydoc.py b/Lib/pydoc.py
 index b7e0db7..2ce7ff4 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -505,6 +505,7 @@ def getdocloc(self, object, basedir=sysconfig.get_path('stdlib')):
+@@ -505,6 +505,7 @@ class Doc:
                                   'marshal', 'posix', 'signal', 'sys',
                                   '_thread', 'zipimport') or
               (file.startswith(basedir) and
@@ -277,7 +277,7 @@ diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
 index 95b48f6..678d905 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -56,6 +56,26 @@
+@@ -56,6 +56,26 @@ _INSTALL_SCHEMES = {
          'scripts': '{base}/Scripts',
          'data': '{base}',
          },
@@ -308,7 +308,7 @@ diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
 index 5f06a0d..830ab52 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -284,16 +284,16 @@ def test_getsitepackages(self):
+@@ -284,16 +284,16 @@ class HelperFunctionsTests(unittest.TestCase):
          if os.sep == '/':
              # OS X, Linux, FreeBSD, etc
              if sys.platlibdir != "lib":
