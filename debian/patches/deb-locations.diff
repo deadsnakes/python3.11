@@ -1,0 +1,92 @@
+From: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Date: Thu, 14 Feb 2019 18:59:13 -0800
+Subject: deb-locations
+
+# DP: adjust locations of directories to debian policy
+# DP: adjust locations of directories to debian policy
+---
+ Lib/distutils/command/install.py |  4 ++--
+ Lib/pydoc.py                     |  4 ++++
+ Lib/sysconfig.py                 | 20 ++++++++++++++++++++
+ Misc/python.man                  |  2 +-
+ 4 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
+index 26696cf..e2e78d2 100644
+--- a/Lib/distutils/command/install.py
++++ b/Lib/distutils/command/install.py
+@@ -33,13 +33,13 @@ SCHEME_KEYS = ('purelib', 'platlib', 'headers', 'scripts', 'data')
+ # alter locations for packages installations in a single place.
+ # Note that this module is depracated (PEP 632); all consumers
+ # of this information should switch to using sysconfig directly.
+-INSTALL_SCHEMES = {"unix_prefix": {}, "unix_home": {}, "nt": {}}
++INSTALL_SCHEMES = {"unix_prefix": {}, "unix_home": {}, "nt": {}, "unix_local": {}, "deb_system": {}}
+ 
+ # Copy from sysconfig._INSTALL_SCHEMES
+ for key in SCHEME_KEYS:
+     for distutils_scheme_name, sys_scheme_name in (
+             ("unix_prefix", "posix_prefix"), ("unix_home", "posix_home"),
+-            ("nt", "nt")):
++            ("nt", "nt"), ("unix_local", "unix_local"), ("deb_system", "deb_system")):
+         sys_key = key
+         sys_scheme = sysconfig._INSTALL_SCHEMES[sys_scheme_name]
+         if key == "headers" and key not in sys_scheme:
+diff --git a/Lib/pydoc.py b/Lib/pydoc.py
+index 4a8c10a..af16580 100755
+--- a/Lib/pydoc.py
++++ b/Lib/pydoc.py
+@@ -31,6 +31,10 @@ to a file named "<name>.html".
+ 
+ Module docs for core modules are assumed to be in
+ 
++    /usr/share/doc/pythonX.Y/html/library
++
++if the pythonX.Y-doc package is installed or in
++
+     https://docs.python.org/X.Y/library/
+ 
+ This can be overridden by setting the PYTHONDOCS environment variable
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index 95b48f6..678d905 100644
+--- a/Lib/sysconfig.py
++++ b/Lib/sysconfig.py
+@@ -56,6 +56,26 @@ _INSTALL_SCHEMES = {
+         'scripts': '{base}/Scripts',
+         'data': '{base}',
+         },
++    'unix_local': {
++        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
++        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
++        'purelib': '{base}/lib/python{py_version_short}/dist-packages',
++        'platlib': '{platbase}/{platlibdir}/python{py_version_short}/dist-packages',
++        'include': '{installed_base}/include/python{py_version_short}{abiflags}',
++        'platinclude': '{installed_platbase}/include/python{py_version_short}{abiflags}',
++        'scripts': '{base}/bin',
++        'data': '{base}',
++        },
++    'deb_system': {
++        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
++        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
++        'purelib': '{base}/lib/python3/dist-packages',
++        'platlib': '{platbase}/{platlibdir}/python3/dist-packages',
++        'include': '{installed_base}/include/python{py_version_short}{abiflags}',
++        'platinclude': '{installed_platbase}/include/python{py_version_short}{abiflags}',
++        'scripts': '{base}/bin',
++        'data': '{base}',
++        },
+     }
+ 
+ 
+diff --git a/Misc/python.man b/Misc/python.man
+index 45a4927..5bec85f 100644
+--- a/Misc/python.man
++++ b/Misc/python.man
+@@ -377,7 +377,7 @@ exception).  Error messages are written to stderr.
+ These are subject to difference depending on local installation
+ conventions; ${prefix} and ${exec_prefix} are installation-dependent
+ and should be interpreted as for GNU software; they may be the same.
+-The default for both is \fI/usr/local\fP.
++On Debian GNU/{Hurd,Linux} the default for both is \fI/usr\fP.
+ .IP \fI${exec_prefix}/bin/python\fP
+ Recommended location of the interpreter.
+ .PP
