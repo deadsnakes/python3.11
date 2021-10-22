@@ -7,10 +7,10 @@ Subject: argparse-no-shutil
  1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/argparse.py b/Lib/argparse.py
-index 5157133..05b7ccc 100644
+index cf887a2..79884ee 100644
 --- a/Lib/argparse.py
 +++ b/Lib/argparse.py
-@@ -175,9 +175,12 @@ class HelpFormatter(object):
+@@ -175,9 +175,12 @@ def __init__(self,
  
          # default setting for width
          if width is None:
@@ -18,8 +18,8 @@ index 5157133..05b7ccc 100644
 -            width = shutil.get_terminal_size().columns
 -            width -= 2
 +            try:
-+                import shutil
-+                width = shutil.get_terminal_size().columns
++                import shutil as _shutil
++                width = _shutil.get_terminal_size().columns
 +                width -= 2
 +            except ImportError:
 +                width = 70

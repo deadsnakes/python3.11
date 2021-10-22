@@ -16,7 +16,7 @@ diff --git a/Lib/locale.py b/Lib/locale.py
 index 6d4f519..088ab26 100644
 --- a/Lib/locale.py
 +++ b/Lib/locale.py
-@@ -1415,8 +1415,8 @@ locale_alias = {
+@@ -1415,8 +1415,8 @@ def getpreferredencoding(do_setlocale=True):
      'ug_cn':                                'ug_CN.UTF-8',
      'uk':                                   'uk_UA.KOI8-U',
      'uk_ua':                                'uk_UA.KOI8-U',

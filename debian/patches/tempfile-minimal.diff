@@ -9,10 +9,10 @@ Subject: tempfile-minimal
  1 file changed, 141 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/tempfile.py b/Lib/tempfile.py
-index efcf7a7..b750f94 100644
+index 8570c3b..f92b439 100644
 --- a/Lib/tempfile.py
 +++ b/Lib/tempfile.py
-@@ -40,7 +40,146 @@ import functools as _functools
+@@ -40,7 +40,146 @@
  import warnings as _warnings
  import io as _io
  import os as _os
@@ -160,7 +160,7 @@ index efcf7a7..b750f94 100644
  import errno as _errno
  from random import Random as _Random
  import sys as _sys
-@@ -825,7 +964,7 @@ class TemporaryDirectory:
+@@ -829,7 +968,7 @@ def resetperms(path):
                  if not ignore_errors:
                      raise
  

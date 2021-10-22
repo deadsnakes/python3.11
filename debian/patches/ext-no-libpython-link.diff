@@ -12,7 +12,7 @@ diff --git a/Lib/distutils/command/build_ext.py b/Lib/distutils/command/build_ex
 index 1a9bd12..05692b1 100644
 --- a/Lib/distutils/command/build_ext.py
 +++ b/Lib/distutils/command/build_ext.py
-@@ -231,7 +231,7 @@ class build_ext(Command):
+@@ -231,7 +231,7 @@ def finalize_options(self):
          # For building extensions with a shared Python library,
          # Python's library directory must be appended to library_dirs
          # See Issues: #1600860, #4366

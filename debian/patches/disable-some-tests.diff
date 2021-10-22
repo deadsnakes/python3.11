@@ -9,10 +9,10 @@ Subject: disable-some-tests
  1 file changed, 1 insertion(+)
 
 diff --git a/Lib/distutils/tests/test_build_ext.py b/Lib/distutils/tests/test_build_ext.py
-index 8e7364d..76c8c3a 100644
+index 3ee567d..f0eb0ca 100644
 --- a/Lib/distutils/tests/test_build_ext.py
 +++ b/Lib/distutils/tests/test_build_ext.py
-@@ -115,6 +115,7 @@ class BuildExtTestCase(TempdirManager,
+@@ -115,6 +115,7 @@ def test_xx(self):
          """)
          assert_python_ok('-c', code)
  

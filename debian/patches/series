@@ -24,4 +24,3 @@ reproducible-buildinfo.diff
 pydoc-use-pager.diff
 build-math-object.diff
 argparse-no-shutil.diff
-0036-allow-older-libmpdec.patch
