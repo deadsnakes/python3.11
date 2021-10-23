@@ -73,6 +73,7 @@
  PyClassMethod_New@Base @SVER@
  PyClassMethod_Type@Base @SVER@
  PyCode_Addr2Line@Base @SVER@
+ PyCode_Addr2Location@Base 3.11.0~a1
  PyCode_New@Base @SVER@
  PyCode_NewEmpty@Base @SVER@
  PyCode_NewWithPosOnlyArgs@Base 3.8.0~b2
@@ -326,8 +327,6 @@
  PyFloat_GetMax@Base @SVER@
  PyFloat_GetMin@Base @SVER@
  PyFloat_Type@Base @SVER@
- PyFrame_BlockPop@Base @SVER@
- PyFrame_BlockSetup@Base @SVER@
  PyFrame_FastToLocals@Base @SVER@
  PyFrame_FastToLocalsWithError@Base @SVER@
  PyFrame_GetBack@Base 3.9.0~b1
@@ -864,6 +863,8 @@
  PyType_GetFlags@Base @SVER@
  PyType_GetModule@Base 3.9.0~b1
  PyType_GetModuleState@Base 3.9.0~b1
+ PyType_GetName@Base 3.11.0~a1
+ PyType_GetQualName@Base 3.11.0~a1
  PyType_GetSlot@Base @SVER@
  PyType_IsSubtype@Base @SVER@
  PyType_Modified@Base @SVER@
@@ -878,7 +879,6 @@
  PyUnicodeDecodeError_SetEnd@Base @SVER@
  PyUnicodeDecodeError_SetReason@Base @SVER@
  PyUnicodeDecodeError_SetStart@Base @SVER@
- PyUnicodeEncodeError_Create@Base @SVER@
  PyUnicodeEncodeError_GetEncoding@Base @SVER@
  PyUnicodeEncodeError_GetEnd@Base @SVER@
  PyUnicodeEncodeError_GetObject@Base @SVER@
@@ -888,7 +888,6 @@
  PyUnicodeEncodeError_SetReason@Base @SVER@
  PyUnicodeEncodeError_SetStart@Base @SVER@
  PyUnicodeIter_Type@Base @SVER@
- PyUnicodeTranslateError_Create@Base @SVER@
  PyUnicodeTranslateError_GetEnd@Base @SVER@
  PyUnicodeTranslateError_GetObject@Base @SVER@
  PyUnicodeTranslateError_GetReason@Base @SVER@
@@ -944,19 +943,8 @@
  PyUnicode_DecodeUTF8@Base @SVER@
  PyUnicode_DecodeUTF8Stateful@Base @SVER@
  PyUnicode_DecodeUnicodeEscape@Base @SVER@
- PyUnicode_Encode@Base @SVER@
- PyUnicode_EncodeASCII@Base @SVER@
- PyUnicode_EncodeCharmap@Base @SVER@
- PyUnicode_EncodeDecimal@Base @SVER@
  PyUnicode_EncodeFSDefault@Base @SVER@
- PyUnicode_EncodeLatin1@Base @SVER@
  PyUnicode_EncodeLocale@Base @SVER@
- PyUnicode_EncodeRawUnicodeEscape@Base @SVER@
- PyUnicode_EncodeUTF16@Base @SVER@
- PyUnicode_EncodeUTF32@Base @SVER@
- PyUnicode_EncodeUTF7@Base @SVER@
- PyUnicode_EncodeUTF8@Base @SVER@
- PyUnicode_EncodeUnicodeEscape@Base @SVER@
  PyUnicode_FSConverter@Base @SVER@
  PyUnicode_FSDecoder@Base @SVER@
  PyUnicode_Fill@Base @SVER@
@@ -993,9 +981,7 @@
  PyUnicode_Splitlines@Base @SVER@
  PyUnicode_Substring@Base @SVER@
  PyUnicode_Tailmatch@Base @SVER@
- PyUnicode_TransformDecimalToASCII@Base @SVER@
  PyUnicode_Translate@Base @SVER@
- PyUnicode_TranslateCharmap@Base @SVER@
  PyUnicode_Type@Base @SVER@
  PyUnicode_WriteChar@Base @SVER@
  PyVectorcall_Call@Base 3.8.0~b1
@@ -1115,6 +1101,7 @@
  _PyArg_ParseTuple_SizeT@Base @SVER@
  _PyArg_Parse_SizeT@Base @SVER@
  _PyArg_UnpackKeywords@Base 3.8.0~a3
+ _PyArg_UnpackKeywordsWithVararg@Base 3.11.0~a1
  _PyArg_UnpackStack@Base @SVER@
  _PyArg_VaParseTupleAndKeywordsFast@Base @SVER@
  _PyArg_VaParseTupleAndKeywordsFast_SizeT@Base @SVER@
@@ -1138,10 +1125,18 @@
  _PyBytes_FromHex@Base @SVER@
  _PyBytes_Join@Base @SVER@
  _PyBytes_Resize@Base @SVER@
+ _PyCode_Addr2EndLine@Base 3.11.0~a1
+ _PyCode_Addr2EndOffset@Base 3.11.0~a1
+ _PyCode_Addr2Offset@Base 3.11.0~a1
  _PyCode_CheckLineNumber@Base @SVER@
  _PyCode_ConstantKey@Base @SVER@
+ _PyCode_GetCellvars@Base 3.11.0~a1
  _PyCode_GetExtra@Base @SVER@
+ _PyCode_GetFreevars@Base 3.11.0~a1
+ _PyCode_GetVarnames@Base 3.11.0~a1
+ _PyCode_New@Base 3.11.0~a1
  _PyCode_SetExtra@Base @SVER@
+ _PyCode_Validate@Base 3.11.0~a1
  _PyCodecInfo_GetIncrementalDecoder@Base @SVER@
  _PyCodecInfo_GetIncrementalEncoder@Base @SVER@
  _PyCodec_DecodeText@Base @SVER@
@@ -1158,6 +1153,8 @@
  _PyCrossInterpreterData_NewObject@Base @SVER@
  _PyCrossInterpreterData_RegisterClass@Base 3.8.0~a3
  _PyCrossInterpreterData_Release@Base @SVER@
+ _PyDeadline_Get@Base 3.11.0~a1
+ _PyDeadline_Init@Base 3.11.0~a1
  _PyDebugAllocatorStats@Base @SVER@
  _PyDictView_Intersect@Base @SVER@
  _PyDictView_New@Base @SVER@
@@ -1245,7 +1242,6 @@
  _PyHamt_CollisionNode_Type@Base @SVER@
  _PyHamt_Type@Base @SVER@
  _PyImport_AcquireLock@Base @SVER@
- _PyImport_FindExtensionObject@Base 3.10.0
  _PyImport_FixupBuiltin@Base @SVER@
  _PyImport_FixupExtensionObject@Base @SVER@
  _PyImport_GetModuleId@Base @SVER@
@@ -1395,14 +1391,17 @@
  _PyThread_CurrentExceptions@Base 3.10.0~a2
  _PyThread_CurrentFrames@Base @SVER@
  _PyThread_at_fork_reinit@Base 3.9.0~a6
+ _PyTime_Add@Base 3.11.0~a1
  _PyTime_AsMicroseconds@Base @SVER@
  _PyTime_AsMilliseconds@Base @SVER@
+ _PyTime_AsNanoseconds@Base 3.11.0~a1
  _PyTime_AsNanosecondsObject@Base @SVER@
  _PyTime_AsSecondsDouble@Base @SVER@
  _PyTime_AsTimespec@Base @SVER@
+ _PyTime_AsTimespec_clamp@Base 3.11.0~a1
  _PyTime_AsTimeval@Base @SVER@
  _PyTime_AsTimevalTime_t@Base @SVER@
- _PyTime_AsTimeval_noraise@Base @SVER@
+ _PyTime_AsTimeval_clamp@Base 3.11.0~a1
  _PyTime_FromMillisecondsObject@Base @SVER@
  _PyTime_FromNanoseconds@Base @SVER@
  _PyTime_FromNanosecondsObject@Base @SVER@
@@ -1426,11 +1425,7 @@
  _PyTraceback_Add@Base @SVER@
  _PyTrash_begin@Base 3.9.0~a5
  _PyTrash_cond@Base 3.10.0~a3
- _PyTrash_deposit_object@Base @SVER@
- _PyTrash_destroy_chain@Base @SVER@
  _PyTrash_end@Base 3.9.0~a5
- _PyTrash_thread_deposit_object@Base @SVER@
- _PyTrash_thread_destroy_chain@Base @SVER@
  _PyTuple_DebugMallocStats@Base @SVER@
  _PyTuple_MaybeUntrack@Base @SVER@
  _PyTuple_Resize@Base @SVER@
@@ -1535,6 +1530,7 @@
  _Py_FatalErrorFormat@Base 3.9.0~a6
  _Py_FatalErrorFunc@Base 3.9.0~a5
  _Py_FatalError_TstateNULL@Base 3.9.0~b3
+ _Py_FatalRefcountErrorFunc@Base 3.11.0~a1
  _Py_FdIsInteractive@Base 3.10.0~a4
  _Py_FreeCharPArray@Base @SVER@
  _Py_GetAllocatedBlocks@Base @SVER@
@@ -1548,6 +1544,7 @@
  _Py_GetLocaleconvNumeric@Base @SVER@
  _Py_Gid_Converter@Base @SVER@
  _Py_HandleSystemExit@Base 3.8.0~b1
+ _Py_HasFileSystemDefaultEncodeErrors@Base 3.11.0~a1
  _Py_HashBytes@Base @SVER@
  _Py_HashDouble@Base @SVER@
  _Py_HashPointer@Base @SVER@

@@ -7,8 +7,10 @@ libpython@VER@d.so.1.0 libpython@VER@-dbg #MINVER#
  _Py_Dealloc@Base @SVER@
  _Py_FatalError_TstateNULL@Base 3.9.0~b3
  _Py_GetRefTotal@Base @SVER@
+ _Py_GetSpecializationStats@Base 3.11.0~a1
  _Py_HashSecret_Initialized@Base @SVER@
  _Py_NegativeRefcount@Base @SVER@
  _Py_RefTotal@Base @SVER@
  PyModule_Create2@Base 3.8.0~a4
  PyModule_FromDefAndSpec2@Base 3.8.0~a4
+
