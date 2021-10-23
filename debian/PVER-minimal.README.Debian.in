@@ -53,6 +53,7 @@ are:
   _symtable		builtin
   _thread		builtin
   _threading_local	module
+  _tokenize		builtin
   _tracemalloc		extension
   _types		builtin
   _weakref		builtin
