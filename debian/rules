@@ -990,7 +990,6 @@ endif
 		$(scriptdir)/ctypes/test \
 		$(scriptdir)/distutils/tests \
 		$(scriptdir)/lib2to3/tests \
-		$(scriptdir)/sqlite3/test \
 		$(scriptdir)/idlelib/idle_test \
 		$(scriptdir)/tkinter/test \
 		$(scriptdir)/unittest/test
