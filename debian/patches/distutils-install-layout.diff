@@ -21,12 +21,12 @@ Subject: distutils-install-layout
  9 files changed, 110 insertions(+), 19 deletions(-)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index 26696cf..b3f926c 100644
+index 01d5331..cf22e44 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
 @@ -33,13 +33,13 @@ SCHEME_KEYS = ('purelib', 'platlib', 'headers', 'scripts', 'data')
  # alter locations for packages installations in a single place.
- # Note that this module is depracated (PEP 632); all consumers
+ # Note that this module is deprecated (PEP 632); all consumers
  # of this information should switch to using sysconfig directly.
 -INSTALL_SCHEMES = {"unix_prefix": {}, "unix_home": {}, "nt": {}}
 +INSTALL_SCHEMES = {"unix_prefix": {}, "unix_home": {}, "nt": {}, "unix_local": {}, "deb_system": {}}
@@ -213,7 +213,7 @@ index b2a3887..2a28fd4 100644
  
      def test_debug_mode(self):
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index b7e0db7..2ce7ff4 100755
+index 161da22..2c30dd7 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
 @@ -505,6 +505,7 @@ class Doc:
@@ -225,7 +225,7 @@ index b7e0db7..2ce7ff4 100755
              object.__name__ not in ('xml.etree', 'test.pydoc_mod')):
              if docloc.startswith(("http://", "https://")):
 diff --git a/Lib/site.py b/Lib/site.py
-index 939893e..0fb8a3f 100644
+index e129f3b..1671ea8 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -7,12 +7,18 @@
@@ -274,7 +274,7 @@ index 939893e..0fb8a3f 100644
              sitepackages.append(prefix)
  
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 95b48f6..678d905 100644
+index daf9f00..12aa55f 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -56,6 +56,26 @@ _INSTALL_SCHEMES = {
