@@ -1046,7 +1046,7 @@ expected_opinfo_jumpy = [
   Instruction(opname='COMPARE_OP', opcode=107, arg=4, argval='>', argrepr='>', offset=34, starts_line=None, is_jump_target=False, positions=None),
   Instruction(opname='POP_JUMP_IF_FALSE', opcode=114, arg=21, argval=42, argrepr='to 42', offset=36, starts_line=None, is_jump_target=False, positions=None),
   Instruction(opname='POP_TOP', opcode=1, arg=None, argval=None, argrepr='', offset=38, starts_line=8, is_jump_target=False, positions=None),
-  Instruction(opname='JUMP_ABSOLUTE', opcode=113, arg=26, argval=52, argrepr='to 52', offset=40, starts_line=None, is_jump_target=False, positions=None),
+  Instruction(opname='JUMP_FORWARD', opcode=110, arg=5, argval=52, argrepr='to 52', offset=40, starts_line=None, is_jump_target=False, positions=None),
   Instruction(opname='JUMP_ABSOLUTE', opcode=113, arg=4, argval=8, argrepr='to 8', offset=42, starts_line=7, is_jump_target=True, positions=None),
   Instruction(opname='LOAD_GLOBAL', opcode=116, arg=1, argval='print', argrepr='print', offset=44, starts_line=10, is_jump_target=True, positions=None),
   Instruction(opname='LOAD_CONST', opcode=100, arg=4, argval='I can haz else clause?', argrepr="'I can haz else clause?'", offset=46, starts_line=None, is_jump_target=False, positions=None),
@@ -1071,7 +1071,7 @@ expected_opinfo_jumpy = [
   Instruction(opname='LOAD_CONST', opcode=100, arg=2, argval=4, argrepr='4', offset=84, starts_line=None, is_jump_target=False, positions=None),
   Instruction(opname='COMPARE_OP', opcode=107, arg=0, argval='<', argrepr='<', offset=86, starts_line=None, is_jump_target=False, positions=None),
   Instruction(opname='POP_JUMP_IF_FALSE', opcode=114, arg=46, argval=92, argrepr='to 92', offset=88, starts_line=None, is_jump_target=False, positions=None),
-  Instruction(opname='JUMP_ABSOLUTE', opcode=113, arg=52, argval=104, argrepr='to 104', offset=90, starts_line=17, is_jump_target=False, positions=None),
+  Instruction(opname='JUMP_FORWARD', opcode=110, arg=6, argval=104, argrepr='to 104', offset=90, starts_line=17, is_jump_target=False, positions=None),
   Instruction(opname='LOAD_FAST', opcode=124, arg=0, argval='i', argrepr='i', offset=92, starts_line=11, is_jump_target=True, positions=None),
   Instruction(opname='POP_JUMP_IF_TRUE', opcode=115, arg=28, argval=56, argrepr='to 56', offset=94, starts_line=None, is_jump_target=False, positions=None),
   Instruction(opname='LOAD_GLOBAL', opcode=116, arg=1, argval='print', argrepr='print', offset=96, starts_line=19, is_jump_target=True, positions=None),
@@ -1357,6 +1357,46 @@ class TestFinderMethods(unittest.TestCase):
                 code = compile(src, "<string>", "exec")
                 res = tuple(dis._find_store_names(code))
                 self.assertEqual(res, expected)
+
+
+class TestDisTraceback(unittest.TestCase):
+    def setUp(self) -> None:
+        try:  # We need to clean up existing tracebacks
+            del sys.last_traceback
+        except AttributeError:
+            pass
+        return super().setUp()
+
+    def get_disassembly(self, tb):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            dis.distb(tb)
+        return output.getvalue()
+
+    def test_distb_empty(self):
+        with self.assertRaises(RuntimeError):
+            dis.distb()
+
+    def test_distb_last_traceback(self):
+        # We need to have an existing last traceback in `sys`:
+        tb = get_tb()
+        sys.last_traceback = tb
+
+        self.assertEqual(self.get_disassembly(None), dis_traceback)
+
+    def test_distb_explicit_arg(self):
+        tb = get_tb()
+
+        self.assertEqual(self.get_disassembly(tb), dis_traceback)
+
+
+class TestDisTracebackWithFile(TestDisTraceback):
+    # Run the `distb` tests again, using the file arg instead of print
+    def get_disassembly(self, tb):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            dis.distb(tb, file=output)
+        return output.getvalue()
 
 
 if __name__ == "__main__":
