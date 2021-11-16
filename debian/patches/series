@@ -22,5 +22,4 @@ tempfile-minimal.diff
 disable-some-tests.diff
 reproducible-buildinfo.diff
 pydoc-use-pager.diff
-build-math-object.diff
 argparse-no-shutil.diff

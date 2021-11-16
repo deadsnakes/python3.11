@@ -14,7 +14,7 @@ this patch can be dropped for python3.5 final, if the upstream chage is kept.
  3 files changed, 20 insertions(+)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index b3f926c..a0b98aa 100644
+index cf22e44..7532840 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
 @@ -196,6 +196,7 @@ class install(Command):
