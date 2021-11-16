@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a2-1+focal2) focal; urgency=medium
+
+  * Fix symbols build on i386.
+
+ -- Anthony Sottile <asottile@umich.edu>  Mon, 15 Nov 2021 19:12:15 -0800
+
 python3.11 (3.11.0~a2-1+focal1) focal; urgency=medium
 
   * Python 3.11.0 alpha 2 release.
