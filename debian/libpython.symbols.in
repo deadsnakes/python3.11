@@ -241,6 +241,7 @@
  PyExc_AssertionError@Base @SVER@
  PyExc_AttributeError@Base @SVER@
  PyExc_BaseException@Base @SVER@
+ PyExc_BaseExceptionGroup@Base 3.11.0~a2
  PyExc_BlockingIOError@Base @SVER@
  PyExc_BrokenPipeError@Base @SVER@
  PyExc_BufferError@Base @SVER@
@@ -639,6 +640,7 @@
  PyObject_CallMethodObjArgs@Base @SVER@
  PyObject_CallNoArgs@Base 3.9.0~a1
  PyObject_CallObject@Base @SVER@
+ PyObject_CallOneArg@Base 3.11.0~a2
  PyObject_Calloc@Base @SVER@
  PyObject_CheckBuffer@Base 3.9.0~a6
  PyObject_CheckReadBuffer@Base 3.10.0~rc1
@@ -693,6 +695,7 @@
  PyObject_Size@Base @SVER@
  PyObject_Str@Base @SVER@
  PyObject_Type@Base @SVER@
+ PyObject_Vectorcall@Base 3.11.0~a2
  PyObject_VectorcallDict@Base 3.9.0~a4
  PyObject_VectorcallMethod@Base 3.9.0~a4
  PyPickleBuffer_FromObject@Base 3.8.0~b1
@@ -781,6 +784,7 @@
  PyStructSequence_New@Base @SVER@
  PyStructSequence_NewType@Base @SVER@
  PyStructSequence_SetItem@Base @SVER@
+ PyStructSequence_UnnamedField@Base 3.11.0~a2
  PySuper_Type@Base @SVER@
  PySymtable_Lookup@Base @SVER@
  PySys_AddAuditHook@Base 3.8.0~b1
@@ -803,11 +807,13 @@
  PyThreadState_Clear@Base @SVER@
  PyThreadState_Delete@Base @SVER@
  PyThreadState_DeleteCurrent@Base @SVER@
+ PyThreadState_EnterTracing@Base 3.11.0~a2
  PyThreadState_Get@Base @SVER@
  PyThreadState_GetDict@Base @SVER@
  PyThreadState_GetFrame@Base 3.9.0~a5
  PyThreadState_GetID@Base 3.9.0~a6
  PyThreadState_GetInterpreter@Base 3.9.0~a5
+ PyThreadState_LeaveTracing@Base 3.11.0~a2
  PyThreadState_New@Base @SVER@
  PyThreadState_Next@Base @SVER@
  PyThreadState_SetAsyncExc@Base @SVER@
@@ -985,6 +991,7 @@
  PyUnicode_Type@Base @SVER@
  PyUnicode_WriteChar@Base @SVER@
  PyVectorcall_Call@Base 3.8.0~b1
+ PyVectorcall_Function@Base 3.11.0~a2
  PyWeakref_GetObject@Base @SVER@
  PyWeakref_NewProxy@Base @SVER@
  PyWeakref_NewRef@Base @SVER@
@@ -1019,6 +1026,7 @@
  Py_FinalizeEx@Base @SVER@
  Py_FrozenFlag@Base @SVER@
  Py_FrozenMain@Base 3.10.0~a4
+ Py_GETENV@Base 3.11.0~a2
  Py_GenericAlias@Base 3.9.0~a6
  Py_GenericAliasType@Base 3.9.0~a6
  Py_GetArgcArgv@Base 3.9.0~b3
@@ -1221,7 +1229,6 @@
  _PyEval_SliceIndex@Base @SVER@
  _PyEval_SliceIndexNotNone@Base @SVER@
  _PyFloat_DebugMallocStats@Base @SVER@
- _PyFloat_FormatAdvancedWriter@Base @SVER@
  _PyFloat_Pack2@Base @SVER@
  _PyFloat_Pack4@Base @SVER@
  _PyFloat_Pack8@Base @SVER@
@@ -1244,6 +1251,9 @@
  _PyImport_AcquireLock@Base @SVER@
  _PyImport_FixupBuiltin@Base @SVER@
  _PyImport_FixupExtensionObject@Base @SVER@
+ _PyImport_FrozenBootstrap@Base 3.11.0~a2
+ _PyImport_FrozenStdlib@Base 3.11.0~a2
+ _PyImport_FrozenTest@Base 3.11.0~a2
  _PyImport_GetModuleId@Base @SVER@
  _PyImport_IsInitialized@Base @SVER@
  _PyImport_ReleaseLock@Base @SVER@
@@ -1332,6 +1342,7 @@
  _PyObject_DebugMallocStats@Base @SVER@
  _PyObject_DebugTypeStats@Base @SVER@
  _PyObject_Dump@Base @SVER@
+ _PyObject_FastCall@Base 3.11.0~a2
  _PyObject_FastCallDictTstate@Base 3.9.0~a1
  _PyObject_FunctionStr@Base 3.9.0~a1
  _PyObject_GC_Calloc@Base @SVER@
@@ -1421,6 +1432,8 @@
  _PyTime_ObjectToTimeval@Base @SVER@
  _PyTime_gmtime@Base @SVER@
  _PyTime_localtime@Base @SVER@
+ _PyTraceBack_FromFrame@Base 3.11.0~a2
+ _PyTraceBack_Print_Indented@Base 3.11.0~a2
  _PyTraceMalloc_GetTraceback@Base @SVER@
  _PyTraceback_Add@Base @SVER@
  _PyTrash_begin@Base 3.9.0~a5
@@ -1454,7 +1467,9 @@
  _PyUnicode_AsUnicode@Base @SVER@
  _PyUnicode_CheckConsistency@Base 3.8.0~a4
  _PyUnicode_Copy@Base @SVER@
- _PyUnicode_DecodeUnicodeEscape@Base @SVER@
+ _PyUnicode_DecodeRawUnicodeEscapeStateful@Base 3.11.0~a2
+ _PyUnicode_DecodeUnicodeEscapeInternal@Base 3.11.0~a2
+ _PyUnicode_DecodeUnicodeEscapeStateful@Base 3.11.0~a2
  _PyUnicode_EQ@Base @SVER@
  _PyUnicode_EncodeCharmap@Base @SVER@
  _PyUnicode_EncodeUTF16@Base @SVER@
@@ -1522,7 +1537,12 @@
  _Py_DecRef@Base 3.10.0~a7
  _Py_DecodeLocaleEx@Base @SVER@
  _Py_DisplaySourceLine@Base @SVER@
+ _Py_DumpASCII@Base 3.11.0~a2
+ _Py_DumpDecimal@Base 3.11.0~a2
  _Py_DumpExtensionModules@Base 3.10.0~a5
+ _Py_DumpHexadecimal@Base 3.11.0~a2
+ _Py_DumpTraceback@Base 3.11.0~a2
+ _Py_DumpTracebackThreads@Base 3.11.0~a2
  _Py_EllipsisObject@Base @SVER@
  _Py_EncodeLocaleEx@Base @SVER@
  _Py_EncodeLocaleRaw@Base @SVER@
@@ -1577,6 +1597,8 @@
  _Py_VaBuildStack@Base @SVER@
  _Py_VaBuildStack_SizeT@Base @SVER@
  _Py_VaBuildValue_SizeT@Base @SVER@
+ _Py_WriteIndent@Base 3.11.0~a2
+ _Py_WriteIndentedMargin@Base 3.11.0~a2
  _Py_abspath@Base 3.9.0~a1
  _Py_add_one_to_index_C@Base @SVER@
  _Py_add_one_to_index_F@Base @SVER@
@@ -1621,6 +1643,7 @@
  _Py_hashtable_size@Base @SVER@
  _Py_hashtable_steal@Base 3.9.0~b1
  _Py_isabs@Base 3.9.0~a1
+ _Py_normalize_path@Base 3.11.0~a2
  _Py_open@Base @SVER@
  _Py_open_noraise@Base @SVER@
  _Py_parse_inf_or_nan@Base @SVER@
@@ -1645,8 +1668,6 @@
  _Py_write_noraise@Base @SVER@
 
  (arch=i386 hurd-i386 kfreebsd-i386 m68k)_Py_force_double@Base @SVER@
- (arch=amd64 i386 hurd-i386 kfreebsd-i386)_Py_get_387controlword@Base @SVER@
- (arch=amd64 i386 hurd-i386 kfreebsd-i386)_Py_set_387controlword@Base @SVER@
 
  (optional|regex)"^_ctypes_.*@Base$" @SVER@
 
