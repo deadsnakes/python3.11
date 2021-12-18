@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a2-1+focal3) focal; urgency=medium
+
+  * Fix installation of global pip packages.
+
+ -- Anthony Sottile <asottile@umich.edu>  Sat, 18 Dec 2021 16:52:41 -0500
+
 python3.11 (3.11.0~a2-1+focal2) focal; urgency=medium
 
   * Fix symbols build on i386.
