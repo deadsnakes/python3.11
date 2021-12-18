@@ -2,26 +2,20 @@ From: Ubuntu Core Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 Date: Thu, 14 Feb 2019 18:59:14 -0800
 Subject: distutils-install-layout
 
-# DP: distutils: Add an option --install-layout=deb, which
-# DP: - installs into $prefix/dist-packages instead of $prefix/site-packages.
-# DP: - doesn't encode the python version into the egg name.
-# DP: distutils: Add an option --install-layout=deb, which
-# DP: - installs into $prefix/dist-packages instead of $prefix/site-packages.
-# DP: - doesn't encode the python version into the egg name.
 ---
- Lib/distutils/command/install.py          | 33 ++++++++++++++++++++++++++++---
- Lib/distutils/command/install_egg_info.py | 30 +++++++++++++++++++++++-----
- Lib/distutils/sysconfig.py                |  7 +++++++
+ Lib/distutils/command/install.py          | 33 ++++++++++++++++++++--
+ Lib/distutils/command/install_egg_info.py | 30 ++++++++++++++++----
+ Lib/distutils/sysconfig.py                |  7 +++++
  Lib/distutils/tests/test_bdist_dumb.py    |  2 +-
- Lib/distutils/tests/test_install.py       |  4 ++--
+ Lib/distutils/tests/test_install.py       |  4 +--
  Lib/pydoc.py                              |  1 +
- Lib/site.py                               | 26 +++++++++++++++++++-----
- Lib/sysconfig.py                          | 20 +++++++++++++++++++
- Lib/test/test_site.py                     |  6 +++---
- 9 files changed, 110 insertions(+), 19 deletions(-)
+ Lib/site.py                               | 26 +++++++++++++----
+ Lib/sysconfig.py                          | 47 +++++++++++++++++++++++++++----
+ Lib/test/test_site.py                     |  6 ++--
+ 9 files changed, 132 insertions(+), 24 deletions(-)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
-index 01d5331..cf22e44 100644
+index 01d5331..81b501e 100644
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
 @@ -33,13 +33,13 @@ SCHEME_KEYS = ('purelib', 'platlib', 'headers', 'scripts', 'data')
@@ -36,7 +30,7 @@ index 01d5331..cf22e44 100644
      for distutils_scheme_name, sys_scheme_name in (
              ("unix_prefix", "posix_prefix"), ("unix_home", "posix_home"),
 -            ("nt", "nt")):
-+            ("nt", "nt"), ("unix_local", "unix_local"), ("deb_system", "deb_system")):
++            ("nt", "nt"), ("unix_local", "posix_local"), ("deb_system", "deb_system")):
          sys_key = key
          sys_scheme = sysconfig._INSTALL_SCHEMES[sys_scheme_name]
          if key == "headers" and key not in sys_scheme:
@@ -274,23 +268,13 @@ index e129f3b..1671ea8 100644
              sitepackages.append(prefix)
  
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index daf9f00..12aa55f 100644
+index daf9f00..8a4e919 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -56,6 +56,26 @@ _INSTALL_SCHEMES = {
          'scripts': '{base}/Scripts',
          'data': '{base}',
          },
-+    'unix_local': {
-+        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
-+        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
-+        'purelib': '{base}/lib/python{py_version_short}/dist-packages',
-+        'platlib': '{platbase}/{platlibdir}/python{py_version_short}/dist-packages',
-+        'include': '{installed_base}/include/python{py_version_short}{abiflags}',
-+        'platinclude': '{installed_platbase}/include/python{py_version_short}{abiflags}',
-+        'scripts': '{base}/bin',
-+        'data': '{base}',
-+        },
 +    'deb_system': {
 +        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
 +        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
@@ -301,9 +285,53 @@ index daf9f00..12aa55f 100644
 +        'scripts': '{base}/bin',
 +        'data': '{base}',
 +        },
++    'posix_local': {
++        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
++        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
++        'purelib': '{base}/local/lib/python{py_version_short}/dist-packages',
++        'platlib': '{platbase}/local/lib/python{py_version_short}/dist-packages',
++        'include': '{installed_base}/local/include/python{py_version_short}{abiflags}',
++        'platinclude': '{installed_platbase}/local/include/python{py_version_short}{abiflags}',
++        'scripts': '{base}/local/bin',
++        'data': '{base}',
++        },
      }
  
  
+@@ -237,11 +257,28 @@ def _get_preferred_schemes():
+             'home': 'posix_home',
+             'user': 'osx_framework_user',
+         }
+-    return {
+-        'prefix': 'posix_prefix',
+-        'home': 'posix_home',
+-        'user': 'posix_user',
+-    }
++    if 'real_prefix' in sys.__dict__ or 'VIRTUAL_ENV' in os.environ:
++        # virtual environments
++        return {
++            'prefix': 'posix_prefix',
++            'home': 'posix_home',
++            'user': 'posix_user',
++        }
++    else:
++        # default to /usr for package builds, /usr/local otherwise
++        deb_build = os.environ.get('DEB_PYTHON_INSTALL_LAYOUT', 'posix_local')
++        if deb_build in ('deb', 'deb_system'):
++            return {
++                'prefix': 'deb_system',
++                'home': 'posix_home',
++                'user': 'posix_user',
++            }
++        else:
++            return {
++                'prefix': 'posix_local',
++                'home': 'posix_home',
++                'user': 'posix_user',
++            }
+ 
+ 
+ def get_preferred_scheme(key):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
 index 5f06a0d..830ab52 100644
 --- a/Lib/test/test_site.py
