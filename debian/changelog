@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a2-1+focal4) focal; urgency=medium
+
+  * Fix symbols for i386.
+
+ -- Anthony Sottile <asottile@umich.edu>  Sun, 19 Dec 2021 23:50:27 -0500
+
 python3.11 (3.11.0~a2-1+focal3) focal; urgency=medium
 
   * Fix installation of global pip packages.
