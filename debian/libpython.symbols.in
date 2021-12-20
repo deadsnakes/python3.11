@@ -1667,8 +1667,6 @@
  _Py_write@Base @SVER@
  _Py_write_noraise@Base @SVER@
 
- (arch=i386 hurd-i386 kfreebsd-i386 m68k)_Py_force_double@Base @SVER@
-
  (optional|regex)"^_ctypes_.*@Base$" @SVER@
 
  (optional|regex)"^PyInit_.*@Base$" @SVER@
