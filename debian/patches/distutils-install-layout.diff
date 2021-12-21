@@ -10,9 +10,9 @@ Subject: distutils-install-layout
  Lib/distutils/tests/test_install.py       |  4 +--
  Lib/pydoc.py                              |  1 +
  Lib/site.py                               | 26 +++++++++++++----
- Lib/sysconfig.py                          | 47 +++++++++++++++++++++++++++----
+ Lib/sysconfig.py                          | 46 +++++++++++++++++++++++++++----
  Lib/test/test_site.py                     |  6 ++--
- 9 files changed, 132 insertions(+), 24 deletions(-)
+ 9 files changed, 131 insertions(+), 24 deletions(-)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
 index 01d5331..81b501e 100644
@@ -268,10 +268,10 @@ index e129f3b..1671ea8 100644
              sitepackages.append(prefix)
  
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index daf9f00..8a4e919 100644
+index daf9f00..908ea48 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -56,6 +56,26 @@ _INSTALL_SCHEMES = {
+@@ -56,7 +56,28 @@ _INSTALL_SCHEMES = {
          'scripts': '{base}/Scripts',
          'data': '{base}',
          },
@@ -296,9 +296,11 @@ index daf9f00..8a4e919 100644
 +        'data': '{base}',
 +        },
      }
++_INSTALL_SCHEMES['venv'] = _INSTALL_SCHEMES['posix_prefix']
  
  
-@@ -237,11 +257,28 @@ def _get_preferred_schemes():
+ # NOTE: site.py has copy of this function.
+@@ -237,11 +258,26 @@ def _get_preferred_schemes():
              'home': 'posix_home',
              'user': 'osx_framework_user',
          }
@@ -307,28 +309,26 @@ index daf9f00..8a4e919 100644
 -        'home': 'posix_home',
 -        'user': 'posix_user',
 -    }
-+    if 'real_prefix' in sys.__dict__ or 'VIRTUAL_ENV' in os.environ:
-+        # virtual environments
++    # virtual environments
++    if hasattr(sys, 'real_prefix') or sys.base_prefix != sys.prefix:
 +        return {
-+            'prefix': 'posix_prefix',
++            'prefix': 'venv',
++            'home': 'posix_home',
++            'user': 'posix_user',
++        }
++    # default to /usr for package builds, /usr/local otherwise
++    elif os.environ.get('DEB_PYTHON_INSTALL_LAYOUT') in ('deb', 'deb_system'):
++        return {
++            'prefix': 'deb_system',
 +            'home': 'posix_home',
 +            'user': 'posix_user',
 +        }
 +    else:
-+        # default to /usr for package builds, /usr/local otherwise
-+        deb_build = os.environ.get('DEB_PYTHON_INSTALL_LAYOUT', 'posix_local')
-+        if deb_build in ('deb', 'deb_system'):
-+            return {
-+                'prefix': 'deb_system',
-+                'home': 'posix_home',
-+                'user': 'posix_user',
-+            }
-+        else:
-+            return {
-+                'prefix': 'posix_local',
-+                'home': 'posix_home',
-+                'user': 'posix_user',
-+            }
++        return {
++            'prefix': 'posix_local',
++            'home': 'posix_home',
++            'user': 'posix_user',
++        }
  
  
  def get_preferred_scheme(key):
