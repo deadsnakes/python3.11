@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a2-1+focal5) focal; urgency=medium
+
+  * Fix virtualenv creation and virtualenv package installation.
+
+ -- Anthony Sottile <asottile@umich.edu>  Tue, 21 Dec 2021 14:04:09 -0500
+
 python3.11 (3.11.0~a2-1+focal4) focal; urgency=medium
 
   * Fix symbols for i386.
