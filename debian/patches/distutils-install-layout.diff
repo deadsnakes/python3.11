@@ -207,7 +207,7 @@ index b2a3887..2a28fd4 100644
  
      def test_debug_mode(self):
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 161da22..2c30dd7 100755
+index b860c78..d1622e9 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
 @@ -505,6 +505,7 @@ class Doc:
@@ -219,7 +219,7 @@ index 161da22..2c30dd7 100755
              object.__name__ not in ('xml.etree', 'test.pydoc_mod')):
              if docloc.startswith(("http://", "https://")):
 diff --git a/Lib/site.py b/Lib/site.py
-index e129f3b..1671ea8 100644
+index b11cd48..e0ae563 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -7,12 +7,18 @@
@@ -243,8 +243,8 @@ index e129f3b..1671ea8 100644
  sys.prefix and sys.exec_prefix are set to that directory and
  it is also checked for site-packages (sys.base_prefix and
 @@ -367,10 +373,20 @@ def getsitepackages(prefixes=None):
+                 libdirs.append("lib")
  
-         if os.sep == '/':
              for libdir in libdirs:
 -                path = os.path.join(prefix, libdir,
 -                                    "python%d.%d" % sys.version_info[:2],
@@ -266,9 +266,9 @@ index e129f3b..1671ea8 100644
 +                                                 "dist-packages"))
          else:
              sitepackages.append(prefix)
- 
+             sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index daf9f00..908ea48 100644
+index da918b7..8e705fb 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -56,7 +56,28 @@ _INSTALL_SCHEMES = {
@@ -300,7 +300,7 @@ index daf9f00..908ea48 100644
  
  
  # NOTE: site.py has copy of this function.
-@@ -237,11 +258,26 @@ def _get_preferred_schemes():
+@@ -242,11 +263,26 @@ def _get_preferred_schemes():
              'home': 'posix_home',
              'user': 'osx_framework_user',
          }
@@ -333,10 +333,10 @@ index daf9f00..908ea48 100644
  
  def get_preferred_scheme(key):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index 5f06a0d..830ab52 100644
+index 76d35da..bc9e457 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -284,16 +284,16 @@ class HelperFunctionsTests(unittest.TestCase):
+@@ -285,16 +285,16 @@ class HelperFunctionsTests(unittest.TestCase):
          if os.sep == '/':
              # OS X, Linux, FreeBSD, etc
              if sys.platlibdir != "lib":

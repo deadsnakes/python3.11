@@ -9,10 +9,10 @@ Subject: reproducible-buildinfo
  1 file changed, 2 insertions(+)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 866de45..7c61671 100644
+index 6f657b3..b7c4fa8 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -906,6 +906,8 @@ Modules/getbuildinfo.o: $(PARSER_OBJS) \
+@@ -1204,6 +1204,8 @@ Modules/getbuildinfo.o: $(PARSER_OBJS) \
  	      -DGITVERSION="\"`LC_ALL=C $(GITVERSION)`\"" \
  	      -DGITTAG="\"`LC_ALL=C $(GITTAG)`\"" \
  	      -DGITBRANCH="\"`LC_ALL=C $(GITBRANCH)`\"" \
@@ -20,4 +20,4 @@ index 866de45..7c61671 100644
 +	      $(if $(BUILD_TIME),-DTIME='"$(BUILD_TIME)"') \
  	      -o $@ $(srcdir)/Modules/getbuildinfo.c
  
- Modules/getpath.o: $(srcdir)/Modules/getpath.c Makefile
+ Modules/getpath.o: $(srcdir)/Modules/getpath.c Python/frozen_modules/getpath.h Makefile $(PYTHON_HEADERS)

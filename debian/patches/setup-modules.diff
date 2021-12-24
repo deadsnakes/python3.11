@@ -7,30 +7,30 @@ Subject: setup-modules
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/Modules/Setup b/Modules/Setup
-index 57584f3..aae0edd 100644
+index d3647ec..c2538eb 100644
 --- a/Modules/Setup
 +++ b/Modules/Setup
-@@ -173,8 +173,8 @@ time timemodule.c
+@@ -158,8 +158,8 @@ PYTHONPATH=$(COREPYTHONPATH)
  #select selectmodule.c
  
  # XML
--#_elementtree -I$(srcdir)/Modules/expat _elementtree.c
--#pyexpat -I$(srcdir)/Modules/expat  expat/xmlparse.c expat/xmlrole.c expat/xmltok.c pyexpat.c
+-#_elementtree _elementtree.c
+-#pyexpat pyexpat.c
 +#_elementtree _elementtree.c -lexpat    # elementtree accelerator
 +#pyexpat pyexpat.c -lexpat
  
  # hashing builtins
  #_blake2 _blake2/blake2module.c _blake2/blake2b_impl.c _blake2/blake2s_impl.c
-@@ -214,7 +214,7 @@ time timemodule.c
+@@ -199,7 +199,7 @@ PYTHONPATH=$(COREPYTHONPATH)
  # Modules that require external libraries.
  
  #_bz2 _bz2module.c -lbz2
 -#_ctypes _ctypes/_ctypes.c _ctypes/callbacks.c _ctypes/callproc.c _ctypes/stgdict.c _ctypes/cfield.c -ldl -lffi -DHAVE_FFI_PREP_CIF_VAR -DHAVE_FFI_PREP_CLOSURE_LOC -DHAVE_FFI_CLOSURE_ALLOC
 +#_ctypes _ctypes/_ctypes.c _ctypes/callbacks.c _ctypes/callproc.c _ctypes/stgdict.c _ctypes/cfield.c _ctypes/malloc_closure.c -lffi
  # The _dbm module supports NDBM, GDBM with compat module, and Berkeley DB.
- #_dbm _dbmmodule.c -lgdbm_compat -DHAVE_NDBM_H
+ #_dbm _dbmmodule.c -lgdbm_compat -DUSE_GDBM_COMPAT
  #_gdbm _gdbmmodule.c -lgdbm
-@@ -228,8 +228,8 @@ time timemodule.c
+@@ -212,8 +212,8 @@ PYTHONPATH=$(COREPYTHONPATH)
  #readline readline.c -lreadline -ltermcap
  
  # OpenSSL bindings
