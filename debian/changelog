@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a3-1+bionic1) bionic; urgency=medium
+
+  * Python 3.11.0 alpha 3 release.
+
+ -- Anthony Sottile <asottile@umich.edu>  Fri, 24 Dec 2021 18:31:30 -0500
+
 python3.11 (3.11.0~a2-1+bionic5) bionic; urgency=medium
 
   * Fix virtualenv creation and virtualenv package installation.
