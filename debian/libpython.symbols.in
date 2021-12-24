@@ -1202,11 +1202,13 @@
  _PyErr_NoMemory@Base 3.9.0~a1
  _PyErr_NormalizeException@Base 3.8.0~b1
  _PyErr_Print@Base 3.8.0~b1
+ _PyErr_ProgramDecodedTextObject@Base 3.11.0~a3
  _PyErr_Restore@Base 3.8.0~b1
  _PyErr_SetKeyError@Base @SVER@
  _PyErr_SetNone@Base 3.8.0~b1
  _PyErr_SetObject@Base 3.8.0~b1
  _PyErr_SetString@Base 3.8.0~b1
+ _PyErr_StackItemToExcInfoTuple@Base 3.11.0~a3
  _PyErr_TrySetFromCause@Base @SVER@
  _PyErr_WriteUnraisableMsg@Base 3.8.0~b1
  _PyEval_AddPendingCall@Base 3.8.0~b1
@@ -1345,8 +1347,6 @@
  _PyObject_FastCall@Base 3.11.0~a2
  _PyObject_FastCallDictTstate@Base 3.9.0~a1
  _PyObject_FunctionStr@Base 3.9.0~a1
- _PyObject_GC_Calloc@Base @SVER@
- _PyObject_GC_Malloc@Base @SVER@
  _PyObject_GC_New@Base @SVER@
  _PyObject_GC_NewVar@Base @SVER@
  _PyObject_GC_Resize@Base @SVER@
@@ -1370,6 +1370,7 @@
  _PyObject_RealIsSubclass@Base @SVER@
  _PyObject_SetAttrId@Base @SVER@
  _PyParser_TokenNames@Base @SVER@
+ _PyPathConfig_ClearGlobal@Base 3.11.0~a3
  _PyPreConfig_InitCompatConfig@Base 3.8.0~b1
  _PyRun_AnyFileObject@Base 3.10.0~a4
  _PyRun_InteractiveLoopObject@Base 3.10.0~a4
@@ -1397,6 +1398,7 @@
  _PyThreadState_GetDict@Base 3.9.0~a6
  _PyThreadState_Init@Base @SVER@
  _PyThreadState_Prealloc@Base @SVER@
+ _PyThreadState_SetCurrent@Base 3.11.0~a3
  _PyThreadState_Swap@Base 3.8.0~b1
  _PyThreadState_UncheckedGet@Base @SVER@
  _PyThread_CurrentExceptions@Base 3.10.0~a2
@@ -1475,6 +1477,7 @@
  _PyUnicode_EncodeUTF16@Base @SVER@
  _PyUnicode_EncodeUTF32@Base @SVER@
  _PyUnicode_EncodeUTF7@Base @SVER@
+ _PyUnicode_Equal@Base 3.11.0~a3
  _PyUnicode_EqualToASCIIId@Base @SVER@
  _PyUnicode_EqualToASCIIString@Base @SVER@
  _PyUnicode_FastCopyCharacters@Base @SVER@
@@ -1562,6 +1565,7 @@
  _Py_GetLocaleEncoding@Base 3.10.0~a2
  _Py_GetLocaleEncodingObject@Base 3.10.0~a2
  _Py_GetLocaleconvNumeric@Base @SVER@
+ _Py_Get_Getpath_CodeObject@Base 3.11.0~a3
  _Py_Gid_Converter@Base @SVER@
  _Py_HandleSystemExit@Base 3.8.0~b1
  _Py_HasFileSystemDefaultEncodeErrors@Base 3.11.0~a1
@@ -1599,7 +1603,6 @@
  _Py_VaBuildValue_SizeT@Base @SVER@
  _Py_WriteIndent@Base 3.11.0~a2
  _Py_WriteIndentedMargin@Base 3.11.0~a2
- _Py_abspath@Base 3.9.0~a1
  _Py_add_one_to_index_C@Base @SVER@
  _Py_add_one_to_index_F@Base @SVER@
  _Py_ascii_whitespace@Base @SVER@
@@ -1642,12 +1645,10 @@
  _Py_hashtable_set@Base @SVER@
  _Py_hashtable_size@Base @SVER@
  _Py_hashtable_steal@Base 3.9.0~b1
- _Py_isabs@Base 3.9.0~a1
- _Py_normalize_path@Base 3.11.0~a2
+ _Py_normpath@Base 3.11.0~a3
  _Py_open@Base @SVER@
  _Py_open_noraise@Base @SVER@
  _Py_parse_inf_or_nan@Base @SVER@
- _Py_path_config@Base @SVER@
  _Py_read@Base @SVER@
  _Py_set_blocking@Base @SVER@
  _Py_set_inheritable@Base @SVER@
