@@ -100,32 +100,6 @@ AS_VAR_IF([cross_compiling], [maybe],
 # pybuilddir.txt will be created by --generate-posix-vars in the Makefile
 rm -f pybuilddir.txt
 
-dnl cross-compiling needs a freeze_module binary for build platform
-AC_ARG_WITH(
-  [freeze-module],
-  [AS_HELP_STRING([--with-freeze-module=Programs/_freeze_module],
-                  [path to _freeze_module binary for cross compiling])],
-  [
-    AC_MSG_CHECKING([for --with-freeze-module])
-    AS_VAR_IF([cross_compiling], [no], AC_MSG_ERROR([--with-freeze-module only applies to cross compiling]))
-    if test "$with_freeze_module" = yes -o "$with_freeze_module" = no; then
-      AC_MSG_ERROR([invalid --with-freeze-module option: expected path, not "$with_freeze_module"])
-    fi
-    if ! $(command -v "$with_freeze_module" >/dev/null 2>&1); then
-      AC_MSG_ERROR([invalid or missing freeze module binary "$with_freeze_module"])
-    fi
-    FREEZE_MODULE="$with_freeze_module"
-    AC_MSG_RESULT([$FREEZE_MODULE])
-  ], [
-    AS_VAR_IF([cross_compiling], [yes],
-      [AC_MSG_ERROR([Cross compiling requires --with-freeze-module])]
-    )
-    FREEZE_MODULE=Programs/_freeze_module
-  ]
-)
-AC_SUBST([FREEZE_MODULE])
-
-dnl build-python is used for cross compiling and macOS framework builds.
 AC_ARG_WITH(
   [build-python],
   [AS_HELP_STRING([--with-build-python=python]PYTHON_VERSION,
@@ -161,6 +135,27 @@ AC_SUBST([PYTHON_FOR_BUILD])
 AC_MSG_CHECKING([for Python interpreter freezing])
 AC_MSG_RESULT([$PYTHON_FOR_FREEZE])
 AC_SUBST([PYTHON_FOR_FREEZE])
+
+AS_VAR_IF([cross_compiling], [yes],
+  [
+    dnl external build Python, freezing depends on Programs/_freeze_module.py
+    FREEZE_MODULE_BOOTSTRAP='$(PYTHON_FOR_FREEZE) $(srcdir)/Programs/_freeze_module.py'
+    FREEZE_MODULE_BOOTSTRAP_DEPS='$(srcdir)/Programs/_freeze_module.py'
+    FREEZE_MODULE='$(FREEZE_MODULE_BOOTSTRAP)'
+    FREEZE_MODULE_DEPS='$(FREEZE_MODULE_BOOTSTRAP_DEPS)'
+  ],
+  [
+    dnl internal build tools also depend on Programs/_freeze_module and _bootstrap_python.
+    FREEZE_MODULE_BOOTSTRAP='./Programs/_freeze_module'
+    FREEZE_MODULE_BOOTSTRAP_DEPS="Programs/_freeze_module"
+    FREEZE_MODULE='$(PYTHON_FOR_FREEZE) $(srcdir)/Programs/_freeze_module.py'
+    FREEZE_MODULE_DEPS="_bootstrap_python \$(srcdir)/Programs/_freeze_module.py"
+  ]
+)
+AC_SUBST([FREEZE_MODULE_BOOTSTRAP])
+AC_SUBST([FREEZE_MODULE_BOOTSTRAP_DEPS])
+AC_SUBST([FREEZE_MODULE])
+AC_SUBST([FREEZE_MODULE_DEPS])
 
 AC_CHECK_PROGS([PYTHON_FOR_REGEN],
   [python$PACKAGE_VERSION python3.10 python3.9 python3.8 python3.7 python3.6 python3 python],
@@ -992,10 +987,14 @@ else
 fi
 rm -f conftest.c conftest.out
 
-if test x$PLATFORM_TRIPLET != xdarwin; then
-  MULTIARCH=$($CC --print-multiarch 2>/dev/null)
-fi
-AC_SUBST(MULTIARCH)
+AC_MSG_CHECKING([for multiarch])
+AS_CASE([$ac_sys_system],
+  [Darwin*], [MULTIARCH=""],
+  [FreeBSD*], [MULTIARCH=""],
+  [MULTIARCH=$($CC --print-multiarch 2>/dev/null)]
+)
+AC_SUBST([MULTIARCH])
+AC_MSG_RESULT([$MULTIARCH])
 
 if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
   if test x$PLATFORM_TRIPLET != x$MULTIARCH; then
@@ -1005,6 +1004,7 @@ elif test x$PLATFORM_TRIPLET != x && test x$MULTIARCH = x; then
   MULTIARCH=$PLATFORM_TRIPLET
 fi
 AC_SUBST(PLATFORM_TRIPLET)
+
 if test x$MULTIARCH != x; then
   MULTIARCH_CPPFLAGS="-DMULTIARCH=\\\"$MULTIARCH\\\""
 fi
@@ -1037,8 +1037,7 @@ if $CPP $CPPFLAGS conftest.c >conftest.out 2>/dev/null; then
   _arm_arch=`sed -n -e '/__ARM_ARCH/d' -e 's/^arm_arch = //p' conftest.out`
   AC_MSG_RESULT([$ANDROID_API_LEVEL])
   if test -z "$ANDROID_API_LEVEL"; then
-    echo 'Fatal: you must define __ANDROID_API__'
-    exit 1
+    AC_MSG_ERROR([Fatal: you must define __ANDROID_API__])
   fi
   AC_DEFINE_UNQUOTED(ANDROID_API_LEVEL, $ANDROID_API_LEVEL, [The Android API level.])
 
@@ -1054,12 +1053,32 @@ fi
 rm -f conftest.c conftest.out
 
 # Check for unsupported systems
-case $ac_sys_system/$ac_sys_release in
-atheos*|Linux*/1*)
-   echo This system \($ac_sys_system/$ac_sys_release\) is no longer supported.
-   echo See README for details.
-   exit 1;;
-esac
+AS_CASE([$ac_sys_system/$ac_sys_release],
+  [atheos*|Linux*/1*], [
+    AC_MSG_ERROR([m4_normalize([
+      This system \($ac_sys_system/$ac_sys_release\) is no longer supported.
+      See README for details.
+   ])])
+ ]
+)
+
+AC_MSG_CHECKING([for --with-emscripten-target])
+AC_ARG_WITH([emscripten-target],
+  [AS_HELP_STRING([--with-emscripten-target=@<:@browser|node@:>@], [Emscripten platform])],
+[
+	AS_VAR_IF([ac_sys_system], [Emscripten], [
+    AS_CASE([$with_emscripten_target],
+      [browser], [ac_sys_emscripten_target=browser],
+      [node], [ac_sys_emscripten_target=node],
+      [AC_MSG_ERROR([Invalid argument: --with-emscripten-target=browser|node])]
+    )
+  ], [
+    AC_MSG_ERROR([--with-emscripten-target only applies to Emscripten])
+  ])
+], [
+  AS_VAR_IF([ac_sys_system], [Emscripten], [ac_sys_emscripten_target=browser])
+])
+AC_MSG_RESULT([$ac_sys_emscripten_target])
 
 AC_MSG_CHECKING([for --with-suffix])
 AC_ARG_WITH([suffix],
@@ -1071,8 +1090,10 @@ AC_ARG_WITH([suffix],
     [EXEEXT=$with_suffix]
   )
 ], [
-  AS_CASE([$ac_sys_system],
-    [Emscripten], [EXEEXT=.wasm],
+  AS_CASE([$ac_sys_system/$ac_sys_emscripten_target],
+    [Emscripten/browser], [EXEEXT=.html],
+    [Emscripten/node], [EXEEXT=.js],
+    [WASI/*], [EXEEXT=.wasm],
     [EXEEXT=]
   )
 ])
@@ -1210,6 +1231,23 @@ then
 fi
 AC_MSG_RESULT($enable_shared)
 
+# --with-static-libpython
+STATIC_LIBPYTHON=1
+AC_MSG_CHECKING(for --with-static-libpython)
+AC_ARG_WITH(static-libpython,
+  AS_HELP_STRING([--without-static-libpython],
+                 [do not build libpythonMAJOR.MINOR.a and do not install python.o (default is yes)]),
+[
+if test "$withval" = no
+then
+  AC_MSG_RESULT(no);
+  STATIC_LIBPYTHON=0
+else
+  AC_MSG_RESULT(yes);
+fi],
+[AC_MSG_RESULT(yes)])
+AC_SUBST(STATIC_LIBPYTHON)
+
 AC_MSG_CHECKING(for --enable-profiling)
 AC_ARG_ENABLE(profiling,
               AS_HELP_STRING([--enable-profiling], [enable C-level code profiling with gprof (default is no)]))
@@ -1315,6 +1353,31 @@ fi
 
 AC_MSG_RESULT($LDLIBRARY)
 
+# LIBRARY_DEPS, LINK_PYTHON_OBJS and LINK_PYTHON_DEPS variable
+LIBRARY_DEPS='$(PY3LIBRARY) $(EXPORTSYMS)'
+LINK_PYTHON_DEPS='$(LIBRARY_DEPS)'
+if test "$PY_ENABLE_SHARED" = 1 || test "$enable_framework" ; then
+    LIBRARY_DEPS="\$(LDLIBRARY) $LIBRARY_DEPS"
+    if test "$STATIC_LIBPYTHON" = 1; then
+        LIBRARY_DEPS="\$(LIBRARY) $LIBRARY_DEPS"
+    fi
+    # Link Python program to the shared library
+    LINK_PYTHON_OBJS='$(BLDLIBRARY)'
+else
+    if test "$STATIC_LIBPYTHON" = 0; then
+        # Build Python needs object files but don't need to build
+        # Python static library
+        LINK_PYTHON_DEPS="$LIBRARY_DEPS \$(LIBRARY_OBJS)"
+    fi
+    LIBRARY_DEPS="\$(LIBRARY) $LIBRARY_DEPS"
+    # Link Python program to object files
+    LINK_PYTHON_OBJS='$(LIBRARY_OBJS)'
+fi
+AC_SUBST(LIBRARY_DEPS)
+AC_SUBST(LINK_PYTHON_DEPS)
+AC_SUBST(LINK_PYTHON_OBJS)
+
+# ar program
 AC_SUBST(AR)
 AC_CHECK_TOOLS(AR, ar aal, ar)
 
@@ -1391,6 +1454,21 @@ then
   AC_DEFINE(Py_TRACE_REFS, 1, [Define if you want to enable tracing references for debugging purpose])
 fi
 
+
+# Check for --enable-pystats
+AC_MSG_CHECKING([for --enable-pystats])
+AC_ARG_ENABLE([pystats],
+  [AS_HELP_STRING(
+    [--enable-pystats],
+    [enable internal statistics gathering (default is no)])],,
+  [enable_pystats=no]
+)
+AC_MSG_RESULT([$enable_pystats])
+
+AS_VAR_IF([enable_pystats], [yes], [
+  AC_DEFINE([Py_STATS], [1], [Define if you want to enable internal statistics gathering.])
+])
+
 # Check for --with-assertions.
 # This allows enabling assertions without Py_DEBUG.
 assertions='false'
@@ -1430,6 +1508,7 @@ else
   AC_MSG_RESULT(no);
 fi],
 [AC_MSG_RESULT(no)])
+
 if test "$Py_OPT" = 'true' ; then
   # Intentionally not forcing Py_LTO='true' here.  Too many toolchains do not
   # compile working code using it and both test_distutils and test_gdb are
@@ -1446,8 +1525,12 @@ if test "$Py_OPT" = 'true' ; then
       ])
       ;;
   esac
-
-
+elif test "$ac_sys_system" = "Emscripten"; then
+  dnl Emscripten does not support shared extensions yet. Build
+  dnl "python.[js,html,wasm]", "pybuilddir.txt", and "platform" files.
+  DEF_MAKE_ALL_RULE="build_platform"
+  REQUIRE_PGO="no"
+  DEF_MAKE_RULE="all"
 else
   DEF_MAKE_ALL_RULE="build_all"
   REQUIRE_PGO="no"
@@ -1753,10 +1836,30 @@ then
     esac
 fi
 
+# WASM flags
+AS_CASE([$ac_sys_system/$ac_sys_emscripten_target],
+  [Emscripten/browser], [
+    LDFLAGS_NODIST="$(LDFLAGS_NODIST) -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 --preload-file \$(WASM_ASSETS_DIR)"
+    WASM_ASSETS_DIR=".\$(prefix)"
+    WASM_STDLIB="\$(WASM_ASSETS_DIR)/local/lib/python\$(VERSION)/os.py"
+  ],
+  [Emscripten/node], [
+    LDFLAGS_NODIST="$(LDFLAGS_NODIST) -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s NODERAWFS=1 -s EXIT_RUNTIME=1 -s USE_PTHREADS -s PROXY_TO_PTHREAD"
+    CFLAGS_NODIST="$(CFLAGS_NODIST) -pthread"
+  ],
+  [WASI], [
+    AC_DEFINE([_WASI_EMULATED_SIGNAL], [1], [Define to 1 if you want to emulate signals on WASI])
+    LIBS="$LIBS -lwasi-emulated-signal"
+    echo "#define _WASI_EMULATED_SIGNAL 1" >> confdefs.h
+  ]
+)
+
 AC_SUBST(BASECFLAGS)
 AC_SUBST(CFLAGS_NODIST)
 AC_SUBST(LDFLAGS_NODIST)
 AC_SUBST(LDFLAGS_NOLTO)
+AC_SUBST([WASM_ASSETS_DIR])
+AC_SUBST([WASM_STDLIB])
 
 # The -arch flags for universal builds on macOS
 UNIVERSAL_ARCH_FLAGS=
@@ -2250,7 +2353,7 @@ AC_CHECK_HEADERS([ \
   alloca.h asm/types.h bluetooth.h conio.h crypt.h direct.h dlfcn.h endian.h errno.h fcntl.h grp.h \
   ieeefp.h io.h langinfo.h libintl.h libutil.h linux/memfd.h linux/random.h linux/soundcard.h \
   linux/tipc.h linux/wait.h netinet/in.h netpacket/packet.h poll.h process.h pthread.h pty.h \
-  sched.h shadow.h signal.h spawn.h stropts.h sys/audioio.h sys/bsdtty.h sys/devpoll.h \
+  sched.h setjmp.h shadow.h signal.h spawn.h stropts.h sys/audioio.h sys/bsdtty.h sys/devpoll.h \
   sys/endian.h sys/epoll.h sys/event.h sys/eventfd.h sys/file.h sys/ioctl.h sys/kern_control.h \
   sys/loadavg.h sys/lock.h sys/memfd.h sys/mkdev.h sys/mman.h sys/modem.h sys/param.h sys/poll.h \
   sys/random.h sys/resource.h sys/select.h sys/sendfile.h sys/socket.h sys/soundcard.h sys/stat.h \
@@ -2845,7 +2948,7 @@ then
 		# small for the default recursion limit. Increase the stack size
 		# to ensure that tests don't crash
     stack_size="1000000"  # 16 MB
-    if test "$with_ubsan" == "yes"
+    if test "$with_ubsan" = "yes"
     then
         # Undefined behavior sanitizer requires an even deeper stack
         stack_size="4000000"  # 64 MB
@@ -3795,16 +3898,17 @@ fi
 if test "$ipv6" = "yes" -a "$ipv6lib" != "none"; then
 	if test -d $ipv6libdir -a -f $ipv6libdir/lib$ipv6lib.a; then
 		LIBS="-L$ipv6libdir -l$ipv6lib $LIBS"
-		echo "using lib$ipv6lib"
+		AC_MSG_NOTICE([using lib$ipv6lib])
 	else
-		if test $ipv6trylibc = "yes"; then
-			echo "using libc"
-		else
-			echo 'Fatal: no $ipv6lib library found.  cannot continue.'
-			echo "You need to fetch lib$ipv6lib.a from appropriate"
-			echo 'ipv6 kit and compile beforehand.'
-			exit 1
-		fi
+    AS_VAR_IF([ipv6trylibc], [yes], [
+      AC_MSG_NOTICE([using libc])
+    ], [
+      AC_MSG_ERROR([m4_normalize([
+        No $ipv6lib library found; cannot continue.
+        You need to fetch lib$ipv6lib.a from appropriate
+        ipv6 kit and compile beforehand.
+      ])])
+    ])
 	fi
 fi
 
@@ -3853,7 +3957,11 @@ AC_ARG_WITH(pymalloc,
 
 if test -z "$with_pymalloc"
 then
-    with_pymalloc="yes"
+  dnl default to yes except for wasm32-emscripten
+  AS_CASE([$ac_sys_system],
+    [Emscripten], [with_pymalloc="no"],
+    [with_pymalloc="yes"]
+  )
 fi
 if test "$with_pymalloc" != "no"
 then
@@ -4001,7 +4109,7 @@ fi
 
 # checks for library functions
 AC_CHECK_FUNCS([ \
-  accept4 alarm bind_textdomain_codeset chown clock close_range confstr \
+  accept4 alarm bind_textdomain_codeset chmod chown clock close_range confstr \
   copy_file_range ctermid dup3 execv explicit_bzero explicit_memset \
   faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve \
   fork fork1 fpathconf fstatat ftime ftruncate futimens futimes futimesat \
@@ -4023,7 +4131,7 @@ AC_CHECK_FUNCS([ \
   sigfillset siginterrupt sigpending sigrelse sigtimedwait sigwait \
   sigwaitinfo snprintf splice strftime strlcpy strsignal symlinkat sync \
   sysconf system tcgetpgrp tcsetpgrp tempnam timegm times tmpfile \
-  tmpnam tmpnam_r truncate ttyname uname unlinkat utimensat utimes vfork \
+  tmpnam tmpnam_r truncate ttyname umask uname unlinkat utimensat utimes vfork \
   wait wait3 wait4 waitid waitpid wcscoll wcsftime wcsxfrm wmemcmp writev \
 ])
 
@@ -4068,7 +4176,7 @@ PY_CHECK_FUNC([symlink], [#include <unistd.h>])
 PY_CHECK_FUNC([fchdir], [#include <unistd.h>])
 PY_CHECK_FUNC([fsync], [#include <unistd.h>])
 PY_CHECK_FUNC([fdatasync], [#include <unistd.h>])
-PY_CHECK_FUNC([epoll], [#include <sys/epoll.h>])
+PY_CHECK_FUNC([epoll_create], [#include <sys/epoll.h>], [HAVE_EPOLL])
 PY_CHECK_FUNC([epoll_create1], [#include <sys/epoll.h>])
 PY_CHECK_FUNC([kqueue],[
 #include <sys/types.h>
@@ -4510,12 +4618,12 @@ dnl if ac_cv_func_getaddrinfo
 
 if test "$ac_cv_func_getaddrinfo" = no -o "$ac_cv_buggy_getaddrinfo" = yes
 then
-	if test $ipv6 = yes
-	then
-		echo 'Fatal: You must get working getaddrinfo() function.'
-		echo '       or you can specify "--disable-ipv6"'.
-		exit 1
-	fi
+  AS_VAR_IF([ipv6], [yes], [
+    AC_MSG_ERROR([m4_normalize([
+      You must get working getaddrinfo() function
+      or pass the "--disable-ipv6" option to configure.
+    ])])
+  ])
 else
 	AC_DEFINE(HAVE_GETADDRINFO, 1, [Define if you have the getaddrinfo function.])
 fi
@@ -6207,33 +6315,6 @@ else
 fi],
 [AC_MSG_RESULT(no)])
 
-# --with-static-libpython
-STATIC_LIBPYTHON=1
-AC_MSG_CHECKING(for --with-static-libpython)
-AC_ARG_WITH(static-libpython,
-  AS_HELP_STRING([--without-static-libpython],
-                 [do not build libpythonMAJOR.MINOR.a and do not install python.o (default is yes)]),
-[
-if test "$withval" = no
-then
-  AC_MSG_RESULT(no);
-  STATIC_LIBPYTHON=0
-else
-  AC_MSG_RESULT(yes);
-fi],
-[AC_MSG_RESULT(yes)])
-LIBRARY_DEPS='$(PY3LIBRARY) $(EXPORTSYMS)'
-if test "$PY_ENABLE_SHARED" = 1 || test "$enable_framework" ; then
-    LIBRARY_DEPS="\$(LDLIBRARY) $LIBRARY_DEPS"
-    if test "$STATIC_LIBPYTHON" = 1; then
-        LIBRARY_DEPS="\$(LIBRARY) $LIBRARY_DEPS"
-    fi
-else
-    LIBRARY_DEPS="\$(LIBRARY) $LIBRARY_DEPS"
-fi
-AC_SUBST(STATIC_LIBPYTHON)
-AC_SUBST(LIBRARY_DEPS)
-
 # Check whether to disable test modules. Once set, setup.py will not build
 # test extension modules and "make install" will not install test suites.
 AC_MSG_CHECKING(for --disable-test-modules)
@@ -6241,11 +6322,15 @@ AC_ARG_ENABLE(test-modules,
               AS_HELP_STRING([--disable-test-modules], [don't build nor install test modules]))
 if test "$enable_test_modules" = no; then
     TEST_MODULES=no
-    AC_MSG_RESULT(yes)
 else
-    TEST_MODULES=yes
-    AC_MSG_RESULT(no)
+    AS_CASE([$ac_sys_system/$ac_sys_emscripten_target],
+      [Emscripten/browser], [TEST_MODULES=no],
+      [TEST_MODULES=yes]
+    )
 fi
+AS_VAR_IF([TEST_MODULES], [yes],
+  [AC_MSG_RESULT(no)], [AC_MSG_RESULT(yes)]
+)
 AC_SUBST(TEST_MODULES)
 
 dnl Modules that are not available on some platforms
@@ -6260,6 +6345,7 @@ AS_CASE([$ac_sys_system],
   [FreeBSD*], [py_stdlib_not_available="_scproxy spwd"],
   [Emscripten], [
     py_stdlib_not_available="m4_normalize([
+      _ctypes
       _curses
       _curses_panel
       _dbm
@@ -6268,12 +6354,14 @@ AS_CASE([$ac_sys_system],
       _posixshmem
       _posixsubprocess
       _scproxy
+      _tkinter
       _xxsubinterpreters
       fcntl
       grp
       nis
       ossaudiodev
       resource
+      readline
       spwd
       syslog
       termios
@@ -6288,6 +6376,16 @@ AS_CASE([$host_cpu],
   [MODULE_BUILDTYPE=${MODULE_BUILDTYPE:-shared}]
 )
 AC_SUBST([MODULE_BUILDTYPE])
+
+dnl Use Modules/Setup.stdlib as additional provider?
+AC_MSG_CHECKING([for additional Modules/Setup files])
+AS_CASE([$ac_sys_system],
+    [Emscripten], [MODULES_SETUP_STDLIB=Modules/Setup.stdlib],
+    [MODULES_SETUP_STDLIB=]
+)
+AC_MSG_RESULT([$MODULES_SETUP_STDLIB])
+AC_SUBST([MODULES_SETUP_STDLIB])
+
 
 dnl _MODULE_BLOCK_ADD([VAR], [VALUE])
 dnl internal: adds $1=quote($2) to MODULE_BLOCK
@@ -6326,7 +6424,7 @@ AC_DEFUN([PY_STDLIB_MOD], [
 ])
 
 dnl Define simple stdlib extension module
-dnl Always enable unless the module is listed in py_stdlib_not_available 
+dnl Always enable unless the module is listed in py_stdlib_not_available
 dnl PY_STDLIB_MOD_SIMPLE([NAME], [CFLAGS], [LDFLAGS])
 dnl cflags and ldflags are optional
 AC_DEFUN([PY_STDLIB_MOD_SIMPLE], [
@@ -6482,8 +6580,9 @@ PY_STDLIB_MOD([_ctypes_test], [test "$TEST_MODULES" = yes], [], [], [-lm])
 
 dnl Limited API template modules.
 dnl The limited C API is not compatible with the Py_TRACE_REFS macro.
-PY_STDLIB_MOD([xxlimited], [test "$with_trace_refs" = "no"])
-PY_STDLIB_MOD([xxlimited_35], [test "$with_trace_refs" = "no"])
+dnl Emscripten does not support shared libraries yet.
+PY_STDLIB_MOD([xxlimited], [test "$with_trace_refs" = "no" -a "$ac_sys_system" != "Emscripten"])
+PY_STDLIB_MOD([xxlimited_35], [test "$with_trace_refs" = "no" -a "$ac_sys_system" != "Emscripten"])
 
 # substitute multiline block, must come after last PY_STDLIB_MOD()
 AC_SUBST([MODULE_BLOCK])
@@ -6494,28 +6593,26 @@ AC_CONFIG_FILES([Modules/Setup.stdlib])
 AC_CONFIG_FILES([Modules/ld_so_aix], [chmod +x Modules/ld_so_aix])
 AC_OUTPUT
 
-echo "creating Modules/Setup.local" >&AS_MESSAGE_FD
+AC_MSG_NOTICE([creating Modules/Setup.local])
 if test ! -f Modules/Setup.local
 then
 	echo "# Edit this file for local setup changes" >Modules/Setup.local
 fi
 
-echo "creating Makefile" >&AS_MESSAGE_FD
+AC_MSG_NOTICE([creating Makefile])
 $SHELL $srcdir/Modules/makesetup -c $srcdir/Modules/config.c.in \
 			-s Modules \
-			Modules/Setup.local $srcdir/Modules/Setup.bootstrap $srcdir/Modules/Setup
+			Modules/Setup.local $MODULES_SETUP_STDLIB $srcdir/Modules/Setup.bootstrap $srcdir/Modules/Setup
 mv config.c Modules
 
 if test -z "$PKG_CONFIG"; then
-  echo "" >&AS_MESSAGE_FD
-  echo "pkg-config is missing. Some dependencies may not be detected correctly." >&AS_MESSAGE_FD
+  AC_MSG_WARN([pkg-config is missing. Some dependencies may not be detected correctly.])
 fi
 
 if test "$Py_OPT" = 'false' -a "$Py_DEBUG" != 'true'; then
-    echo "" >&AS_MESSAGE_FD
-    echo "" >&AS_MESSAGE_FD
-    echo "If you want a release build with all stable optimizations active (PGO, etc)," >&AS_MESSAGE_FD
-    echo "please run ./configure --enable-optimizations" >&AS_MESSAGE_FD
-    echo "" >&AS_MESSAGE_FD
-    echo "" >&AS_MESSAGE_FD
+  AC_MSG_NOTICE([
+
+If you want a release build with all stable optimizations active (PGO, etc),
+please run ./configure --enable-optimizations
+])
 fi
