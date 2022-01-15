@@ -268,7 +268,7 @@ index b11cd48..e0ae563 100644
              sitepackages.append(prefix)
              sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index da918b7..8e705fb 100644
+index ef335c6..274bed1 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -56,7 +56,28 @@ _INSTALL_SCHEMES = {
@@ -333,7 +333,7 @@ index da918b7..8e705fb 100644
  
  def get_preferred_scheme(key):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index 76d35da..bc9e457 100644
+index c54d868..8128bcf 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
 @@ -285,16 +285,16 @@ class HelperFunctionsTests(unittest.TestCase):
