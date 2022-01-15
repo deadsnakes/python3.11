@@ -1247,8 +1247,6 @@ class InitConfigTests(EmbeddingTestsMixin, unittest.TestCase):
             'stdlib_dir': stdlib,
         }
         self.default_program_name(config)
-        if not config['executable']:
-            config['use_frozen_modules'] = -1
         env = {'TESTHOME': home, 'PYTHONPATH': paths_str}
         self.check_all_configs("test_init_setpythonhome", config,
                                api=API_COMPAT, env=env)
@@ -1300,11 +1298,16 @@ class InitConfigTests(EmbeddingTestsMixin, unittest.TestCase):
     def test_init_pybuilddir_win32(self):
         # Test path configuration with pybuilddir.txt configuration file
 
-        with self.tmpdir_with_python(r'PCbuild\arch') as tmpdir:
+        vpath = sysconfig.get_config_var("VPATH")
+        subdir = r'PCbuild\arch'
+        if os.path.normpath(vpath).count(os.sep) == 2:
+            subdir = os.path.join(subdir, 'instrumented')
+
+        with self.tmpdir_with_python(subdir) as tmpdir:
             # The prefix is dirname(executable) + VPATH
-            prefix = os.path.normpath(os.path.join(tmpdir, r'..\..'))
+            prefix = os.path.normpath(os.path.join(tmpdir, vpath))
             # The stdlib dir is dirname(executable) + VPATH + 'Lib'
-            stdlibdir = os.path.normpath(os.path.join(tmpdir, r'..\..\Lib'))
+            stdlibdir = os.path.normpath(os.path.join(tmpdir, vpath, 'Lib'))
 
             filename = os.path.join(tmpdir, 'pybuilddir.txt')
             with open(filename, "w", encoding="utf8") as fp:

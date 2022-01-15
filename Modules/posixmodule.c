@@ -3292,7 +3292,14 @@ os_chmod_impl(PyObject *module, path_t *path, int mode, int dir_fd,
     }
     else
 #endif /* HAVE_FHCMODAT */
+    {
+#ifdef HAVE_CHMOD
         result = chmod(path->narrow, mode);
+#else
+        result = -1;
+        errno = ENOSYS;
+#endif
+    }
     Py_END_ALLOW_THREADS
 
     if (result) {
@@ -4885,6 +4892,7 @@ os_system_impl(PyObject *module, PyObject *command)
 #endif /* HAVE_SYSTEM */
 
 
+#ifdef HAVE_UMASK
 /*[clinic input]
 os.umask
 
@@ -4903,6 +4911,7 @@ os_umask_impl(PyObject *module, int mask)
         return posix_error();
     return PyLong_FromLong((long)i);
 }
+#endif
 
 #ifdef MS_WINDOWS
 
@@ -8219,7 +8228,7 @@ wait_helper(PyObject *module, pid_t pid, int status, struct rusage *ru)
         memset(ru, 0, sizeof(*ru));
     }
 
-    PyObject *m = PyImport_ImportModuleNoBlock("resource");
+    PyObject *m = PyImport_ImportModule("resource");
     if (m == NULL)
         return NULL;
     struct_rusage = PyObject_GetAttr(m, get_posix_state(module)->struct_rusage);
@@ -15170,11 +15179,15 @@ all_ins(PyObject *m)
 #ifdef SF_NODISKIO
     if (PyModule_AddIntMacro(m, SF_NODISKIO)) return -1;
 #endif
+    /* is obsolete since the 11.x release */
 #ifdef SF_MNOWAIT
     if (PyModule_AddIntMacro(m, SF_MNOWAIT)) return -1;
 #endif
 #ifdef SF_SYNC
     if (PyModule_AddIntMacro(m, SF_SYNC)) return -1;
+#endif
+#ifdef SF_NOCACHE
+    if (PyModule_AddIntMacro(m, SF_NOCACHE)) return -1;
 #endif
 
     /* constants for posix_fadvise */
