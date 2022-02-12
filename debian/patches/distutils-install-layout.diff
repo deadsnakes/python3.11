@@ -185,7 +185,7 @@ index bb860c8..c13a1df 100644
              wanted.append('foo.%s.pyc' % sys.implementation.cache_tag)
          self.assertEqual(contents, sorted(wanted))
 diff --git a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_install.py
-index b2a3887..2a28fd4 100644
+index c38f98b..12d021f 100644
 --- a/Lib/distutils/tests/test_install.py
 +++ b/Lib/distutils/tests/test_install.py
 @@ -205,7 +205,7 @@ class InstallTestCase(support.TempdirManager,
@@ -196,8 +196,8 @@ index b2a3887..2a28fd4 100644
 +                    'UNKNOWN-0.0.0.egg-info']
          self.assertEqual(found, expected)
  
-     def test_record_extensions(self):
-@@ -238,7 +238,7 @@ class InstallTestCase(support.TempdirManager,
+     @requires_subprocess()
+@@ -239,7 +239,7 @@ class InstallTestCase(support.TempdirManager,
  
          found = [os.path.basename(line) for line in content.splitlines()]
          expected = [_make_ext_name('xx'),
@@ -268,7 +268,7 @@ index b11cd48..e0ae563 100644
              sitepackages.append(prefix)
              sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index ef335c6..274bed1 100644
+index d4a8a68..3221d9c 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -56,7 +56,28 @@ _INSTALL_SCHEMES = {
@@ -300,7 +300,7 @@ index ef335c6..274bed1 100644
  
  
  # NOTE: site.py has copy of this function.
-@@ -242,11 +263,26 @@ def _get_preferred_schemes():
+@@ -243,11 +264,26 @@ def _get_preferred_schemes():
              'home': 'posix_home',
              'user': 'osx_framework_user',
          }
@@ -333,10 +333,10 @@ index ef335c6..274bed1 100644
  
  def get_preferred_scheme(key):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index c54d868..8128bcf 100644
+index 032a1be..3f62e14 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -285,16 +285,16 @@ class HelperFunctionsTests(unittest.TestCase):
+@@ -286,16 +286,16 @@ class HelperFunctionsTests(unittest.TestCase):
          if os.sep == '/':
              # OS X, Linux, FreeBSD, etc
              if sys.platlibdir != "lib":

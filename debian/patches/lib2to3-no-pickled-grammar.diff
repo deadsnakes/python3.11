@@ -4,8 +4,8 @@ Subject: lib2to3-no-pickled-grammar
 
 ---
  Lib/lib2to3/pgen2/driver.py      |  5 ++-
- Lib/lib2to3/tests/test_parser.py | 81 ----------------------------------------
- 2 files changed, 4 insertions(+), 82 deletions(-)
+ Lib/lib2to3/tests/test_parser.py | 84 ----------------------------------------
+ 2 files changed, 4 insertions(+), 85 deletions(-)
 
 diff --git a/Lib/lib2to3/pgen2/driver.py b/Lib/lib2to3/pgen2/driver.py
 index 6471635..957fb5a 100644
@@ -24,10 +24,10 @@ index 6471635..957fb5a 100644
              try:
                  g.dump(gp)
 diff --git a/Lib/lib2to3/tests/test_parser.py b/Lib/lib2to3/tests/test_parser.py
-index 5eefb5a..e648b65 100644
+index 74a5787..5fdba0c 100644
 --- a/Lib/lib2to3/tests/test_parser.py
 +++ b/Lib/lib2to3/tests/test_parser.py
-@@ -38,87 +38,6 @@ class TestDriver(support.TestCase):
+@@ -39,90 +39,6 @@ class TestDriver(support.TestCase):
          self.assertEqual(t.children[1].children[0].type, syms.print_stmt)
  
  
@@ -54,6 +54,9 @@ index 5eefb5a..e648b65 100644
 -            shutil.rmtree(tmpdir)
 -
 -    @unittest.skipIf(sys.executable is None, 'sys.executable required')
+-    @unittest.skipIf(
+-        sys.platform == 'emscripten', 'requires working subprocess'
+-    )
 -    def test_load_grammar_from_subprocess(self):
 -        tmpdir = tempfile.mkdtemp()
 -        tmpsubdir = os.path.join(tmpdir, 'subdir')
