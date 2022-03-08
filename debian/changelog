@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a6-1+bionic1) bionic; urgency=medium
+
+  * Python 3.11.0 alpha 6 release.
+
+ -- Anthony Sottile <asottile@umich.edu>  Tue, 08 Mar 2022 12:42:42 -0500
+
 python3.11 (3.11.0~a5-1+bionic1) bionic; urgency=medium
 
   * Python 3.11.0 alpha 5 release.
