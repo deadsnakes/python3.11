@@ -333,7 +333,7 @@ index d4a8a68..3221d9c 100644
  
  def get_preferred_scheme(key):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index 032a1be..3f62e14 100644
+index a67cfec..fb02270 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
 @@ -286,16 +286,16 @@ class HelperFunctionsTests(unittest.TestCase):
