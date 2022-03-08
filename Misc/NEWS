@@ -2,6 +2,447 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.0 alpha 6?
+====================================
+
+*Release date: 2022-03-07*
+
+Core and Builtins
+-----------------
+
+- bpo-46940: Avoid overriding :exc:`AttributeError` metadata information for
+  nested attribute access calls. Patch by Pablo Galindo.
+
+- bpo-46927: Include the type's name in the error message for subscripting
+  non-generic types.
+
+- bpo-46921: Support vectorcall for ``super()``. Patch by Ken Jin.
+
+- bpo-46841: Fix incorrect handling of inline cache entries when
+  specializing :opcode:`BINARY_OP`.
+
+- bpo-46841: Use an oparg to simplify the construction of helpful error
+  messages in :opcode:`GET_AWAITABLE`.
+
+- bpo-46903: Make sure that str subclasses can be used as attribute names
+  for instances with virtual dictionaries. Fixes regression in 3.11alpha
+
+- bpo-46841: Add more detailed specialization failure stats for
+  :opcode:`COMPARE_OP` followed by :opcode:`EXTENDED_ARG`.
+
+- bpo-46891: Fix bug introduced during 3.11alpha where subclasses of
+  ``types.ModuleType`` with ``__slots__`` were not initialized correctly,
+  resulting in an interpreter crash.
+
+- bpo-46841: Use inline caching for :opcode:`LOAD_ATTR`,
+  :opcode:`LOAD_METHOD`, and :opcode:`STORE_ATTR`.
+
+- bpo-46841: Use inline cache for :opcode:`BINARY_SUBSCR`.
+
+- bpo-46841: Use inline caching for :opcode:`COMPARE_OP`.
+
+- bpo-46864: Deprecate ``PyBytesObject.ob_shash``. It will be removed in
+  Python 3.13.
+
+- bpo-46841: Use inline caching for :opcode:`UNPACK_SEQUENCE`.
+
+- bpo-46845: Reduces dict size by removing hash value from hash table when
+  all inserted keys are Unicode. For example,
+  ``sys.getsizeof(dict.fromkeys("abcdefg"))`` becomes 272 bytes from 352
+  bytes on 64bit platform.
+
+- bpo-46841: Use inline cache for :opcode:`LOAD_GLOBAL`.
+
+- bpo-46852: Rename the private undocumented ``float.__set_format__()``
+  method to ``float.__setformat__()`` to fix a typo introduced in Python
+  3.7. The method is only used by test_float. Patch by Victor Stinner.
+
+- bpo-46852: Remove the undocumented private ``float.__set_format__()``
+  method, previously known as ``float.__setformat__()`` in Python 3.7. Its
+  docstring said: "You probably don't want to use this function. It exists
+  mainly to be used in Python's test suite." Patch by Victor Stinner.
+
+- bpo-40116: Fix regression that dict.update(other) may don't respect
+  iterate order of other when other is key sharing dict.
+
+- bpo-46712: Share global string identifiers in deep-frozen modules.
+
+- bpo-46430: Fix memory leak in interned strings of deep-frozen modules.
+
+- bpo-46841: Store :opcode:`BINARY_OP` caches inline using a new
+  :opcode:`CACHE` instruction.
+
+- bpo-45107: Specialize ``LOAD_METHOD`` for instances with a dict.
+
+- bpo-44337: Reduce the memory usage of specialized :opcode:`LOAD_ATTR` and
+  :opcode:`STORE_ATTR` instructions.
+
+- bpo-46729: Add number of sub-exceptions to :meth:`BaseException.__str__`.
+
+- bpo-45885: Don't un-adapt :opcode:`COMPARE_OP` when collecting
+  specialization stats.
+
+- bpo-46329: Fix specialization stats gathering for :opcode:`PRECALL`
+  instructions.
+
+- bpo-46794: Bump up the libexpat version into 2.4.6
+
+- bpo-46823: Implement a specialized combined opcode
+  ``LOAD_FAST__LOAD_ATTR_INSTANCE_VALUE``.  Patch by Dennis Sweeney.
+
+- bpo-46820: Fix parsing a numeric literal immediately (without spaces)
+  followed by "not in" keywords, like in ``1not in x``. Now the parser only
+  emits a warning, not a syntax error.
+
+- bpo-46329: Move ``KW_NAMES`` before ``PRECALL`` instruction in call
+  sequence. Change ``operand`` of ``CALL`` to match ``PRECALL`` for easier
+  specialization.
+
+- bpo-46808: Remove the ``NEXT_BLOCK`` macro from compile.c, and make the
+  compiler automatically generate implicit blocks when they are needed.
+
+- bpo-46329: Add ``PUSH_NULL`` instruction. This is used as a prefix when
+  evaluating a callable, so that the stack has the same shape for methods
+  and other calls. ``PRECALL_FUNCTION`` and ``PRECALL_METHOD`` are merged
+  into a single ``PRECALL`` instruction.
+
+  There is no change in semantics.
+
+- bpo-46762: Fix an assert failure in debug builds when a '<', '>', or '='
+  is the last character in an f-string that's missing a closing right brace.
+
+- bpo-46730: Message of AttributeError caused by getting, setting or
+  deleting a property without the corresponding function now mentions that
+  the attribute is in fact a property and also specifies type of the class
+  that it belongs to.
+
+- bpo-46724: Make sure that all backwards jumps use the ``JUMP_ABSOLUTE``
+  instruction, rather than ``JUMP_FORWARD`` with an argument of
+  ``(2**32)+offset``.
+
+- bpo-46732: Correct the docstring for the :meth:`__bool__` method. Patch by
+  Jelle Zijlstra.
+
+- bpo-46072: Add more detailed specialization failure statistics for
+  :opcode:`BINARY_OP`.
+
+- bpo-46707: Avoid potential exponential backtracking when producing some
+  syntax errors involving lots of brackets. Patch by Pablo Galindo.
+
+- bpo-46323: :mod:`ctypes` now allocates memory on the stack instead of on
+  the heap to pass arguments while calling a Python callback function. Patch
+  by Dong-hee Na.
+
+- bpo-45923: Add a quickened form of :opcode:`RESUME` that skips quickening
+  checks.
+
+- bpo-46702: Specialize :opcode:`UNPACK_SEQUENCE` for :class:`tuple` and
+  :class:`list` unpackings.
+
+- bpo-46072: Opcode pair stats are now gathered with ``--enable-pystats``.
+  Defining ``DYNAMIC_EXECUTION_PROFILE`` or  ``DXPAIRS`` no longer has any
+  effect.
+
+- bpo-46675: Allow more than 16 items in a split dict before it is combined.
+  The limit is now 254.
+
+- bpo-40479: Add a missing call to ``va_end()`` in
+  ``Modules/_hashopenssl.c``.
+
+- bpo-46323: Use :c:func:`PyObject_Vectorcall` while calling ctypes callback
+  function. Patch by Dong-hee Na.
+
+- bpo-46615: When iterating over sets internally in ``setobject.c``, acquire
+  strong references to the resulting items from the set.  This prevents
+  crashes in corner-cases of various set operations where the set gets
+  mutated.
+
+- bpo-45828: The bytecode compiler now attempts to apply runtime stack
+  manipulations at compile-time (whenever it is feasible to do so).
+
+- bpo-30496: Fixed a minor portability issue in the implementation of
+  :c:func:`PyLong_FromLong`, and added a fast path for single-digit integers
+  to :c:func:`PyLong_FromLongLong`.
+
+Library
+-------
+
+- bpo-25707: Fixed a file leak in :func:`xml.etree.ElementTree.iterparse`
+  when the iterator is not exhausted. Patch by Jacob Walls.
+
+- bpo-46877: Export :func:`unittest.doModuleCleanups` in :mod:`unittest`.
+  Patch by Kumar Aditya.
+
+- bpo-46848: For performance, use the optimized string-searching
+  implementations from :meth:`~bytes.find` and :meth:`~bytes.rfind` for
+  :meth:`~mmap.find` and :meth:`~mmap.rfind`.
+
+- bpo-46736: :class:`~http.server.SimpleHTTPRequestHandler` now uses HTML5
+  grammar. Patch by Dong-hee Na.
+
+- bpo-44886: Inherit asyncio proactor datagram transport from
+  :class:`asyncio.DatagramTransport`.
+
+- bpo-46827: Support UDP sockets in  :meth:`asyncio.loop.sock_connect` for
+  selector-based event loops.  Patch by Thomas Grainger.
+
+- bpo-46811: Make test suite support Expat >=2.4.5
+
+- bpo-46252: Raise :exc:`TypeError` if :class:`ssl.SSLSocket` is passed to
+  transport-based APIs.
+
+- bpo-46784: Fix libexpat symbols collisions with user dynamically loaded or
+  statically linked libexpat in embedded Python.
+
+- bpo-46786: The HTML serialisation in xml.etree.ElementTree now writes
+  ``embed``, ``source``, ``track`` and ``wbr`` as empty tags, as defined in
+  HTML 5.
+
+- bpo-39327: :func:`shutil.rmtree` can now work with VirtualBox shared
+  folders when running from the guest operating-system.
+
+- bpo-45390: Propagate :exc:`asyncio.CancelledError` message from inner task
+  to outer awaiter.
+
+- bpo-46756: Fix a bug in
+  :meth:`urllib.request.HTTPPasswordMgr.find_user_password` and
+  :meth:`urllib.request.HTTPPasswordMgrWithPriorAuth.is_authenticated` which
+  allowed to bypass authorization. For example, access to URI
+  ``example.org/foobar`` was allowed if the user was authorized for URI
+  ``example.org/foo``.
+
+- bpo-46737: :func:`random.gauss` and :func:`random.normalvariate` now have
+  default arguments.
+
+- bpo-46752: Add task groups to asyncio (structured concurrency, inspired by
+  Trio's nurseries). This also introduces a change to task cancellation,
+  where a cancelled task can't be cancelled again until it calls
+  .uncancel().
+
+- bpo-46724: Fix :mod:`dis` behavior on negative jump offsets.
+
+- bpo-46333: The :meth:`__repr__` method of :class:`typing.ForwardRef` now
+  includes the ``module`` parameter of :class:`typing.ForwardRef` when it is
+  set.
+
+- bpo-46643: In :func:`typing.get_type_hints`, support evaluating
+  stringified ``ParamSpecArgs`` and ``ParamSpecKwargs`` annotations. Patch
+  by Gregory Beauregard.
+
+- bpo-45863: When the :mod:`tarfile` module creates a pax format archive, it
+  will put an integer representation of timestamps in the ustar header (if
+  possible) for the benefit of older unarchivers, in addition to the
+  existing full-precision timestamps in the pax extended header.
+
+- bpo-46066: Deprecate kwargs-based syntax for :class:`typing.TypedDict`
+  definitions. It had confusing semantics when specifying totality, and was
+  largely unused. Patch by Jingchen Ye.
+
+- bpo-46676: Make :data:`typing.ParamSpec` args and kwargs equal to
+  themselves. Patch by Gregory Beauregard.
+
+- bpo-46323: ``ctypes.CFUNCTYPE()`` and ``ctypes.WINFUNCTYPE()`` now fail to
+  create the type if its ``_argtypes_`` member contains too many arguments.
+  Previously, the error was only raised when calling a function. Patch by
+  Victor Stinner.
+
+- bpo-46672: Fix ``NameError`` in :func:`asyncio.gather` when initial type
+  check fails.
+
+- bpo-46659: The :class:`calendar.LocaleTextCalendar` and
+  :class:`calendar.LocaleHTMLCalendar` classes now use
+  :func:`locale.getlocale`, instead of using
+  :func:`locale.getdefaultlocale`, if no locale is specified. Patch by
+  Victor Stinner.
+
+- bpo-46659: The :func:`locale.getdefaultlocale` function is deprecated and
+  will be removed in Python 3.13. Use :func:`locale.setlocale`,
+  :func:`locale.getpreferredencoding(False) <locale.getpreferredencoding>`
+  and :func:`locale.getlocale` functions instead.  Patch by Victor Stinner.
+
+- bpo-46655: In :func:`typing.get_type_hints`, support evaluating bare
+  stringified ``TypeAlias`` annotations. Patch by Gregory Beauregard.
+
+- bpo-45948: Fixed a discrepancy in the C implementation of the
+  :mod:`xml.etree.ElementTree` module. Now, instantiating an
+  :class:`xml.etree.ElementTree.XMLParser` with a ``target=None`` keyword
+  provides a default :class:`xml.etree.ElementTree.TreeBuilder` target as
+  the Python implementation does.
+
+- bpo-46626: Expose Linux's ``IP_BIND_ADDRESS_NO_PORT`` option in
+  :mod:`socket`.
+
+- bpo-46521: Fix a bug in the :mod:`codeop` module that was incorrectly
+  identifying invalid code involving string quotes as valid code.
+
+- bpo-46571: Improve :func:`typing.no_type_check`.
+
+  Now it does not modify external classes and functions. We also now
+  correctly mark classmethods as not to be type checked.
+
+- bpo-46400: expat: Update libexpat from 2.4.1 to 2.4.4
+
+- bpo-46556: Deprecate undocumented support for using a
+  :class:`pathlib.Path` object as a context manager.
+
+- bpo-46534: Implement :pep:`673` :class:`typing.Self`. Patch by James
+  Hilton-Balfe.
+
+- bpo-46522: Make various module ``__getattr__`` AttributeErrors more
+  closely match a typical AttributeError
+
+- bpo-46475: Add :data:`typing.Never` and :func:`typing.assert_never`. Patch
+  by Jelle Zijlstra.
+
+- bpo-46333: The :meth:`__eq__` and :meth:`__hash__` methods of
+  :class:`typing.ForwardRef` now honor the ``module`` parameter of
+  :class:`typing.ForwardRef`. Forward references from different modules are
+  now differentiated.
+
+- bpo-46246: Add missing ``__slots__`` to
+  ``importlib.metadata.DeprecatedList``. Patch by Arie Bovenberg.
+
+- bpo-46232: The :mod:`ssl` module now handles certificates with bit strings
+  in DN correctly.
+
+- bpo-46195: :func:`typing.get_type_hints` no longer adds ``Optional`` to
+  parameters with ``None`` as a default. This aligns to changes to PEP 484
+  in https://github.com/python/peps/pull/689
+
+- bpo-31369: Add :class:`~re.RegexFlag` to ``re.__all__`` and documented it.
+  Add :data:`~re.RegexFlag.NOFLAG` to indicate no flags being set.
+
+- bpo-45898: :mod:`ctypes` no longer defines ``ffi_type_*`` symbols in
+  ``cfield.c``. The symbols have been provided by libffi for over a decade.
+
+- bpo-44953: Calling ``operator.itemgetter`` objects and
+  ``operator.attrgetter`` objects is now faster due to use of the vectorcall
+  calling convention.
+
+- bpo-44289: Fix an issue with :meth:`~tarfile.is_tarfile` method when using
+  *fileobj* argument: position in the *fileobj* was advanced forward which
+  made it unreadable with :meth:`tarfile.TarFile.open`.
+
+- bpo-44011: Reimplement SSL/TLS support in asyncio, borrow the
+  implementation from uvloop library.
+
+- bpo-41086: Make the :class:`configparser.ConfigParser` constructor raise
+  :exc:`TypeError` if the ``interpolation`` parameter is not of type
+  :class:`configparser.Interpolation`
+
+- bpo-29418: Implement :func:`inspect.ismethodwrapper` and fix
+  :func:`inspect.isroutine` for cases where methodwrapper is given. Patch by
+  Hakan Çelik.
+
+- bpo-14156: argparse.FileType now supports an argument of '-' in binary
+  mode, returning the .buffer attribute of sys.stdin/sys.stdout as
+  appropriate. Modes including 'x' and 'a' are treated equivalently to 'w'
+  when argument is '-'. Patch contributed by Josh Rosenberg
+
+Documentation
+-------------
+
+- bpo-42238: ``Doc/tools/rstlint.py`` has moved to its own repository and is
+  now packaged on PyPI as ``sphinx-lint``.
+
+Tests
+-----
+
+- bpo-46913: Fix test_faulthandler.test_sigfpe() if Python is built with
+  undefined behavior sanitizer (UBSAN): disable UBSAN on the
+  faulthandler_sigfpe() function. Patch by Victor Stinner.
+
+- bpo-46760: Remove bytecode offsets from expected values in test.test_dis
+  module. Reduces the obstacles to modifying the VM or compiler.
+
+- bpo-46708: Prevent default asyncio event loop policy modification warning
+  after ``test_asyncio`` execution.
+
+- bpo-46678: The function ``make_legacy_pyc`` in
+  ``Lib/test/support/import_helper.py`` no longer fails when
+  ``PYTHONPYCACHEPREFIX`` is set to a directory on a different device from
+  where tempfiles are stored.
+
+- bpo-46623: Skip test_pair() and test_speech128() of test_zlib on s390x
+  since they fail if zlib uses the s390x hardware accelerator. Patch by
+  Victor Stinner.
+
+Build
+-----
+
+- bpo-46860: Respect `--with-suffix` when building on case-insensitive file
+  systems.
+
+- bpo-46656: Building Python now requires a C11 compiler without optional
+  C11 features. Patch by Victor Stinner.
+
+- bpo-46656: Building Python now requires support for floating point
+  Not-a-Number (NaN): remove the ``Py_NO_NAN`` macro. Patch by by Victor
+  Stinner.
+
+- bpo-46640: Building Python now requires a C99 ``<math.h>`` header file
+  providing a ``NAN`` constant, or the ``__builtin_nan()`` built-in
+  function. Patch by Victor Stinner.
+
+- bpo-46608: Exclude marshalled-frozen data if deep-freezing to save 300 KB
+  disk space. This includes adding a new ``is_package`` field to
+  :c:struct:`_frozen`. Patch by Kumar Aditya.
+
+- bpo-40280: Fix wasm32-emscripten test failures and platform issues. -
+  Disable syscalls that are not supported or don't work, e.g.   wait,
+  getrusage, prlimit, mkfifo, mknod, setres[gu]id, setgroups. - Use fd_count
+  to cound open fds. - Add more checks for subprocess and fork. - Add
+  workarounds for missing _multiprocessing and failing socket.accept(). -
+  Enable bzip2. - Disable large file support. - Disable signal.alarm.
+
+- bpo-46430: Intern strings in deep-frozen modules. Patch by Kumar Aditya.
+
+Windows
+-------
+
+- bpo-46744: The default all users install directory for ARM64 is now under
+  the native ``Program Files`` folder, rather than ``Program Files (Arm)``
+  which is intended for ARM (32-bit) files.
+
+- bpo-46567: Adds Tcl and Tk support for Windows ARM64. This also adds IDLE
+  to the installation.
+
+- bpo-46638: Ensures registry virtualization is consistently disabled. For
+  3.10 and earlier, it remains enabled (some registry writes are protected),
+  while for 3.11 and later it is disabled (registry modifications affect all
+  applications).
+
+IDLE
+----
+
+- bpo-46630: Make query dialogs on Windows start with a cursor in the entry
+  box.
+
+- bpo-45447: Apply IDLE syntax highlighting to `.pyi` files. Patch by Alex
+  Waygood and Terry Jan Reedy.
+
+C API
+-----
+
+- bpo-46748: Python's public headers no longer import ``<stdbool.h>``,
+  leaving code that embedd/extends Python free to define ``bool``, ``true``
+  and ``false``.
+
+- bpo-46836: Move the :c:type:`PyFrameObject` type definition (``struct
+  _frame``) to the internal C API ``pycore_frame.h`` header file. Patch by
+  Victor Stinner.
+
+- bpo-45459: Rename ``Include/buffer.h`` header file to
+  ``Include/pybuffer.h`` to avoid conflits with projects having an existing
+  ``buffer.h`` header file. Patch by Victor Stinner.
+
+- bpo-45412: Remove the ``HAVE_PY_SET_53BIT_PRECISION`` macro (moved to the
+  internal C API). Patch by Victor Stinner.
+
+- bpo-46613: Added function :c:func:`PyType_GetModuleByDef`, which allows
+  accesss to module state when a method's defining class is not available.
+
+
 What's New in Python 3.11.0 alpha 5?
 ====================================
 
