@@ -12,13 +12,14 @@ extern "C" {
 
 #include "pycore_atomic.h"        // _Py_atomic_address
 #include "pycore_ast_state.h"     // struct ast_state
+#include "pycore_code.h"          // struct callable_cache
 #include "pycore_context.h"       // struct _Py_context_state
 #include "pycore_dict.h"          // struct _Py_dict_state
 #include "pycore_exceptions.h"    // struct _Py_exc_state
 #include "pycore_floatobject.h"   // struct _Py_float_state
+#include "pycore_gc.h"            // struct _gc_runtime_state
 #include "pycore_genobject.h"     // struct _Py_async_gen_state
 #include "pycore_gil.h"           // struct _gil_runtime_state
-#include "pycore_gc.h"            // struct _gc_runtime_state
 #include "pycore_list.h"          // struct _Py_list_state
 #include "pycore_tuple.h"         // struct _Py_tuple_state
 #include "pycore_typeobject.h"    // struct type_cache
@@ -68,6 +69,20 @@ struct atexit_state {
     int ncallbacks;
     int callback_len;
 };
+
+
+/* Frame evaluation API (PEP 523) */
+
+typedef PyObject* (*_PyFrameEvalFunction) (
+    PyThreadState *tstate,
+    struct _PyInterpreterFrame *frame,
+    int throwflag);
+
+PyAPI_FUNC(_PyFrameEvalFunction) _PyInterpreterState_GetEvalFrameFunc(
+    PyInterpreterState *interp);
+PyAPI_FUNC(void) _PyInterpreterState_SetEvalFrameFunc(
+    PyInterpreterState *interp,
+    _PyFrameEvalFunction eval_frame);
 
 
 /* interpreter state */
@@ -176,6 +191,7 @@ struct _is {
 
     struct ast_state ast;
     struct type_cache type_cache;
+    struct callable_cache callable_cache;
 
     /* The following fields are here to avoid allocation during init.
        The data is exposed through PyInterpreterState pointer fields.
