@@ -199,6 +199,9 @@ ifeq ($(with_lto),yes)
     RANLIB=$(DEB_HOST_GNU_TYPE)-gcc-ranlib
 endif
 
+TCLTK_CFLAGS=-I/usr/include/tcl8.6
+TCLTK_LIBS=-ltcl8.6
+
 sysconfig_substflags = \
 	-e 's,gcc-8,gcc,;s,g++-8,g++,' \
 	-e '/^OPT/s,-O3,-O2,' \
@@ -386,6 +389,7 @@ stamps/stamp-configure-shared: stamps/stamp-patch
 	cd $(buildd_shared) && \
 	  CC="$(CC)" CXX="$(CXX)" AR="$(AR)" RANLIB="$(RANLIB)" CFLAGS="$(OPT_CFLAGS)" \
 	  CPPFLAGS="$(DPKG_CPPFLAGS)" LDFLAGS="$(DPKG_LDFLAGS)" \
+	  TCLTK_CFLAGS="$(TCLTK_CFLAGS)" TCLTK_LIBS="$(TCLTK_LIBS)" \
 	    $(config_site) \
 	    ../configure \
 		--enable-shared \
@@ -404,6 +408,7 @@ stamps/stamp-configure-static: stamps/stamp-patch
 	cd $(buildd_static) && \
 	  CC="$(CC)" CXX="$(CXX)" AR="$(AR)" RANLIB="$(RANLIB)" CFLAGS="$(OPT_CFLAGS)" \
 	  CPPFLAGS="$(DPKG_CPPFLAGS)" LDFLAGS="$(DPKG_LDFLAGS)" \
+	  TCLTK_CFLAGS="$(TCLTK_CFLAGS)" TCLTK_LIBS="$(TCLTK_LIBS)" \
 	    $(config_site) \
 	    ../configure \
 		$(common_configure_args)
@@ -417,6 +422,7 @@ stamps/stamp-configure-debug: stamps/stamp-patch
 	cd $(buildd_debug) && \
 	  CC="$(CC)" CXX="$(CXX)" AR="$(AR)" RANLIB="$(RANLIB)" CFLAGS="$(DEBUG_CFLAGS)" \
 	  CPPFLAGS="$(DPKG_CPPFLAGS)" LDFLAGS="$(DPKG_LDFLAGS)" \
+	  TCLTK_CFLAGS="$(TCLTK_CFLAGS)" TCLTK_LIBS="$(TCLTK_LIBS)" \
 	    $(config_site) \
 	    ../configure \
 		$(common_configure_args) \
@@ -431,6 +437,7 @@ stamps/stamp-configure-shared-debug: stamps/stamp-patch
 	cd $(buildd_shdebug) && \
 	  CC="$(CC)" CXX="$(CXX)" AR="$(AR)" RANLIB="$(RANLIB)" CFLAGS="$(DEBUG_CFLAGS)" \
 	  CPPFLAGS="$(DPKG_CPPFLAGS)" LDFLAGS="$(DPKG_LDFLAGS)" \
+	  TCLTK_CFLAGS="$(TCLTK_CFLAGS)" TCLTK_LIBS="$(TCLTK_LIBS)" \
 	    $(config_site) \
 	    ../configure \
 		$(common_configure_args) \
