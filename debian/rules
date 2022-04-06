@@ -450,7 +450,7 @@ define __post_configure
 	: # unconditionally run makesetup
 	cd $(1) && \
 	  ../Modules/makesetup -c ../Modules/config.c.in -s Modules \
-	    Modules/Setup.local ../Modules/Setup.bootstrap ../Modules/Setup
+	    Modules/Setup.local Modules/Setup.bootstrap ../Modules/Setup
 	mv $(1)/config.c $(1)/Modules/
 
 	: # and fix the timestamps
