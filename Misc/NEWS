@@ -2,6 +2,607 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.0 alpha 7?
+====================================
+
+*Release date: 2022-04-05*
+
+Core and Builtins
+-----------------
+
+- bpo-47212: Raise :exc:`IndentationError` instead of :exc:`SyntaxError` for
+  a bare ``except`` with no following indent. Improve :exc:`SyntaxError`
+  locations for an un-parenthesized generator used as arguments. Patch by
+  Matthieu Dartiailh.
+
+- bpo-47186: Replace :opcode:`JUMP_IF_NOT_EG_MATCH` by
+  :opcode:`CHECK_EG_MATCH` + jump.
+
+- bpo-47176: Emscripten builds cannot handle signals in the usual way due to
+  platform limitations. Python can now handle signals. To use, set
+  Module.Py_EmscriptenSignalBuffer to be a single byte SharedArrayBuffer and
+  set Py_EMSCRIPTEN_SIGNAL_HANDLING to 1. Writing a number into the
+  SharedArrayBuffer will cause the corresponding signal to be raised into
+  the Python thread.
+
+- bpo-47186: Replace :opcode:`JUMP_IF_NOT_EXC_MATCH` by
+  :opcode:`CHECK_EXC_MATCH` + jump.
+
+- bpo-47120: Replace the absolute jump opcode :opcode:`JUMP_NO_INTERRUPT` by
+  the relative :opcode:`JUMP_BACKWARD_NO_INTERRUPT`.
+
+- bpo-46841: Avoid unnecessary allocations when comparing code objects.
+
+- bpo-47182: Fix a crash when using a named unicode character like
+  ``"\N{digit nine}"`` after the main interpreter has been initialized a
+  second time.
+
+- bpo-47162: WebAssembly cannot deal with bad function pointer casts
+  (different count or types of arguments). Python can now use call
+  trampolines to mitigate the problem. Define :c:macro:`PY_CALL_TRAMPOLINE`
+  to enable call trampolines.
+
+- bpo-46775: Some Windows system error codes(>= 10000) are now mapped into
+  the correct errno and may now raise a subclass of :exc:`OSError`. Patch by
+  Dong-hee Na.
+
+- bpo-47129: Improve error messages in f-string syntax errors concerning
+  empty expressions.
+
+- bpo-47117: Fix a crash if we fail to decode characters in interactive mode
+  if the tokenizer buffers are uninitialized. Patch by Pablo Galindo.
+
+- bpo-47127: Speed up calls to c functions with keyword arguments by 25%
+  with specialization. Patch by Kumar Aditya.
+
+- bpo-47120: Replaced :opcode:`JUMP_ABSOLUTE` by the relative jump
+  :opcode:`JUMP_BACKWARD`.
+
+- bpo-42197: :c:func:`PyFrame_FastToLocalsWithError` and
+  :c:func:`PyFrame_LocalsToFast` are no longer called during profiling nor
+  tracing. C code can access the ``f_locals`` attribute of
+  :c:type:`PyFrameObject` by calling :c:func:`PyFrame_GetLocals`.
+
+- bpo-47070: Improve performance of ``array_inplace_repeat`` by reducing the
+  number of invocations of ``memcpy``. Refactor the ``repeat`` and inplace
+  ``repeat`` methods of ``array``, ``bytes``, ``bytearray`` and
+  ``unicodeobject`` to use the common ``_PyBytes_Repeat``.
+
+- bpo-47053: Reduce de-optimization in the specialized
+  ``BINARY_OP_INPLACE_ADD_UNICODE`` opcode.
+
+- bpo-47045: Remove the ``f_state`` field from the _PyInterpreterFrame
+  struct. Add the ``owner`` field to the _PyInterpreterFrame struct to make
+  ownership explicit to simplify clearing and deallocing frames and
+  generators.
+
+- bpo-46968: Check for the existence of the "sys/auxv.h" header in
+  :mod:`faulthandler` to avoid compilation problems in systems where this
+  header doesn't exist. Patch by Pablo Galindo
+
+- bpo-46329: Use low bit of ``LOAD_GLOBAL`` to indicate whether to push a
+  ``NULL`` before the global. Helps streamline the call sequence a bit.
+
+- bpo-46841: Quicken bytecode in-place by storing it as part of the
+  corresponding ``PyCodeObject``.
+
+- bpo-47012: Speed up iteration of :class:`bytes` and :class:`bytearray` by
+  30%. Patch by Kumar Aditya.
+
+- bpo-47009: Improved the performance of :meth:`list.append()` and list
+  comprehensions by optimizing for the common case, where no resize is
+  needed. Patch by Dennis Sweeney.
+
+- bpo-47005: Improve performance of ``bytearray_repeat`` and
+  ``bytearray_irepeat`` by reducing the number of invocations of ``memcpy``.
+
+- bpo-46829: Deprecate passing a message into :meth:`asyncio.Future.cancel`
+  and :meth:`asyncio.Task.cancel`
+
+- bpo-46993: Speed up :class:`bytearray` creation from :class:`list` and
+  :class:`tuple` by 40%. Patch by Kumar Aditya.
+
+- bpo-39829: Removed the ``__len__()`` call when initializing a list and
+  moved initializing to ``list_extend``. Patch by Jeremiah Pascual.
+
+- bpo-46944: Speed up throwing exception in generator with
+  :const:`METH_FASTCALL` calling convention. Patch by Kumar Aditya.
+
+- bpo-46841: Modify :opcode:`STORE_SUBSCR` to use an inline cache entry
+  (rather than its oparg) as an adaptive counter.
+
+- bpo-46841: Use inline caching for :opcode:`PRECALL` and :opcode:`CALL`,
+  and remove the internal machinery for managing the (now unused) non-inline
+  caches.
+
+- bpo-46881: Statically allocate and initialize the latin1 characters.
+
+- bpo-46838: Improve syntax errors for incorrect function definitions. Patch
+  by Pablo Galindo
+
+- bpo-43721: Fix docstrings of :attr:`~property.getter`,
+  :attr:`~property.setter`, and :attr:`~property.deleter` to clarify that
+  they create a new copy of the property.
+
+- bpo-43224: Make grammar changes required for PEP 646.
+
+Library
+-------
+
+- bpo-47208: Allow vendors to override :const:`CTYPES_MAX_ARGCOUNT`.
+
+- bpo-23689: :mod:`re` module: fix memory leak when a match is terminated by
+  a signal or memory allocation failure. Patch by Ma Lin.
+
+- bpo-47167: Allow overriding a future compliance check in
+  :class:`asyncio.Task`.
+
+- bpo-47151: When subprocess tries to use vfork, it now falls back to fork
+  if vfork returns an error. This allows use in situations where vfork isn't
+  allowed by the OS kernel.
+
+- bpo-47152: Convert the :mod:`re` module into a package. Deprecate modules
+  ``sre_compile``, ``sre_constants`` and ``sre_parse``.
+
+- bpo-4833: Add :meth:`ZipFile.mkdir`
+
+- bpo-27929: Fix :meth:`asyncio.loop.sock_connect` to only resolve names for
+  :const:`socket.AF_INET` or :const:`socket.AF_INET6` families. Resolution
+  may not make sense for other families, like :const:`socket.AF_BLUETOOTH`
+  and :const:`socket.AF_UNIX`.
+
+- bpo-14265: Adds the fully qualified test name to unittest output
+
+- bpo-47061: Deprecate the aifc module.
+
+- bpo-39622: Handle Ctrl+C in asyncio programs to interrupt the main task.
+
+- bpo-47101: :const:`hashlib.algorithms_available` now lists only algorithms
+  that are provided by activated crypto providers on OpenSSL 3.0. Legacy
+  algorithms are not listed unless the legacy provider has been loaded into
+  the default OSSL context.
+
+- bpo-47099: All :exc:`URLError` exception messages raised in
+  :class:`urllib.request.URLopener` now contain a colon between ``ftp
+  error`` and the rest of the message. Previously,
+  :func:`~urllib.request.URLopener.open_ftp` missed the colon. Patch by Oleg
+  Iarygin.
+
+- bpo-47099: Exception chaining is changed from
+  :func:`Exception.with_traceback`/:func:`sys.exc_info` to :pep:`3134`.
+  Patch by Oleg Iarygin.
+
+- bpo-47095: :mod:`hashlib`'s internal ``_blake2`` module now prefers
+  ``libb2`` from https://www.blake2.net/ over Python's vendored copy of
+  blake2.
+
+- bpo-47098: The Keccak Code Package for :mod:`hashlib`'s internal ``_sha3``
+  module has been replaced with tiny_sha3. The module is used as fallback
+  when Python is built without OpenSSL.
+
+- bpo-47088: Implement :data:`typing.LiteralString`, part of :pep:`675`.
+  Patch by Jelle Zijlstra.
+
+- bpo-42885: Optimize :func:`re.search`, :func:`re.split`,
+  :func:`re.findall`, :func:`re.finditer` and :func:`re.sub` for regular
+  expressions starting with ``\A`` or ``^``.
+
+- bpo-23691: Protect the :func:`re.finditer` iterator from re-entering.
+
+- bpo-47067: Optimize calling ``GenericAlias`` objects by using :pep:`590`
+  ``vectorcall`` and by replacing ``PyObject_SetAttrString`` with
+  ``PyObject_SetAttr``.
+
+- bpo-28080: Add the *metadata_encoding* parameter in the
+  :class:`zipfile.ZipFile` constructor and the ``--metadata-encoding``
+  option in the :mod:`zipfile` CLI to allow reading zipfiles using
+  non-standard codecs to encode the filenames within the archive.
+
+- bpo-47000: Make :func:`io.text_encoding` returns "utf-8" when UTF-8 mode
+  is enabled.
+
+- bpo-42369: Fix thread safety of :meth:`zipfile._SharedFile.tell` to avoid
+  a "zipfile.BadZipFile: Bad CRC-32 for file" exception when reading a
+  :class:`ZipFile` from multiple threads.
+
+- bpo-38256: Fix :func:`binascii.crc32` when it is compiled to use zlib'c
+  crc32 to work properly on inputs 4+GiB in length instead of returning the
+  wrong result. The workaround prior to this was to always feed the function
+  data in increments smaller than 4GiB or to just call the zlib module
+  function.
+
+  We also have :func:`binascii.crc32` release the GIL when computing on
+  larger inputs as :func:`zlib.crc32` and :mod:`hashlib` do.
+
+  This also boosts performance on Windows as it now uses the zlib crc32
+  implementation for :func:`binascii.crc32` for a 2-3x speedup.
+
+  That the stdlib has a crc32 API in two modules is a known historical
+  oddity. This moves us closer to a single implementation behind them.
+
+- bpo-47066: Global inline flags (e.g. ``(?i)``) can now only be used at the
+  start of the regular expressions.  Using them not at the start of
+  expression was deprecated since Python 3.6.
+
+- bpo-39394: A warning about inline flags not at the start of the regular
+  expression now contains the position of the flag.
+
+- bpo-433030: Add support of atomic grouping (``(?>...)``) and possessive
+  quantifiers (``*+``, ``++``, ``?+``, ``{m,n}+``) in :mod:`regular
+  expressions <re>`.
+
+- bpo-47062: Implement :class:`asyncio.Runner` context manager.
+
+- bpo-46382: :func:`~dataclasses.dataclass` ``slots=True`` now correctly
+  omits slots already defined in base classes. Patch by Arie Bovenberg.
+
+- bpo-47057: Use FASTCALL convention for ``FutureIter.throw()``
+
+- bpo-47061: Deprecate the various modules listed by :pep:`594`:
+
+  aifc, asynchat, asyncore, audioop, cgi, cgitb, chunk, crypt, imghdr,
+  msilib, nntplib, nis, ossaudiodev, pipes, smtpd, sndhdr, spwd, sunau,
+  telnetlib, uu, xdrlib
+
+- bpo-34790: Remove passing coroutine objects to :func:`asyncio.wait`.
+
+- bpo-47039: Normalize ``repr()`` of asyncio future and task objects.
+
+- bpo-2604: Fix bug where doctests using globals would fail when run
+  multiple times.
+
+- bpo-45150: Add :func:`hashlib.file_digest` helper for efficient hashing of
+  file object.
+
+- bpo-34861: Made cumtime the default sorting key for cProfile
+
+- bpo-45997: Fix :class:`asyncio.Semaphore` re-aquiring FIFO order.
+
+- bpo-47022: The :mod:`asynchat`, :mod:`asyncore` and  :mod:`smtpd` modules
+  have been deprecated since at least Python 3.6. Their documentation and
+  deprecation warnings and have now been updated to note they will removed
+  in Python 3.12 (:pep:`594`).
+
+- bpo-43253: Fix a crash when closing transports where the underlying socket
+  handle is already invalid on the Proactor event loop.
+
+- bpo-40280: :func:`select.select` now passes ``NULL`` to ``select`` for
+  each empty fdset.
+
+- bpo-47004: Apply bugfixes from importlib_metadata 4.11.3, including bugfix
+  for EntryPoint.extras, which was returning match objects and not the
+  extras strings.
+
+- bpo-46998: Allow subclassing of :class:`typing.Any`. Patch by Shantanu
+  Jain.
+
+- bpo-46995: Deprecate missing :meth:`asyncio.Task.set_name` for third-party
+  task implementations, schedule making it mandatory in Python 3.13.
+
+- bpo-46994: Accept explicit contextvars.Context in
+  :func:`asyncio.create_task` and :meth:`asyncio.loop.create_task`.
+
+- bpo-46981: ``typing.get_args(typing.Tuple[()])`` now returns ``()``
+  instead of ``((),)``.
+
+- bpo-46968: Add ``os.sysconf_names['SC_MINSIGSTKSZ']``.
+
+- bpo-46985: Upgrade pip wheel bundled with ensurepip (pip 22.0.4)
+
+- bpo-46968: :mod:`faulthandler`: On Linux 5.14 and newer, dynamically
+  determine size of signal handler stack size CPython allocates using
+  ``getauxval(AT_MINSIGSTKSZ)``. This changes allows for Python extension's
+  request to Linux kernel to use AMX_TILE instruction set on Sapphire Rapids
+  Xeon processor to succeed, unblocking use of the ISA in frameworks.
+
+- bpo-46917: The :data:`math.nan` value is now always available. Patch by
+  Victor Stinner.
+
+- bpo-46955: Expose :class:`asyncio.base_events.Server` as
+  :class:`asyncio.Server`. Patch by Stefan Zabka.
+
+- bpo-23325: The :mod:`signal` module no longer assumes that
+  :const:`~signal.SIG_IGN` and :const:`~signal.SIG_DFL` are small int
+  singletons.
+
+- bpo-46932: Update bundled libexpat to 2.4.7
+
+- bpo-46933: The :mod:`pwd` module is now optional.
+  :func:`os.path.expanduser` returns the path when the :mod:`pwd` module is
+  not available.
+
+- bpo-40059: :pep:`680`, the :mod:`tomllib` module. Adds support for parsing
+  TOML.
+
+- bpo-464471: :func:`asyncio.timeout` and :func:`asyncio.timeout_at` context
+  managers added. Patch by Tin Tvrtković and Andrew Svetlov.
+
+- bpo-46805: Added raw datagram socket functions for asyncio:
+  :meth:`~asyncio.AbstractEventLoop.sock_sendto`,
+  :meth:`~asyncio.AbstractEventLoop.sock_recvfrom` and
+  :meth:`~asyncio.AbstractEventLoop.sock_recvfrom_into`.
+
+- bpo-46644: No longer require valid typeforms to be callable. This allows
+  :data:`typing.Annotated` to wrap :data:`typing.ParamSpecArgs` and
+  :data:`dataclasses.InitVar`. Patch by Gregory Beauregard.
+
+- bpo-46581: Brings :class:`ParamSpec` propagation for :class:`GenericAlias`
+  in line with :class:`Concatenate` (and others).
+
+- bpo-45413: Define *posix_venv* and *nt_venv* :ref:`sysconfig installation
+  schemes <installation_paths>` to be used for bootstrapping new virtual
+  environments. Add *venv* sysconfig installation scheme to get the
+  appropriate one of the above. The schemes are identical to the
+  pre-existing *posix_prefix* and *nt* install schemes. The :mod:`venv`
+  module now uses the *venv* scheme to create new virtual environments
+  instead of hardcoding the paths depending only on the platform. Downstream
+  Python distributors customizing the *posix_prefix* or *nt* install scheme
+  in a way that is not compatible with the install scheme used in virtual
+  environments are encouraged not to customize the *venv* schemes. When
+  Python itself runs in a virtual environment,
+  :func:`sysconfig.get_default_scheme` and
+  :func:`sysconfig.get_preferred_scheme` with ``key="prefix"`` returns
+  *venv*.
+
+- bpo-43224: Implement support for PEP 646 in typing.py.
+
+- bpo-43224: Allow unpacking types.GenericAlias objects, e.g. ``*tuple[int,
+  str]``.
+
+- bpo-46557: Warnings captured by the logging module are now logged without
+  a format string to prevent systems that group logs by the msg argument
+  from grouping captured warnings together.
+
+- bpo-41370: :func:`typing.get_type_hints` now supports evaluating strings
+  as forward references in :ref:`PEP 585 generic aliases
+  <types-genericalias>`.
+
+- bpo-46607: Add :exc:`DeprecationWarning` to :class:`LegacyInterpolation`,
+  deprecated in the docstring since Python 3.2. Will be removed in Python
+  3.13. Use :class:`BasicInterpolation` or :class:`ExtendedInterpolation`
+  instead.
+
+- bpo-26120: :mod:`pydoc` now excludes __future__ imports from the module's
+  data items.
+
+- bpo-46480: Add :func:`typing.assert_type`. Patch by Jelle Zijlstra.
+
+- bpo-46421: Fix a unittest issue where if the command was invoked as
+  ``python -m unittest`` and the filename(s) began with a dot (.), a
+  ``ValueError`` is returned.
+
+- bpo-46245: Add optional parameter *dir_fd* in :func:`shutil.rmtree`.
+
+- bpo-22859: :meth:`~unittest.TestProgram.usageExit` is marked deprecated,
+  to be removed in 3.13.
+
+- bpo-46170: Improve the error message when you try to subclass an instance
+  of :class:`typing.NewType`.
+
+- bpo-40296: Fix supporting generic aliases in :mod:`pydoc`.
+
+- bpo-20392: Fix inconsistency with uppercase file extensions in
+  :meth:`MimeTypes.guess_type`. Patch by Kumar Aditya.
+
+- bpo-46030: Add ``LOCAL_CREDS``, ``LOCAL_CREDS_PERSISTENT`` and
+  ``SCM_CREDS2`` FreeBSD constants to the socket module.
+
+- bpo-44439: Fix ``.write()`` method of a member file in ``ZipFile``, when
+  the input data is an object that supports the buffer protocol, the file
+  length may be wrong.
+
+- bpo-45171: Fix handling of the ``stacklevel`` argument to logging
+  functions in the :mod:`logging` module so that it is consistent accross
+  all logging functions and, as advertised, similar to the ``stacklevel``
+  argument used in :meth:`~warnings.warn`.
+
+- bpo-24959: Fix bug where :mod:`unittest` sometimes drops frames from
+  tracebacks of exceptions raised in tests.
+
+- bpo-44859: Raise more accurate and :pep:`249` compatible exceptions in
+  :mod:`sqlite3`.
+
+  * Raise :exc:`~sqlite3.InterfaceError` instead of
+    :exc:`~sqlite3.ProgrammingError` for ``SQLITE_MISUSE`` errors.
+  * Don't overwrite :exc:`BufferError` with :exc:`ValueError` when conversion to
+    BLOB fails.
+  * Raise :exc:`~sqlite3.ProgrammingError` instead of :exc:`~sqlite3.Warning` if
+    user tries to :meth:`~sqlite3.Cursor.execute()` more than one SQL statement.
+  * Raise :exc:`~sqlite3.ProgrammingError` instead of :exc:`ValueError` if an SQL
+    query contains null characters.
+
+- bpo-44493: Add missing terminated NUL in sockaddr_un's length
+
+  This was potentially observable when using non-abstract AF_UNIX datagram
+  sockets to processes written in another programming language.
+
+- bpo-41930: Add :meth:`~sqlite3.Connection.serialize` and
+  :meth:`~sqlite3.Connection.deserialize` support to :mod:`sqlite3`. Patch
+  by Erlend E. Aasland.
+
+- bpo-33178: Added :class:`ctypes.BigEndianUnion` and
+  :class:`ctypes.LittleEndianUnion` classes, as originally documented in the
+  library docs but not yet implemented.
+
+- bpo-43352: Add an Barrier object in synchronization primitives of
+  *asyncio* Lib in order to be consistant with Barrier from *threading* and
+  *multiprocessing* libs*
+
+- bpo-35859: :mod:`re` module, fix a few bugs about capturing group. In rare
+  cases, capturing group gets an incorrect string. Patch by Ma Lin.
+
+Documentation
+-------------
+
+- bpo-45099: Document internal :mod:`asyncio` API.
+
+- bpo-47126: Update PEP URLs to :pep:`676`'s new canonical form.
+
+- bpo-47040: Clarified the old Python versions compatiblity note of
+  :func:`binascii.crc32` / :func:`zlib.adler32` / :func:`zlib.crc32`
+  functions.
+
+- bpo-46033: Clarify ``for`` statement execution in its doc.
+
+- bpo-45790: Adjust inaccurate phrasing in
+  :doc:`../extending/newtypes_tutorial` about the ``ob_base`` field and the
+  macros used to access its contents.
+
+- bpo-42340: Document that in some circumstances :exc:`KeyboardInterrupt`
+  may cause the code to enter an inconsistent state. Provided a sample
+  workaround to avoid it if needed.
+
+- bpo-41233: Link the errnos referenced in ``Doc/library/exceptions.rst`` to
+  their respective section in ``Doc/library/errno.rst``, and vice versa.
+  Previously this was only done for EINTR and InterruptedError. Patch by Yan
+  "yyyyyyyan" Orestes.
+
+Tests
+-----
+
+- bpo-47205: Skip test for :func:`~os.sched_getaffinity` and
+  :func:`~os.sched_setaffinity` error case on FreeBSD.
+
+- bpo-46126: Restore 'descriptions' when running tests internally.
+
+- bpo-47104: Rewrite :func:`asyncio.to_thread` tests to use
+  :class:`unittest.IsolatedAsyncioTestCase`.
+
+- bpo-40280: The test suite is now passing on the Emscripten platform. All
+  fork, socket, and subprocess-based tests are skipped.
+
+- bpo-47037: Skip ``strftime("%4Y")`` feature test on Windows. It can cause
+  an assertion error in debug builds.
+
+- bpo-46587: Skip tests if platform's ``strftime`` does not support
+  non-portable glibc extensions.
+
+- bpo-47015: A test case for :func:`os.sendfile` is converted from
+  deprecated :mod:`asyncore` (see :pep:`594`) to :mod:`asyncio`. Patch by
+  Oleg Iarygin.
+
+Build
+-----
+
+- bpo-40280: Add configure option :option:`--enable-wasm-dynamic-linking` to
+  enable ``dlopen`` and MAIN_MODULE / SIDE_MODULE on ``wasm32-emscripten``.
+
+- bpo-46023: ``makesetup`` now detects and skips all duplicated module
+  definitions. The first entry wins.
+
+- bpo-40280: Add SOABI ``wasm32-emscripten`` for Emscripten and
+  ``wasm32-wasi`` for WASI on 32bit WASM as well as ``wasm64`` counter
+  parts.
+
+- bpo-47032: Ensure Windows install builds fail correctly with a non-zero
+  exit code when part of the build fails.
+
+- bpo-47024: Update OpenSSL to 1.1.1n for macOS installers and all Windows
+  builds.
+
+- bpo-46996: The :mod:`tkinter` package now requires Tcl/Tk version 8.5.12
+  or newer.
+
+- bpo-46973: Add ``regen-configure`` make target to regenerate configure
+  script with Christian's container image
+  ``quay.io/tiran/cpython_autoconf:269``.
+
+- bpo-46917: Building Python now requires support of IEEE 754 floating point
+  numbers. Patch by Victor Stinner.
+
+- bpo-45774: ``configure`` now verifies that all SQLite C APIs needed for
+  the :mod:`sqlite3` extension module are found.
+
+Windows
+-------
+
+- bpo-47194: Update ``zlib`` to v1.2.12 to resolve CVE-2018-25032.
+
+- bpo-47171: Enables installing the :file:`py.exe` launcher on Windows
+  ARM64.
+
+- bpo-46566: Upgraded :ref:`launcher` to support a new ``-V:company/tag``
+  argument for full :pep:`514` support and to detect ARM64 installs. The
+  ``-64`` suffix on arguments is deprecated, but still selects any
+  non-32-bit install. Setting :envvar:`PYLAUNCHER_ALLOW_INSTALL` and
+  specifying a version that is not installed will attempt to install the
+  requested version from the Microsoft Store.
+
+- bpo-47086: The installer for Windows now includes documentation as loose
+  HTML files rather than a single compiled :file:`.chm` file.
+
+- bpo-46907: Update Windows installer to use SQLite 3.38.1.
+
+- bpo-44549: Update bzip2 to 1.0.8 in Windows builds to mitigate
+  CVE-2016-3189 and CVE-2019-12900
+
+- bpo-46948: Prevent CVE-2022-26488 by ensuring the Add to PATH option in
+  the Windows installer uses the correct path when being repaired.
+
+macOS
+-----
+
+- bpo-46890: Fix a regression in the setting of ``sys._base_executable`` in
+  framework builds, and thereby fix a regression in :mod:`venv` virtual
+  environments with such builds.
+
+- bpo-46907: Update macOS installer to SQLite 3.38.1.
+
+Tools/Demos
+-----------
+
+- bpo-40280: Replace Emscripten's limited shell with Katie Bell's browser-ui
+  REPL from python-wasm project.
+
+C API
+-----
+
+- bpo-40421: Add ``PyFrame_GetBuiltins``, ``PyFrame_GetGenerator`` and
+  ``PyFrame_GetGlobals`` C-API functions to access frame object attributes
+  safely from C code.
+
+- bpo-46850: Move the private ``_PyFrameEvalFunction`` type, and private
+  ``_PyInterpreterState_GetEvalFrameFunc()`` and
+  ``_PyInterpreterState_SetEvalFrameFunc()`` functions to the internal C
+  API. The ``_PyFrameEvalFunction`` callback function type now uses the
+  ``_PyInterpreterFrame`` type which is part of the internal C API. Patch by
+  Victor Stinner.
+
+- bpo-46850: Move the private undocumented ``_PyEval_EvalFrameDefault()``
+  function to the internal C API. The function now uses the
+  ``_PyInterpreterFrame`` type which is part of the internal C API. Patch by
+  Victor Stinner.
+
+- bpo-46850: Remove the private undocumented function
+  ``_PyEval_CallTracing()`` from the C API. Call the public
+  :func:`sys.call_tracing` function instead. Patch by Victor Stinner.
+
+- bpo-46850: Remove the private undocumented function
+  ``_PyEval_GetCoroutineOriginTrackingDepth()`` from the C API. Call the
+  public :func:`sys.get_coroutine_origin_tracking_depth` function instead.
+  Patch by Victor Stinner.
+
+- bpo-46850: Remove the following private undocumented functions from the C
+  API:
+
+  * ``_PyEval_GetAsyncGenFirstiter()``
+  * ``_PyEval_GetAsyncGenFinalizer()``
+  * ``_PyEval_SetAsyncGenFirstiter()``
+  * ``_PyEval_SetAsyncGenFinalizer()``
+
+  Call the public :func:`sys.get_asyncgen_hooks` and
+  :func:`sys.set_asyncgen_hooks` functions instead. Patch by Victor Stinner.
+
+- bpo-46987: Remove private functions ``_PySys_GetObjectId()`` and
+  ``_PySys_SetObjectId()``. Patch by Dong-hee Na.
+
+- bpo-46906: Add new functions to pack and unpack C double (serialize and
+  deserialize): :c:func:`PyFloat_Pack2`, :c:func:`PyFloat_Pack4`,
+  :c:func:`PyFloat_Pack8`, :c:func:`PyFloat_Unpack2`,
+  :c:func:`PyFloat_Unpack4` and :c:func:`PyFloat_Unpack8`. Patch by Victor
+  Stinner.
+
+
 What's New in Python 3.11.0 alpha 6?
 ====================================
 
