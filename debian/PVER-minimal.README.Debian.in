@@ -123,7 +123,7 @@ are:
   py_compile		module
   quopri		module
   random		module
-  re			module
+  re			package
   reprlib		module
   runpy			module
   select		extension
@@ -131,9 +131,6 @@ are:
   signal		module
   socket		module
   spwd			extension
-  sre_compile		module
-  sre_constants		module
-  sre_parse		module
   ssl			module
   stat			module
   string		module
