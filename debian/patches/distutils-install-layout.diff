@@ -3,16 +3,16 @@ Date: Thu, 14 Feb 2019 18:59:14 -0800
 Subject: distutils-install-layout
 
 ---
- Lib/distutils/command/install.py          | 33 ++++++++++++++++++++--
- Lib/distutils/command/install_egg_info.py | 30 ++++++++++++++++----
+ Lib/distutils/command/install.py          | 33 ++++++++++++++++++++---
+ Lib/distutils/command/install_egg_info.py | 30 +++++++++++++++++----
  Lib/distutils/sysconfig.py                |  7 +++++
  Lib/distutils/tests/test_bdist_dumb.py    |  2 +-
  Lib/distutils/tests/test_install.py       |  4 +--
  Lib/pydoc.py                              |  1 +
- Lib/site.py                               | 26 +++++++++++++----
- Lib/sysconfig.py                          | 46 +++++++++++++++++++++++++++----
- Lib/test/test_site.py                     |  6 ++--
- 9 files changed, 131 insertions(+), 24 deletions(-)
+ Lib/site.py                               | 26 ++++++++++++++----
+ Lib/sysconfig.py                          | 45 +++++++++++++++++++++++++++----
+ Lib/test/test_site.py                     |  6 ++---
+ 9 files changed, 130 insertions(+), 24 deletions(-)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
 index 01d5331..81b501e 100644
@@ -207,10 +207,10 @@ index c38f98b..12d021f 100644
  
      def test_debug_mode(self):
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index b860c78..d1622e9 100755
+index c2f7758..725f1fc 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -505,6 +505,7 @@ class Doc:
+@@ -516,6 +516,7 @@ class Doc:
                                   'marshal', 'posix', 'signal', 'sys',
                                   '_thread', 'zipimport') or
               (file.startswith(basedir) and
@@ -268,10 +268,10 @@ index b11cd48..e0ae563 100644
              sitepackages.append(prefix)
              sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index d4a8a68..3221d9c 100644
+index 2a01342..4ea8a27 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -56,7 +56,28 @@ _INSTALL_SCHEMES = {
+@@ -95,6 +95,26 @@ _INSTALL_SCHEMES = {
          'scripts': '{base}/Scripts',
          'data': '{base}',
          },
@@ -296,11 +296,9 @@ index d4a8a68..3221d9c 100644
 +        'data': '{base}',
 +        },
      }
-+_INSTALL_SCHEMES['venv'] = _INSTALL_SCHEMES['posix_prefix']
  
- 
- # NOTE: site.py has copy of this function.
-@@ -243,11 +264,26 @@ def _get_preferred_schemes():
+ # For the OS-native venv scheme, we essentially provide an alias:
+@@ -288,11 +308,26 @@ def _get_preferred_schemes():
              'home': 'posix_home',
              'user': 'osx_framework_user',
          }
@@ -333,7 +331,7 @@ index d4a8a68..3221d9c 100644
  
  def get_preferred_scheme(key):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index a67cfec..fb02270 100644
+index dd018d6..8b31ca1 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
 @@ -286,16 +286,16 @@ class HelperFunctionsTests(unittest.TestCase):
