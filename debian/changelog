@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a7-1+bionic3) bionic; urgency=medium
+
+  * Synchronize with upstream debian.
+
+ -- Anthony Sottile <asottile@umich.edu>  Sun, 10 Apr 2022 11:31:33 -0400
+
 python3.11 (3.11.0~a7-1+bionic2) bionic; urgency=medium
 
   * Fix mising link to libtk.
