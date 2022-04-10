@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a7-1+focal2) focal; urgency=medium
+
+  * Synchronize with upstream debian.
+
+ -- Anthony Sottile <asottile@umich.edu>  Sat, 09 Apr 2022 21:29:41 -0400
+
 python3.11 (3.11.0~a7-1+focal1) focal; urgency=medium
 
   * Python 3.11.0 alpha 7 release.
