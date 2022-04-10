@@ -200,7 +200,7 @@ ifeq ($(with_lto),yes)
 endif
 
 TCLTK_CFLAGS=-I/usr/include/tcl8.6
-TCLTK_LIBS=-ltcl8.6
+TCLTK_LIBS=-ltcl8.6 -ltk8.6
 
 sysconfig_substflags = \
 	-e 's,gcc-8,gcc,;s,g++-8,g++,' \
