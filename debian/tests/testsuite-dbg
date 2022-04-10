@@ -16,13 +16,13 @@ if [ "$(whoami)" = root ]; then
   fi
 fi
 
-tmphome=$ADTTMP/home
-mkdir -p $tmphome/.local/lib/python3.11/site-packages
+tmphome=$AUTOPKGTEST_TMP/home
+mkdir -p $tmphome/.local/lib/python3.9/site-packages
 if [ -n "$su_user" ]; then
-  chmod -R go+rx $ADTTMP
+  chmod -R go+rx $AUTOPKGTEST_TMP
   chown -R $su_user:nogroup $tmphome
 fi
-ls -la $ADTTMP
+ls -la $AUTOPKGTEST_TMP
 
 debian_dir=$(dirname $(dirname $0))
 

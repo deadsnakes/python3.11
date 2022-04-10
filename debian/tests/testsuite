@@ -17,20 +17,13 @@ if [ "$(whoami)" = root ]; then
     sed -i '/^enabled=/s/=.*/=0/' /etc/default/apport 2>/dev/null
   fi
 fi
-tmphome=$ADTTMP/home
+tmphome=$AUTOPKGTEST_TMP/home
 mkdir -p $tmphome
 if [ -n "$su_user" ]; then
-  chmod go+rx $ADTTMP
+  chmod go+rx $AUTOPKGTEST_TMP
   chown $su_user:nogroup $tmphome
 fi
-ls -la $ADTTMP
-
-tmphome=$ADTTMP/home
-mkdir -p $tmphome/.local/lib/python3.11/site-packages
-if [ -n "$su_user" ]; then
-  chmod -R go+rx $ADTTMP
-  chown -R $su_user:nogroup $tmphome
-fi
+ls -la $AUTOPKGTEST_TMP
 
 debian_dir=$(dirname $(dirname $0))
 

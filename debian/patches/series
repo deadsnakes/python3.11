@@ -23,3 +23,5 @@ disable-some-tests.diff
 reproducible-buildinfo.diff
 pydoc-use-pager.diff
 argparse-no-shutil.diff
+0028-sysconfigdata-name.patch
+0029-destshared-location.patch
