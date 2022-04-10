@@ -1,3 +1,9 @@
+python3.11 (3.11.0~a7-1+bionic2) bionic; urgency=medium
+
+  * Fix mising link to libtk.
+
+ -- Anthony Sottile <asottile@umich.edu>  Sun, 10 Apr 2022 11:08:52 -0400
+
 python3.11 (3.11.0~a7-1+bionic1) bionic; urgency=medium
 
   * Python 3.11.0 alpha 7 release.
