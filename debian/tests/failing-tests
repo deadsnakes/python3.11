@@ -16,13 +16,13 @@ if [ "$(whoami)" = root ]; then
   fi
 fi
 
-tmphome=$ADTTMP/home
+tmphome=$AUTOPKGTEST_TMP/home
 mkdir -p $tmphome/.local/lib/python3.11/site-packages
 if [ -n "$su_user" ]; then
-  chmod go+rx $ADTTMP
+  chmod go+rx $AUTOPKGTEST_TMP
   chown $su_user:nogroup $tmphome
 fi
-ls -la $ADTTMP
+ls -la $AUTOPKGTEST_TMP
 
 debian_dir=$(dirname $(dirname $0))
 
@@ -30,6 +30,8 @@ debian_dir=$(dirname $(dirname $0))
 
 TESTPYTHON="python3.11 -W default -bb -E -R -m test"
 TESTEXCLUSIONS=""
+
+TESTOPTS="$TESTOPTS --timeout=7200"
 
 . $debian_dir/tests/test-common.sh
 

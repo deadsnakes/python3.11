@@ -5,7 +5,7 @@ Maintainer: Matthias Klose <doko@debian.org>
 Build-Depends: debhelper (>= 9), dpkg-dev (>= 1.17.11),
   quilt, autoconf,
   lsb-release, sharutils,
-  libreadline-dev, libncurses-dev (>= 5.3), 
+  libreadline-dev, libncursesw5-dev (>= 5.3), 
   zlib1g-dev, libbz2-dev, liblzma-dev,
   libgdbm-dev, libdb-dev,
   tk-dev, blt-dev (>= 2.4z), libssl-dev,
@@ -81,6 +81,7 @@ Description: Minimal subset of the Python language (version 3.11)
  be used in the boot process for some basic tasks.
  See /usr/share/doc/python3.11-minimal/README.Debian for a list of the modules
  contained in this package.
+XB-Cnf-Visible-Pkgname: python3.11
 
 Package: libpython3.11-minimal
 Architecture: any
@@ -149,7 +150,7 @@ Package: libpython3.11-testsuite
 Section: libdevel
 Architecture: all
 Depends: python3.11 (>= ${binary:Version}), ${misc:Depends}, net-tools
-Suggests: pythonpython3.11-gdbm, pythonpython3.11-tk
+Suggests: python3.11-gdbm, python3.11-tk
 Description: Testsuite for the Python standard library (v3.11)
  The complete testsuite for the Python standard library.  Note that
  a subset is found in the libpython3.11-stdlib package, which should
@@ -173,7 +174,7 @@ Architecture: any
 Multi-Arch: allowed
 Depends: python3.11 (= ${binary:Version}), libpython3.11-dbg (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Recommends: gdb
-Suggests: pythonpython3.11-gdbm-dbg, pythonpython3.11-tk-dbg
+Suggests: python3.11-gdbm-dbg, python3.11-tk-dbg
 Description: Debug Build of the Python Interpreter (version 3.11)
  The package holds two things:
  .
