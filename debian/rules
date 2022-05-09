@@ -193,8 +193,6 @@ endif
 ifneq (,$(findstring nolto, $(DEB_BUILD_OPTIONS)))
   with_lto :=
 endif
-with_pgo :=
-with_lto :=
 
 ifneq (,$(findstring noopt, $(DEB_BUILD_OPTIONS)))
     OPT_CFLAGS := $(filter-out -O%, $(OPT_CFLAGS))
