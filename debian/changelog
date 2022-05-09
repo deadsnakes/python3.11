@@ -1,3 +1,9 @@
+python3.11 (3.11.0~b1-1+bionic1) bionic; urgency=medium
+
+  * Python 3.11.0 beta 1 release.
+
+ -- Anthony Sottile <asottile@umich.edu>  Mon, 09 May 2022 19:48:58 -0400
+
 python3.11 (3.11.0~a7-1+bionic3) bionic; urgency=medium
 
   * Synchronize with upstream debian.
