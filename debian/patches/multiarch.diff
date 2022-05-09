@@ -23,10 +23,10 @@ index 83064a0..71ca279 100644
      elif os.name == "nt":
          if python_build:
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 4ea8a27..1fec79b 100644
+index bc39abf..6c1af59 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -712,6 +712,12 @@ def get_config_vars(*args):
+@@ -708,6 +708,12 @@ def get_config_vars(*args):
              # the init-function.
              _CONFIG_VARS['userbase'] = _getuserbase()
  
@@ -40,10 +40,10 @@ index 4ea8a27..1fec79b 100644
          srcdir = _CONFIG_VARS.get('srcdir', _PROJECT_BASE)
          if os.name == 'posix':
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 2693cf0..1e79f11 100644
+index a659758..dc0a01b 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -1256,6 +1256,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
+@@ -1265,6 +1265,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
  
  Python/dynload_shlib.o: $(srcdir)/Python/dynload_shlib.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \

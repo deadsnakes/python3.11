@@ -15,7 +15,7 @@ Forwarded: no
  3 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 1fec79b..521b080 100644
+index 6c1af59..4461c53 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -491,7 +491,7 @@ def _get_sysconfigdata_name():
@@ -28,10 +28,10 @@ index 1fec79b..521b080 100644
  
  
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index b15451d..274c1c4 100644
+index 5802aa7..b02a899 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2043,8 +2043,10 @@ libinstall:	build_all $(srcdir)/Modules/xxmodule.c
+@@ -2066,8 +2066,10 @@ libinstall:	all $(srcdir)/Modules/xxmodule.c
  			esac; \
  		done; \
  	done
@@ -44,7 +44,7 @@ index b15451d..274c1c4 100644
  	$(INSTALL_DATA) $(srcdir)/LICENSE $(DESTDIR)$(LIBDEST)/LICENSE.txt
  	if test -d $(DESTDIR)$(LIBDEST)/distutils/tests; then \
  		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
-@@ -2203,6 +2205,7 @@ sharedinstall: sharedmods
+@@ -2226,6 +2228,7 @@ sharedinstall: sharedmods
  		--install-scripts=$(BINDIR) \
  		--install-platlib=$(DESTSHARED) \
  		--root=$(DESTDIR)/
@@ -53,7 +53,7 @@ index b15451d..274c1c4 100644
  	-rm -r $(DESTDIR)$(DESTSHARED)/__pycache__
  
 diff --git a/configure.ac b/configure.ac
-index fc82e69..24a3fcf 100644
+index f63a9d6..08de318 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -120,7 +120,7 @@ AC_ARG_WITH(
