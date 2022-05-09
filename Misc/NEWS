@@ -2,6 +2,775 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.0 beta 1?
+===================================
+
+*Release date: 2022-05-06*
+
+Security
+--------
+
+- gh-issue-57684: Add the :option:`-P` command line option and the
+  :envvar:`PYTHONSAFEPATH` environment variable to not prepend a potentially
+  unsafe path to :data:`sys.path`. Patch by Victor Stinner.
+
+Core and Builtins
+-----------------
+
+- gh-issue-89519: Chaining classmethod descriptors (introduced in bpo-19072)
+  is deprecated. It can no longer be used to wrap other descriptors such as
+  property().  The core design of this feature was flawed, and it caused a
+  number of downstream problems.
+
+- gh-issue-92345: ``pymain_run_python()`` now imports ``readline`` and
+  ``rlcompleter`` before sys.path is extended to include the current working
+  directory of an interactive interpreter. Non-interactive interpreters are
+  not affected.
+
+- bpo-43857: Improve the :exc:`AttributeError` message when deleting a
+  missing attribute. Patch by Géry Ogam.
+
+- gh-issue-92245: Make sure that PEP 523 is respected in all cases. In
+  3.11a7, specialization may have prevented Python-to-Python calls
+  respecting PEP 523.
+
+- gh-issue-92203: Add a closure keyword-only parameter to exec(). It can
+  only be specified when exec-ing a code object that uses free variables.
+  When specified, it must be a tuple, with exactly the number of cell
+  variables referenced by the code object. closure has a default value of
+  None, and it must be None if the code object doesn't refer to any free
+  variables.
+
+- gh-issue-91173: Disable frozen modules in debug builds. Patch by Kumar
+  Aditya.
+
+- gh-issue-92114: Improve error message when subscript a type with
+  ``__class_getitem__`` set to ``None``.
+
+- gh-issue-92112: Fix crash triggered by an evil custom ``mro()`` on a
+  metaclass.
+
+- gh-issue-92063: The ``PRECALL_METHOD_DESCRIPTOR_FAST_WITH_KEYWORDS``
+  instruction now ensures methods are called only on objects of the correct
+  type.
+
+- gh-issue-92031: Deoptimize statically-allocated code objects during
+  ``Py_FINALIZE()`` so that future ``_PyCode_Quicken`` calls always start
+  with unquickened code.
+
+- gh-issue-92036: Fix a crash in subinterpreters related to the garbage
+  collector. When a subinterpreter is deleted, untrack all objects tracked
+  by its GC. To prevent a crash in deallocator functions expecting objects
+  to be tracked by the GC, leak a strong reference to these objects on
+  purpose, so they are never deleted and their deallocator functions are not
+  called. Patch by Victor Stinner.
+
+- gh-issue-92032: The interpreter can now autocomplete soft keywords, as of
+  now ``match``, ``case``, and ``_`` (wildcard pattern) from :pep:`634`.
+
+- gh-issue-87999: The warning emitted by the Python parser for a numeric
+  literal immediately followed by keyword has been changed from deprecation
+  warning to syntax warning.
+
+- gh-issue-91869: Fix an issue where specialized opcodes with extended
+  arguments could produce incorrect tracing output or lead to assertion
+  failures.
+
+- gh-issue-91603: Speed up :class:`types.UnionType` instantiation. Based on
+  patch provided by Yurii Karabas.
+
+- gh-issue-89373: If Python is built in debug mode, Python now ensures that
+  deallocator functions leave the current exception unchanged. Patch by
+  Victor Stinner.
+
+- gh-issue-91632: Fix a minor memory leak at exit: release the memory of the
+  :class:`generic_alias_iterator` type. Patch by Dong-hee Na.
+
+- gh-issue-81548: Octal escapes with value larger than ``0o377`` now produce
+  a :exc:`DeprecationWarning`. In a future Python version they will be a
+  :exc:`SyntaxWarning` and eventually a :exc:`SyntaxError`.
+
+- bpo-43950: Use a single compact table for line starts, ends and column
+  offsets. Reduces memory consumption for location info by half
+
+- gh-issue-91102: Use Argument Clinic for :class:`EncodingMap`.  Patch by
+  Oleg Iarygin.
+
+- gh-issue-91636: Fixed a crash in a garbage-collection edge-case, in which
+  a ``PyFunction_Type.tp_clear`` function could leave a python function
+  object in an inconsistent state.
+
+- gh-issue-91603: Speed up :func:`isinstance` and :func:`issubclass` checks
+  for :class:`types.UnionType`. Patch by Yurii Karabas.
+
+- gh-issue-91625: Fixed a bug in which adaptive opcodes ignored any
+  preceding ``EXTENDED_ARG``\ s on specialization failure.
+
+- gh-issue-78607: The LLTRACE special build now looks for the name
+  ``__lltrace__`` defined in module globals, rather than the name
+  ``__ltrace__``, which had been introduced as a typo.
+
+- gh-issue-91576: Speed up iteration of ascii strings by 50%. Patch by Kumar
+  Aditya.
+
+- gh-issue-89279: Improve interpreter performance on Windows by inlining a
+  few specific macros.
+
+- gh-issue-91502: Add a new :c:func:`_PyFrame_IsEntryFrame` API function, to
+  check if a :c:type:`PyFrameObject` is an entry frame. Patch by Pablo
+  Galindo.
+
+- gh-issue-91266: Refactor the ``bytearray`` strip methods ``strip``,
+  ``lstrip`` and ``rstrip`` to use a common implementation.
+
+- gh-issue-91479: Replaced the ``__note__`` field of :exc:`BaseException`
+  (added in an earlier version of 3.11) with the final design of :pep:`678`.
+  Namely, :exc:`BaseException` gets an :meth:`add_note` method, and its
+  ``__notes__`` field is created when necessary.
+
+- gh-issue-46055: Speed up right shift of negative integers, by removing
+  unnecessary creation of temporaries. Original patch by Xinhang Xu,
+  reworked by Mark Dickinson.
+
+- gh-issue-91462: Make the interpreter's low-level tracing (lltrace) feature
+  output more readable by displaying opcode names (rather than just
+  numbers), and by displaying stack contents before each opcode.
+
+- gh-issue-89455: Fixed an uninitialized bool value in the traceback
+  printing code path that was introduced by the initial bpo-45292 exception
+  groups work.
+
+- gh-issue-91421: Fix a potential integer overflow in _Py_DecodeUTF8Ex.
+
+- gh-issue-91428: Add ``static const char *const _PyOpcode_OpName[256] =
+  {...};`` to ``opcode.h`` for debug builds to assist in debugging the
+  Python interpreter. It is now more convenient to make various forms of
+  debugging output more human-readable by including opcode names rather than
+  just the corresponding decimal digits.
+
+- bpo-47120: Make :opcode:`POP_JUMP_IF_TRUE`, :opcode:`POP_JUMP_IF_FALSE`,
+  :opcode:`POP_JUMP_IF_NONE` and :opcode:`POP_JUMP_IF_NOT_NONE` virtual,
+  mapping to new relative jump opcodes.
+
+- bpo-45317: Add internal documentation explaining design of new (for 3.11)
+  frame stack.
+
+- bpo-47197: ctypes used to mishandle ``void`` return types, so that for
+  instance a function declared like ``ctypes.CFUNCTYPE(None, ctypes.c_int)``
+  would be called with signature ``int f(int)`` instead of ``void f(int)``.
+  Wasm targets require function pointers to be called with the correct
+  signatures so this led to crashes. The problem is now fixed.
+
+- bpo-47120: Make opcodes :opcode:`JUMP_IF_TRUE_OR_POP` and
+  :opcode:`JUMP_IF_FALSE_OR_POP` relative rather than absolute.
+
+- bpo-47177: Replace the ``f_lasti`` member of the internal
+  ``_PyInterpreterFrame`` structure with a ``prev_instr`` pointer, which
+  reduces overhead in the main interpreter loop. The ``f_lasti`` attribute
+  of Python-layer frame objects is preserved for backward-compatibility.
+
+- bpo-46961: Integer mod/remainder operations, including the three-argument
+  form of :func:`pow`, now consistently return ints from the global small
+  integer cache when applicable.
+
+- bpo-46962: Classes and functions that unconditionally declared their
+  docstrings ignoring the `--without-doc-strings` compilation flag no longer
+  do so.
+
+  The classes affected are :class:`ctypes.UnionType`,
+  :class:`pickle.PickleBuffer`, :class:`testcapi.RecursingInfinitelyError`,
+  and :class:`types.GenericAlias`.
+
+  The functions affected are 24 methods in :mod:`ctypes`.
+
+  Patch by Oleg Iarygin.
+
+- bpo-46942: Use Argument Clinic for the :class:`types.MethodType`
+  constructor.  Patch by Oleg Iarygin.
+
+- bpo-46764: Fix wrapping bound methods with @classmethod
+
+- bpo-43464: Optimize :meth:`set.intersection` for non-set arguments.
+
+- bpo-46721: Optimize :meth:`set.issuperset` for non-set argument.
+
+- bpo-46509: Add type-specialized versions of the ``Py_DECREF()``, and use
+  them for ``float``, ``int``, ``str``, ``bool``, and ``None`` to avoid
+  pointer-chasing at runtime where types are known at C compile time.
+
+- bpo-46045: Do not use POSIX semaphores on NetBSD
+
+- bpo-36819: Fix crashes in built-in encoders with error handlers that
+  return position less or equal than the starting position of non-encodable
+  characters.
+
+- bpo-34093: ``marshal.dumps()`` uses ``FLAG_REF`` for all interned strings.
+  This makes output more deterministic and helps reproducible build.
+
+- bpo-26579: Added ``object.__getstate__`` which provides the default
+  implementation of the ``__getstate__()`` method.
+
+  Copying and pickling instances of subclasses of builtin types bytearray,
+  set, frozenset, collections.OrderedDict, collections.deque,
+  weakref.WeakSet, and datetime.tzinfo now copies and pickles instance
+  attributes implemented as slots.
+
+Library
+-------
+
+- gh-issue-87901: Add the *encoding* parameter to :func:`os.popen`.
+
+- gh-issue-90997: Fix an issue where :mod:`dis` utilities may interpret
+  populated inline cache entries as valid instructions.
+
+- gh-issue-92332: Deprecate :class:`typing.Text` (removal of the class is
+  currently not planned). Patch by Alex Waygood.
+
+- bpo-78157: Deprecate nested classes in enum definitions becoming members
+  -- in 3.13 they will be normal classes; add `member` and `nonmember`
+  functions to allow control over results now.
+
+- gh-issue-92356: Fixed a performance regression in ctypes function calls.
+
+- gh-issue-90997: Show the actual named values stored in inline caches when
+  ``show_caches=True`` is passed to :mod:`dis` utilities.
+
+- gh-issue-92301: Prefer ``close_range()`` to iterating over procfs for file
+  descriptor closing in :mod:`subprocess` for better performance.
+
+- gh-issue-67248: Sort the miscellaneous topics in Cmd.do_help()
+
+- gh-issue-92210: Port ``socket.__init__`` to Argument Clinic. Patch by
+  Cinder.
+
+- gh-issue-80010: Add support for generalized ISO 8601 parsing to
+  :meth:`datetime.datetime.fromisoformat`,
+  :meth:`datetime.date.fromisoformat` and
+  :meth:`datetime.time.fromisoformat`. Patch by Paul Ganssle.
+
+- gh-issue-92118: Fix a 3.11 regression in
+  :func:`~contextlib.contextmanager`, which caused it to propagate
+  exceptions with incorrect tracebacks.
+
+- gh-issue-90887: Adding ``COPYFILE_STAT``, ``COPYFILE_ACL`` and
+  ``COPYFILE_XATTR`` constants for :func:`os.fcopyfile` available in macOs.
+
+- gh-issue-91215: For @dataclass, add weakref_slot. Default is False. If
+  True, and if slots=True, add a slot named "__weakref__", which will allow
+  instances to be weakref'd. Contributed by Eric V. Smith
+
+- gh-issue-85984: New function os.login_tty() for Unix.
+
+- gh-issue-92128: Add :meth:`~object.__class_getitem__` to
+  :class:`logging.LoggerAdapter` and :class:`logging.StreamHandler`,
+  allowing them to be parameterized at runtime. Patch by Alex Waygood.
+
+- gh-issue-92049: Forbid pickling constants ``re._constants.SUCCESS`` etc.
+  Previously, pickling did not fail, but the result could not be unpickled.
+
+- gh-issue-92062: :class:`inspect.Parameter` now raises :exc:`ValueError` if
+  ``name`` is a keyword, in addition to the existing check that it is an
+  identifier.
+
+- gh-issue-87390: Add an ``__unpacked__`` attribute to
+  :class:`types.GenericAlias`. Patch by Jelle Zijlstra.
+
+- gh-issue-88089: Add support for generic :class:`typing.NamedTuple`.
+
+- gh-issue-91996: New http.HTTPMethod enum to represent all the available
+  HTTP request methods in a convenient way
+
+- gh-issue-91984: Modified test strings in test_argparse.py to not contain
+  trailing spaces before end of line.
+
+- gh-issue-91952: Add ``encoding="locale"`` support to
+  :meth:`TextIOWrapper.reconfigure`.
+
+- gh-issue-91954: Add *encoding* and *errors* arguments to
+  :func:`subprocess.getoutput` and :func:`subprocess.getstatusoutput`.
+
+- bpo-47029: Always close the read end of the pipe used by
+  :class:`multiprocessing.Queue` *after* the last write of buffered data to
+  the write end of the pipe to avoid :exc:`BrokenPipeError` at garbage
+  collection and at :meth:`multiprocessing.Queue.close` calls. Patch by Géry
+  Ogam.
+
+- gh-issue-91928: Add `datetime.UTC` alias for `datetime.timezone.utc`.
+
+  Patch by Kabir Kwatra.
+
+- gh-issue-68966: The :mod:`mailcap` module is now deprecated and will be
+  removed in Python 3.13. See :pep:`594` for the rationale and the
+  :mod:`mimetypes` module for an alternative. Patch by Victor Stinner.
+
+- gh-issue-91401: Provide a way to disable :mod:`subprocess` use of
+  ``vfork()`` just in case it is ever needed and document the existing
+  mechanism for ``posix_spawn()``.
+
+- gh-issue-64783: Fix :data:`signal.NSIG` value on FreeBSD to accept signal
+  numbers greater than 32, like :data:`signal.SIGRTMIN` and
+  :data:`signal.SIGRTMAX`. Patch by Victor Stinner.
+
+- gh-issue-91910: Add missing f prefix to f-strings in error messages from
+  the :mod:`multiprocessing` and :mod:`asyncio` modules.
+
+- gh-issue-91860: Add :func:`typing.dataclass_transform`, implementing
+  :pep:`681`. Patch by Jelle Zijlstra.
+
+- gh-issue-91832: Add ``required`` attribute to :class:`argparse.Action`
+  repr output.
+
+- gh-issue-91827: In the :mod:`tkinter` module add method
+  ``info_patchlevel()`` which returns the exact version of the Tcl library
+  as a named tuple similar to :data:`sys.version_info`.
+
+- gh-issue-84461: Add :option:`--enable-wasm-pthreads` to enable pthreads
+  support for WASM builds. ``Emscripten/node`` no longer has threading
+  enabled by default. Include additional file systems.
+
+- gh-issue-91821: Fix unstable ``test_from_tuple`` test in
+  ``test_decimal.py``.
+
+- gh-issue-91217: Deprecate the xdrlib module.
+
+- gh-issue-91217: Deprecate the uu module.
+
+- gh-issue-91760: More strict rules will be applied for numerical group
+  references and group names in regular expressions. For now, a deprecation
+  warning is emitted for group references and group names which will be
+  errors in future Python versions.
+
+- gh-issue-84461: Add provisional :data:`sys._emscripten_info` named tuple
+  with build-time and run-time information about Emscripten platform.
+
+- gh-issue-90623: :func:`signal.raise_signal` and :func:`os.kill` now check
+  immediately for pending signals. Patch by Victor Stinner.
+
+- gh-issue-91734: Fix OSS audio support on Solaris.
+
+- gh-issue-90633: Include the passed value in the exception thrown by
+  :func:`typing.assert_never`. Patch by Jelle Zijlstra.
+
+- gh-issue-91700: Compilation of regular expression containing a conditional
+  expression ``(?(group)...)`` now raises an appropriate :exc:`re.error` if
+  the group number refers to not defined group. Previously an internal
+  RuntimeError was raised.
+
+- gh-issue-91231: Add an optional keyword *shutdown_timeout* parameter to
+  the :class:`multiprocessing.BaseManager` constructor. Kill the process if
+  terminate() takes longer than the timeout. Patch by Victor Stinner.
+
+- gh-issue-91621: Fix :func:`typing.get_type_hints` for
+  :class:`collections.abc.Callable`. Patch by Shantanu Jain.
+
+- gh-issue-90568: Parsing ``\N`` escapes of Unicode Named Character
+  Sequences in a :mod:`regular expression <re>` raises now :exc:`re.error`
+  instead of ``TypeError``.
+
+- gh-issue-91670: Remove deprecated ``SO`` config variable in
+  :mod:`sysconfig`.
+
+- gh-issue-91217: Deprecate the telnetlib module.
+
+- gh-issue-91217: Deprecate the sunau module.
+
+- gh-issue-91217: Deprecate the spwd module.
+
+- gh-issue-91217: Deprecate the sndhdr module, as well as inline needed
+  functionality for ``email.mime.MIMEAudio``.
+
+- gh-issue-91616: :mod:`re` module, fix :meth:`~re.Pattern.fullmatch`
+  mismatch when using Atomic Grouping or Possessive Quantifiers.
+
+- gh-issue-91217: Deprecate the 'pipes' module.
+
+- gh-issue-91217: Deprecate the ossaudiodev module.
+
+- bpo-47256: :mod:`re` module, limit the maximum capturing group to
+  1,073,741,823 in 64-bit build, this increases the depth of backtracking.
+
+- gh-issue-91217: Deprecate the nis module.
+
+- gh-issue-91595: Fix the comparison of character and integer inside
+  :func:`Tools.gdb.libpython.write_repr`. Patch by Yu Liu.
+
+- gh-issue-74166: Add option to raise all errors from
+  :meth:`~socket.create_connection` in an :exc:`ExceptionGroup` when it
+  fails to create a connection. The default remains to raise only the last
+  error that had occurred when multiple addresses were tried.
+
+- gh-issue-91487: Optimize asyncio UDP speed, over 100 times faster when
+  transferring a large file.
+
+- gh-issue-91575: Update case-insensitive matching in the :mod:`re` module
+  to the latest Unicode version.
+
+- gh-issue-90622: In ``concurrent.futures.process.ProcessPoolExecutor``
+  disallow the "fork" multiprocessing start method when the new
+  ``max_tasks_per_child`` feature is used as the mix of threads+fork can
+  hang the child processes. Default to using the safe "spawn" start method
+  in that circumstance if no ``mp_context`` was supplied.
+
+- gh-issue-89022: In :mod:`sqlite3`, ``SQLITE_MISUSE`` result codes are now
+  mapped to :exc:`~sqlite3.InterfaceError` instead of
+  :exc:`~sqlite3.ProgrammingError`. Also, more accurate exceptions are
+  raised when binding parameters fail. Patch by Erlend E. Aasland.
+
+- gh-issue-91526: Stop calling ``os.device_encoding(file.fileno())`` in
+  :class:`TextIOWrapper`. It was complex, never documented, and didn't work
+  for most cases. (Patch by Inada Naoki.)
+
+- gh-issue-88116: Change the frame-related functions in the :mod:`inspect`
+  module to return a regular object (that is backwards compatible with the
+  old tuple-like interface) that include the extended :pep:`657` position
+  information (end line number, column and end column). The affected
+  functions are: :func:`inspect.getframeinfo`,
+  :func:`inspect.getouterframes`, :func:`inspect.getinnerframes`,
+  :func:`inspect.stack` and :func:`inspect.trace`. Patch by Pablo Galindo.
+
+- gh-issue-69093: Add indexing and slicing support to :class:`sqlite3.Blob`.
+  Patch by Aviv Palivoda and Erlend E. Aasland.
+
+- gh-issue-69093: Add :term:`context manager` support to
+  :class:`sqlite3.Blob`. Patch by Aviv Palivoda and Erlend E. Aasland.
+
+- gh-issue-91217: Deprecate nntplib.
+
+- gh-issue-91217: Deprecate msilib.
+
+- gh-issue-91404: Improve the performance of :mod:`re` matching by using
+  computed gotos (or "threaded code") on supported platforms and removing
+  expensive pointer indirections.
+
+- gh-issue-91217: Deprecate the imghdr module.
+
+- gh-issue-91217: Deprecate the crypt module.
+
+- gh-issue-91276: Make space for longer opcodes in :mod:`dis` output.
+
+- bpo-47000: Make :class:`TextIOWrapper` uses locale encoding when
+  ``encoding="locale"`` is specified even in UTF-8 mode.
+
+- gh-issue-91230: :func:`warnings.catch_warnings` now accepts arguments for
+  :func:`warnings.simplefilter`, providing a more concise way to locally
+  ignore warnings or convert them to errors.
+
+- gh-issue-91217: Deprecate the chunk module.
+
+- bpo-91498: Add the ``TCP_CONNECTION_INFO`` option (available on macOS) to
+  :mod:`socket`.
+
+- bpo-47260: Fix ``os.closerange()`` potentially being a no-op in a Linux
+  seccomp sandbox.
+
+- bpo-47087: Implement ``typing.Required`` and ``typing.NotRequired``
+  (:pep:`655`). Patch by David Foster and Jelle Zijlstra.
+
+- bpo-47061: Deprecate cgi and cgitb.
+
+- bpo-47061: Deprecate audioop.
+
+- bpo-47000: Add :func:`locale.getencoding` to get the current locale
+  encoding. It is similar to ``locale.getpreferredencoding(False)`` but
+  ignores the :ref:`Python UTF-8 Mode <utf8-mode>`.
+
+- bpo-42012: Add :mod:`wsgiref.types`, containing WSGI-specific types for
+  static type checking.
+
+- bpo-47227: Suppress expression chaining for more :mod:`re` parsing errors.
+
+- bpo-47211: Remove undocumented and never working function
+  ``re.template()`` and flag ``re.TEMPLATE``.
+
+- bpo-47135: :meth:`decimal.localcontext` now accepts context attributes via
+  keyword arguments
+
+- bpo-43323: Fix errors in the :mod:`email` module if the charset itself
+  contains undecodable/unencodable characters.
+
+- bpo-46841: Disassembly of quickened code.
+
+- bpo-46681: Forward gzip.compress() compresslevel to zlib.
+
+- bpo-45100: Add :func:`typing.get_overloads` and
+  :func:`typing.clear_overloads`. Patch by Jelle Zijlstra.
+
+- bpo-44807: :class:`typing.Protocol` no longer silently replaces
+  :meth:`__init__` methods defined on subclasses. Patch by Adrian Garcia
+  Badaracco.
+
+- bpo-46787: Fix :class:`concurrent.futures.ProcessPoolExecutor` exception
+  memory leak
+
+- bpo-46720: Add support for path-like objects to
+  :func:`multiprocessing.set_executable` for Windows to be on a par with
+  Unix-like systems. Patch by Géry Ogam.
+
+- bpo-46696: Add ``SO_INCOMING_CPU`` constant to :mod:`socket`.
+
+- bpo-46053: Fix OSS audio support on NetBSD.
+
+- bpo-45639: ``image/avif`` and ``image/webp`` were added to
+  :mod:`mimetypes`.
+
+- bpo-46285: Add command-line option ``-p``/``--protocol`` to module
+  :mod:`http.server` which specifies the HTTP version to which the server is
+  conformant (HTTP/1.1 conformant servers can now be run from the
+  command-line interface of module :mod:`http.server`). Patch by Géry Ogam.
+
+- bpo-44791: Accept ellipsis as the last argument of
+  :data:`typing.Concatenate`.
+
+- bpo-46547: Remove variables leaking into ``pydoc.Helper`` class namespace.
+
+- bpo-46415: Fix ipaddress.ip_{address,interface,network} raising TypeError
+  instead of ValueError if given invalid tuple as address parameter.
+
+- bpo-46075: ``CookieJar`` with ``DefaultCookiePolicy`` now can process
+  cookies from localhost with domain=localhost explicitly specified in
+  Set-Cookie header.
+
+- bpo-45995: Add a "z" option to the string formatting specification that
+  coerces negative zero floating-point values to positive zero after
+  rounding to the format precision.  Contributed by John Belmonte.
+
+- bpo-26175: Fully implement the :class:`io.BufferedIOBase` or
+  :class:`io.TextIOBase` interface for
+  :class:`tempfile.SpooledTemporaryFile` objects. This lets them work
+  correctly with higher-level layers (like compression modules). Patch by
+  Carey Metcalfe.
+
+- bpo-45138: Fix a regression in the :mod:`sqlite3` trace callback where
+  bound parameters were not expanded in the passed statement string. The
+  regression was introduced in Python 3.10 by :issue:`40318`. Patch by
+  Erlend E. Aasland.
+
+- bpo-44863: Allow :class:`~typing.TypedDict` subclasses to also include
+  :class:`~typing.Generic` as a base class in class based syntax. Thereby
+  allowing the user to define a generic ``TypedDict``, just like a
+  user-defined generic but with ``TypedDict`` semantics.
+
+- bpo-44587: Fix BooleanOptionalAction to not automatically add a default
+  string.  If a default string is desired, use a formatter to add it.
+
+- bpo-43827: All positional-or-keyword parameters to ``ABCMeta.__new__`` are
+  now positional-only to avoid conflicts with keyword arguments to be passed
+  to :meth:`__init_subclass__`.
+
+- bpo-43218: Prevent creation of a venv whose path contains the PATH
+  separator. This could affect the usage of the activate script. Patch by
+  Dustin Rodrigues.
+
+- bpo-38435: Add a ``process_group`` parameter to :class:`subprocess.Popen`
+  to help move more things off of the unsafe ``preexec_fn`` parameter.
+
+- bpo-42066: Fix cookies getting sorted in :func:`CookieJar.__iter__` which
+  is an extra behavior and not mentioned in RFC 2965 or Netscape cookie
+  protocol. Now the cookies in ``CookieJar`` follows the order of the
+  ``Set-Cookie`` header. Patch by Iman Kermani.
+
+- bpo-40617: Add :meth:`~sqlite3.Connection.create_window_function` to
+  :class:`sqlite3.Connection` for creating aggregate window functions. Patch
+  by Erlend E. Aasland.
+
+- bpo-40676: Convert :mod:`csv` to use Argument Clinic for
+  :func:`csv.field_size_limit`, :func:`csv.get_dialect`,
+  :func:`csv.unregister_dialect` and :func:`csv.list_dialects`.
+
+- bpo-39716: Raise an ArgumentError when the same subparser name is added
+  twice to an `argparse.ArgumentParser`.  This is consistent with the
+  (default) behavior when the same option string is added twice to an
+  ArgumentParser.
+
+- bpo-36073: Raise :exc:`~sqlite3.ProgrammingError` instead of segfaulting
+  on recursive usage of cursors in :mod:`sqlite3` converters. Patch by
+  Sergey Fedoseev.
+
+- bpo-34975: Adds a ``start_tls()`` method to
+  :class:`~asyncio.streams.StreamWriter`, which upgrades the connection with
+  TLS using the given :class:`~ssl.SSLContext`.
+
+- bpo-22276: :class:`~pathlib.Path` methods :meth:`~pathlib.Path.glob` and
+  :meth:`~pathlib.Path.rglob` return only directories if *pattern* ends with
+  a pathname components separator (``/`` or :data:`~os.sep`). Patch by
+  Eisuke Kawashima.
+
+- bpo-24905: Add :meth:`~sqlite3.Connection.blobopen` to
+  :class:`sqlite3.Connection`. :class:`sqlite3.Blob` allows incremental I/O
+  operations on blobs. Patch by Aviv Palivoda and Erlend E. Aasland.
+
+Documentation
+-------------
+
+- gh-issue-91888: Add a new `gh` role to the documentation to link to GitHub
+  issues.
+
+- gh-issue-91783: Document security issues concerning the use of the
+  function :meth:`shutil.unpack_archive`
+
+- gh-issue-91547: Remove "Undocumented modules" page.
+
+- gh-issue-91298: In ``importlib.resources.abc``, refined the documentation
+  of the Traversable Protocol, applying changes from importlib_resources
+  5.7.1.
+
+- bpo-44347: Clarify the meaning of *dirs_exist_ok*, a kwarg of
+  :func:`shutil.copytree`.
+
+- bpo-36329: Remove 'make -C Doc serve' in favour of 'make -C Doc htmlview'
+
+- bpo-47189: Add a What's New in Python 3.11 entry for the Faster CPython
+  project. Documentation by Ken Jin and Kumar Aditya.
+
+- bpo-38668: Update the introduction to documentation for :mod:`os.path` to
+  remove warnings that became irrelevant after the implementations of
+  :pep:`383` and :pep:`529`.
+
+- bpo-47115: The documentation now lists which members of C structs are part
+  of the :ref:`Limited API/Stable ABI <stable>`.
+
+- bpo-46962: All docstrings in code snippets are now wrapped into
+  :func:`PyDoc_STR` to follow the guideline of `PEP 7's Documentation
+  Strings paragraph
+  <https://www.python.org/dev/peps/pep-0007/#documentation-strings>`_. Patch
+  by Oleg Iarygin.
+
+- bpo-26792: Improve the docstrings of :func:`runpy.run_module` and
+  :func:`runpy.run_path`. Original patch by Andrew Brezovsky.
+
+Tests
+-----
+
+- gh-issue-92169: Use ``warnings_helper.import_deprecated()`` to import
+  deprecated modules uniformly in tests. Patch by Hugo van Kemenade.
+
+- gh-issue-84461: When multiprocessing is enabled, libregrtest can now use a
+  Python executable other than :code:`sys.executable` via the ``--python``
+  flag.
+
+- gh-issue-91904: Fix initialization of
+  :envvar:`PYTHONREGRTEST_UNICODE_GUARD` which prevented running regression
+  tests on non-UTF-8 locale.
+
+- gh-issue-91752: Added @requires_zlib to
+  test.test_tools.test_freeze.TestFreeze.
+
+- gh-issue-91607: Fix ``test_concurrent_futures`` to test the correct
+  multiprocessing start method context in several cases where the test logic
+  mixed this up.
+
+- bpo-40280: Threading tests are now skipped on WASM targets without pthread
+  support.
+
+- bpo-47109: Test for :mod:`ctypes.macholib.dyld`,
+  :mod:`ctypes.macholib.dylib`, and :mod:`ctypes.macholib.framework` are
+  brought from manual pre-:mod:`unittest` times to :mod:`ctypes.test`
+  location and structure. Patch by Oleg Iarygin.
+
+- bpo-29890: Add tests for :class:`ipaddress.IPv4Interface` and
+  :class:`ipaddress.IPv6Interface` construction with tuple arguments.
+  Original patch and tests by louisom.
+
+Build
+-----
+
+- gh-issue-89452: gdbm-compat is now preferred over ndbm if both are
+  available on the system. This allows avoiding the problematic ndbm.h on
+  macOS.
+
+- gh-issue-91731: Python is now built with ``-std=c11`` compiler option,
+  rather than ``-std=c99``. Patch by Victor Stinner.
+
+- bpo-47152: Add script and make target for generating ``sre_constants.h``.
+
+- bpo-47103: Windows ``PGInstrument`` builds now copy a required DLL into
+  the output directory, making it easier to run the profile stage of a PGO
+  build.
+
+Windows
+-------
+
+- bpo-46907: Update Windows installer to use SQLite 3.38.3.
+
+- bpo-47239: Fixed --list and --list-paths output for :ref:`launcher` when
+  used in an active virtual environment.
+
+- bpo-46907: Update Windows installer to use SQLite 3.38.2.
+
+- bpo-46785: Fix race condition between :func:`os.stat` and unlinking a file
+  on Windows, by using errors codes returned by ``FindFirstFileW()`` when
+  appropriate in ``win32_xstat_impl``.
+
+- bpo-40859: Update Windows build to use xz-5.2.5
+
+macOS
+-----
+
+- bpo-46907: Update macOS installer to SQLite 3.38.4.
+
+Tools/Demos
+-----------
+
+- gh-issue-91583: Fix regression in the code generated by Argument Clinic
+  for functions with the ``defining_class`` parameter.
+
+- gh-issue-91575: Add script ``Tools/scripts/generate_re_casefix.py`` and
+  the make target ``regen-re`` for generating additional data for
+  case-insensitive matching according to the current Unicode version.
+
+- gh-issue-91551: Remove the ancient Pynche color editor.  It has moved to
+  https://gitlab.com/warsaw/pynche
+
+C API
+-----
+
+- gh-issue-88279: Deprecate the C functions: :c:func:`PySys_SetArgv`,
+  :c:func:`PySys_SetArgvEx`, :c:func:`PySys_SetPath`. Patch by Victor
+  Stinner.
+
+- gh-issue-92154: Added the :c:func:`PyCode_GetCode` function. This function
+  does the equivalent of the Python code ``getattr(code_object,
+  'co_code')``.
+
+- gh-issue-92173: Fix the ``closure`` argument to
+  :c:func:`PyEval_EvalCodeEx`.
+
+- gh-issue-91320: Fix C++ compiler warnings about "old-style cast" (``g++
+  -Wold-style-cast``) in the Python C API. Use C++ ``reinterpret_cast<>``
+  and ``static_cast<>`` casts when the Python C API is used in C++. Patch by
+  Victor Stinner.
+
+- gh-issue-80527: Mark functions as deprecated by :pep:`623`:
+  :c:func:`PyUnicode_AS_DATA`, :c:func:`PyUnicode_AS_UNICODE`,
+  :c:func:`PyUnicode_GET_DATA_SIZE`, :c:func:`PyUnicode_GET_SIZE`. Patch by
+  Victor Stinner.
+
+- gh-issue-91768: :c:func:`Py_REFCNT`, :c:func:`Py_TYPE`, :c:func:`Py_SIZE`
+  and :c:func:`Py_IS_TYPE` functions argument type is now ``PyObject*``,
+  rather than ``const PyObject*``. Patch by Victor Stinner.
+
+- gh-issue-91020: Add ``PyBytes_Type.tp_alloc`` to initialize
+  ``PyBytesObject.ob_shash`` for bytes subclasses.
+
+- bpo-40421: Add ``PyFrame_GetLasti`` C-API function to access frame
+  object's ``f_lasti`` attribute safely from C code.
+
+- bpo-35134: Remove the ``Include/code.h`` header file. C extensions should
+  only include the main ``<Python.h>`` header file. Patch by Victor Stinner.
+
+- bpo-47169: :c:func:`PyOS_CheckStack` is now exported in the Stable ABI on
+  Windows.
+
+- bpo-47169: :c:func:`PyThread_get_thread_native_id` is excluded from the
+  stable ABI on platforms where it doesn't exist (like Solaris).
+
+- bpo-46343: Added :c:func:`PyErr_GetHandledException` and
+  :c:func:`PyErr_SetHandledException` as simpler alternatives to
+  :c:func:`PyErr_GetExcInfo` and :c:func:`PyErr_SetExcInfo`.
+
+  They are included in the stable ABI.
+
+
 What's New in Python 3.11.0 alpha 7?
 ====================================
 
@@ -24218,6 +24987,13 @@ What's New in Python 3.6.2 release candidate 1?
 
 *Release date: 2017-06-17*
 
+Security
+--------
+
+- bpo-29591: Update expat copy from 2.1.1 to 2.2.0 to get fixes of
+  CVE-2016-0718 and CVE-2016-4472. See
+  https://sourceforge.net/p/expat/bugs/537/ for more information.
+
 Core and Builtins
 -----------------
 
@@ -24292,16 +25068,6 @@ Library
 
 - bpo-30605: re.compile() no longer raises a BytesWarning when compiling a
   bytes instance with misplaced inline modifier.  Patch by Roy Williams.
-
-Security
---------
-
-- bpo-29591: Update expat copy from 2.1.1 to 2.2.0 to get fixes of
-  CVE-2016-0718 and CVE-2016-4472. See
-  https://sourceforge.net/p/expat/bugs/537/ for more information.
-
-Library
--------
 
 - bpo-24484: Avoid race condition in multiprocessing cleanup (#2159)
 
@@ -26265,6 +27031,15 @@ What's New in Python 3.6.0 alpha 3?
 
 *Release date: 2016-07-11*
 
+Security
+--------
+
+- bpo-27278: Fix os.urandom() implementation using getrandom() on Linux.
+  Truncate size to INT_MAX and loop until we collected enough random bytes,
+  instead of casting a directly Py_ssize_t to int.
+
+- bpo-22636: Avoid shell injection problems with ctypes.util.find_library().
+
 Core and Builtins
 -----------------
 
@@ -26359,16 +27134,6 @@ Library
   let the new chained one through.  This avoids the :pep:`479` bug described
   in issue25782.
 
-Security
---------
-
-- bpo-27278: Fix os.urandom() implementation using getrandom() on Linux.
-  Truncate size to INT_MAX and loop until we collected enough random bytes,
-  instead of casting a directly Py_ssize_t to int.
-
-Library
--------
-
 - bpo-16864: sqlite3.Cursor.lastrowid now supports REPLACE statement.
   Initial patch by Alex LordThorsen.
 
@@ -26377,14 +27142,6 @@ Library
 
 - bpo-8637: Honor a pager set by the env var MANPAGER (in preference to one
   set by the env var PAGER).
-
-Security
---------
-
-- bpo-22636: Avoid shell injection problems with ctypes.util.find_library().
-
-Library
--------
 
 - bpo-16182: Fix various functions in the "readline" module to use the
   locale encoding, and fix get_begidx() and get_endidx() to return code
@@ -26485,6 +27242,18 @@ What's New in Python 3.6.0 alpha 2?
 
 *Release date: 2016-06-13*
 
+Security
+--------
+
+- bpo-26556: Update expat to 2.1.1, fixes CVE-2015-1283.
+
+- Fix TLS stripping vulnerability in smtplib, CVE-2016-0772. Reported by
+  Team Oststrom.
+
+- bpo-26839: On Linux, :func:`os.urandom` now calls ``getrandom()`` with
+  ``GRND_NONBLOCK`` to fall back on reading ``/dev/urandom`` if the urandom
+  entropy pool is not initialized yet. Patch written by Colm Buckley.
+
 Core and Builtins
 -----------------
 
@@ -26543,17 +27312,6 @@ Library
 - bpo-20508: Improve exception message of IPv{4,6}Network.__getitem__. Patch
   by Gareth Rees.
 
-Security
---------
-
-- bpo-26556: Update expat to 2.1.1, fixes CVE-2015-1283.
-
-- Fix TLS stripping vulnerability in smtplib, CVE-2016-0772. Reported by
-  Team Oststrom.
-
-Library
--------
-
 - bpo-21386: Implement missing IPv4Address.is_global property.  It was
   documented since 07a5610bae9d.  Initial patch by Roger Luethi.
 
@@ -26593,16 +27351,6 @@ Library
 
 - bpo-21313: Fix the "platform" module to tolerate when sys.version contains
   truncated build information.
-
-Security
---------
-
-- bpo-26839: On Linux, :func:`os.urandom` now calls ``getrandom()`` with
-  ``GRND_NONBLOCK`` to fall back on reading ``/dev/urandom`` if the urandom
-  entropy pool is not initialized yet. Patch written by Colm Buckley.
-
-Library
--------
 
 - bpo-23883: Added missing APIs to __all__ to match the documented APIs for
   the following modules: cgi, mailbox, mimetypes, plistlib and smtpd.
@@ -26753,6 +27501,9 @@ Windows
   launcher ``py.exe`` no longer prefers an installed Python 2 version over
   Python 3 by default when used interactively.
 
+- bpo-17500: Remove unused and outdated icons. (See also:
+  https://github.com/python/pythondotorg/issues/945)
+
 Build
 -----
 
@@ -26761,12 +27512,6 @@ Build
 
 - bpo-26930: Update OS X 10.5+ 32-bit-only installer to build and link with
   OpenSSL 1.0.2h.
-
-Windows
--------
-
-- bpo-17500: Remove unused and outdated icons. (See also:
-  https://github.com/python/pythondotorg/issues/945)
 
 C API
 -----
@@ -26787,6 +27532,19 @@ What's New in Python 3.6.0 alpha 1?
 ===================================
 
 *Release date: 2016-05-16*
+
+Security
+--------
+
+- bpo-26657: Fix directory traversal vulnerability with http.server on
+  Windows.  This fixes a regression that was introduced in 3.3.4rc1 and
+  3.4.0rc1.  Based on patch by Philipp Hagemeister.
+
+- bpo-26313: ssl.py _load_windows_store_certs fails if windows cert store is
+  empty. Patch by Baji.
+
+- bpo-25939: On Windows open the cert store readonly in
+  ssl.enum_certificates.
 
 Core and Builtins
 -----------------
@@ -27189,16 +27947,6 @@ Library
 - bpo-24838: tarfile's ustar and gnu formats now correctly calculate name
   and link field limits for multibyte character encodings like utf-8.
 
-Security
---------
-
-- bpo-26657: Fix directory traversal vulnerability with http.server on
-  Windows.  This fixes a regression that was introduced in 3.3.4rc1 and
-  3.4.0rc1.  Based on patch by Philipp Hagemeister.
-
-Library
--------
-
 - bpo-26717: Stop encoding Latin-1-ized WSGI paths with UTF-8.  Patch by
   Anthony Sottile.
 
@@ -27300,15 +28048,6 @@ Library
   :class:`warnings.WarningMessage`. Add warnings._showwarnmsg() which uses
   tracemalloc to get the traceback where source object was allocated.
 
-Security
---------
-
-- bpo-26313: ssl.py _load_windows_store_certs fails if windows cert store is
-  empty. Patch by Baji.
-
-Library
--------
-
 - bpo-26569: Fix :func:`pyclbr.readmodule` and :func:`pyclbr.readmodule_ex`
   to support importing packages.
 
@@ -27389,15 +28128,6 @@ Library
   BaseException). Therefore SystemExit and KeyboardInterrupt no longer
   trigger the handle_error() method, and will now to stop a single-threaded
   server.
-
-Security
---------
-
-- bpo-25939: On Windows open the cert store readonly in
-  ssl.enum_certificates.
-
-Library
--------
 
 - bpo-25995: os.walk() no longer uses FDs proportional to the tree depth.
 
@@ -28575,6 +29305,15 @@ What's New in Python 3.5.3 release candidate 1?
 
 *Release date: 2017-01-02*
 
+Security
+--------
+
+- bpo-27278: Fix os.urandom() implementation using getrandom() on Linux.
+  Truncate size to INT_MAX and loop until we collected enough random bytes,
+  instead of casting a directly Py_ssize_t to int.
+
+- bpo-22636: Avoid shell injection problems with ctypes.util.find_library().
+
 Core and Builtins
 -----------------
 
@@ -29013,26 +29752,8 @@ Library
   let the new chained one through.  This avoids the :pep:`479` bug described
   in issue25782.
 
-Security
---------
-
-- bpo-27278: Fix os.urandom() implementation using getrandom() on Linux.
-  Truncate size to INT_MAX and loop until we collected enough random bytes,
-  instead of casting a directly Py_ssize_t to int.
-
-Library
--------
-
 - bpo-26386: Fixed ttk.TreeView selection operations with item id's
   containing spaces.
-
-Security
---------
-
-- bpo-22636: Avoid shell injection problems with ctypes.util.find_library().
-
-Library
--------
 
 - bpo-16182: Fix various functions in the "readline" module to use the
   locale encoding, and fix get_begidx() and get_endidx() to return code
@@ -29287,6 +30008,28 @@ What's New in Python 3.5.2 release candidate 1?
 
 *Release date: 2016-06-12*
 
+Security
+--------
+
+- bpo-26556: Update expat to 2.1.1, fixes CVE-2015-1283.
+
+- Fix TLS stripping vulnerability in smtplib, CVE-2016-0772. Reported by
+  Team Oststrom
+
+- bpo-26839: On Linux, :func:`os.urandom` now calls ``getrandom()`` with
+  ``GRND_NONBLOCK`` to fall back on reading ``/dev/urandom`` if the urandom
+  entropy pool is not initialized yet. Patch written by Colm Buckley.
+
+- bpo-26657: Fix directory traversal vulnerability with http.server on
+  Windows.  This fixes a regression that was introduced in 3.3.4rc1 and
+  3.4.0rc1.  Based on patch by Philipp Hagemeister.
+
+- bpo-26313: ssl.py _load_windows_store_certs fails if windows cert store is
+  empty. Patch by Baji.
+
+- bpo-25939: On Windows open the cert store readonly in
+  ssl.enum_certificates.
+
 Core and Builtins
 -----------------
 
@@ -29417,14 +30160,6 @@ Core and Builtins
   iterator should be returned directly.  Doing the former will trigger a
   PendingDeprecationWarning.
 
-Security
---------
-
-- bpo-26556: Update expat to 2.1.1, fixes CVE-2015-1283.
-
-- Fix TLS stripping vulnerability in smtplib, CVE-2016-0772. Reported by
-  Team Oststrom
-
 Library
 -------
 
@@ -29449,16 +30184,6 @@ Library
 
 - bpo-21313: Fix the "platform" module to tolerate when sys.version contains
   truncated build information.
-
-Security
---------
-
-- bpo-26839: On Linux, :func:`os.urandom` now calls ``getrandom()`` with
-  ``GRND_NONBLOCK`` to fall back on reading ``/dev/urandom`` if the urandom
-  entropy pool is not initialized yet. Patch written by Colm Buckley.
-
-Library
--------
 
 - bpo-27164: In the zlib module, allow decompressing raw Deflate streams
   with a predefined zdict.  Based on patch by Xiang Zhang.
@@ -29562,16 +30287,6 @@ Library
 - bpo-24838: tarfile's ustar and gnu formats now correctly calculate name
   and link field limits for multibyte character encodings like utf-8.
 
-Security
---------
-
-- bpo-26657: Fix directory traversal vulnerability with http.server on
-  Windows.  This fixes a regression that was introduced in 3.3.4rc1 and
-  3.4.0rc1.  Based on patch by Philipp Hagemeister.
-
-Library
--------
-
 - bpo-26717: Stop encoding Latin-1-ized WSGI paths with UTF-8.  Patch by
   Anthony Sottile.
 
@@ -29616,15 +30331,6 @@ Library
 
 - bpo-26560: Avoid potential ValueError in BaseHandler.start_response.
   Initial patch by Peter Inglesby.
-
-Security
---------
-
-- bpo-26313: ssl.py _load_windows_store_certs fails if windows cert store is
-  empty. Patch by Baji.
-
-Library
--------
 
 - bpo-26569: Fix :func:`pyclbr.readmodule` and :func:`pyclbr.readmodule_ex`
   to support importing packages.
@@ -29685,15 +30391,6 @@ Library
 - bpo-26309: In the "socketserver" module, shut down the request (closing
   the connected socket) when verify_request() returns false.  Patch by Aviv
   Palivoda.
-
-Security
---------
-
-- bpo-25939: On Windows open the cert store readonly in
-  ssl.enum_certificates.
-
-Library
--------
 
 - bpo-25995: os.walk() no longer uses FDs proportional to the tree depth.
 
@@ -30016,6 +30713,9 @@ Windows
 
 - bpo-26065: Excludes venv from library when generating embeddable distro.
 
+- bpo-17500: Remove unused and outdated icons. (See also:
+  https://github.com/python/pythondotorg/issues/945)
+
 Tools/Demos
 -----------
 
@@ -30031,12 +30731,6 @@ Tools/Demos
   Patch by Guo Ci Teo.
 
 - bpo-26316: Fix variable name typo in Argument Clinic.
-
-Windows
--------
-
-- bpo-17500: Remove unused and outdated icons. (See also:
-  https://github.com/python/pythondotorg/issues/945)
 
 
 What's New in Python 3.5.1 final?
