@@ -7,10 +7,10 @@ Subject: argparse-no-shutil
  1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/argparse.py b/Lib/argparse.py
-index c630bcc..fe12c6a 100644
+index 04494c8..740c2a2 100644
 --- a/Lib/argparse.py
 +++ b/Lib/argparse.py
-@@ -177,9 +177,12 @@ class HelpFormatter(object):
+@@ -178,9 +178,12 @@ class HelpFormatter(object):
  
          # default setting for width
          if width is None:
