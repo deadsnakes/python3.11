@@ -34,14 +34,13 @@ jobs:
         - name: bionic
         - name: focal
         - name: jammy
-    env:
-      DEBEMAIL: 'asottile+deadsnakes@umich.edu'
-      DEBFULLNAME: 'Anthony Sottile (deadsnakes)'
-      GIT_AUTHOR_NAME: 'Anthony Sottile'
-      GIT_AUTHOR_EMAIL: 'asottile+deadsnakes@umich.edu'
-      GIT_COMMITTER_NAME: 'Anthony Sottile'
-      GIT_COMMITTER_EMAIL: 'asottile+deadsnakes@umich.edu'
     steps:
+    - name: configure debian and git
+      run: |
+        echo 'DEBEMAIL=asottile+deadsnakes@umich.edu' >> $GITHUB_ENV
+        echo 'DEBFULLNAME=Anthony Sottile (deadsnakes)' >> $GITHUB_ENV
+        git config --global user.name 'Anthony Sottile'
+        git config --global user.email asottile+deadsnakes@umich.edu
     - name: clone target
       uses: actions/checkout@v2
       with:
