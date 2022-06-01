@@ -22,12 +22,34 @@
 // _Py_CAST(PyObject*, op) can convert a "const PyObject*" to
 // "PyObject*".
 //
-// The type argument must not be constant. For example, in C++,
-// _Py_CAST(const PyObject*, expr) fails with a compiler error.
+// The type argument must not be a constant type.
 #ifdef __cplusplus
 #  define _Py_STATIC_CAST(type, expr) static_cast<type>(expr)
-#  define _Py_CAST(type, expr) \
-       const_cast<type>(reinterpret_cast<const type>(expr))
+extern "C++" {
+    namespace {
+        template <typename type, typename expr_type>
+            inline type _Py_CAST_impl(expr_type *expr) {
+                return reinterpret_cast<type>(expr);
+            }
+
+        template <typename type, typename expr_type>
+            inline type _Py_CAST_impl(expr_type const *expr) {
+                return reinterpret_cast<type>(const_cast<expr_type *>(expr));
+            }
+
+        template <typename type, typename expr_type>
+            inline type _Py_CAST_impl(expr_type &expr) {
+                return static_cast<type>(expr);
+            }
+
+        template <typename type, typename expr_type>
+            inline type _Py_CAST_impl(expr_type const &expr) {
+                return static_cast<type>(const_cast<expr_type &>(expr));
+            }
+    }
+}
+#  define _Py_CAST(type, expr) _Py_CAST_impl<type>(expr)
+
 #else
 #  define _Py_STATIC_CAST(type, expr) ((type)(expr))
 #  define _Py_CAST(type, expr) ((type)(expr))
