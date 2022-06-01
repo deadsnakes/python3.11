@@ -326,8 +326,9 @@ static inline void* _PyUnicode_COMPACT_DATA(PyObject *op) {
 }
 
 static inline void* _PyUnicode_NONCOMPACT_DATA(PyObject *op) {
+    void *data;
     assert(!PyUnicode_IS_COMPACT(op));
-    void *data = _PyUnicodeObject_CAST(op)->data.any;
+    data = _PyUnicodeObject_CAST(op)->data.any;
     assert(data != NULL);
     return data;
 }
@@ -367,7 +368,7 @@ static inline Py_ssize_t PyUnicode_GET_LENGTH(PyObject *op) {
    kind and data pointers obtained from other function calls.
    index is the index in the string (starts at 0) and value is the new
    code point value which should be written to that location. */
-static inline void PyUnicode_WRITE(unsigned int kind, void *data,
+static inline void PyUnicode_WRITE(int kind, void *data,
                                    Py_ssize_t index, Py_UCS4 value)
 {
     if (kind == PyUnicode_1BYTE_KIND) {
@@ -384,12 +385,15 @@ static inline void PyUnicode_WRITE(unsigned int kind, void *data,
         _Py_STATIC_CAST(Py_UCS4*, data)[index] = value;
     }
 }
+#if !defined(Py_LIMITED_API) || Py_LIMITED_API+0 < 0x030b0000
 #define PyUnicode_WRITE(kind, data, index, value) \
-    PyUnicode_WRITE((unsigned int)(kind), (void*)(data), (index), (Py_UCS4)(value))
+    PyUnicode_WRITE(_Py_STATIC_CAST(int, kind), _Py_CAST(void*, data), \
+                    (index), _Py_STATIC_CAST(Py_UCS4, value))
+#endif
 
 /* Read a code point from the string's canonical representation.  No checks
    or ready calls are performed. */
-static inline Py_UCS4 PyUnicode_READ(unsigned int kind,
+static inline Py_UCS4 PyUnicode_READ(int kind,
                                      const void *data, Py_ssize_t index)
 {
     if (kind == PyUnicode_1BYTE_KIND) {
@@ -401,8 +405,12 @@ static inline Py_UCS4 PyUnicode_READ(unsigned int kind,
     assert(kind == PyUnicode_4BYTE_KIND);
     return _Py_STATIC_CAST(const Py_UCS4*, data)[index];
 }
+#if !defined(Py_LIMITED_API) || Py_LIMITED_API+0 < 0x030b0000
 #define PyUnicode_READ(kind, data, index) \
-    PyUnicode_READ((unsigned int)(kind), (const void*)(data), (index))
+    PyUnicode_READ(_Py_STATIC_CAST(int, kind), \
+                   _Py_STATIC_CAST(const void*, data), \
+                   (index))
+#endif
 
 /* PyUnicode_READ_CHAR() is less efficient than PyUnicode_READ() because it
    calls PyUnicode_KIND() and might call it twice.  For single reads, use
@@ -410,8 +418,9 @@ static inline Py_UCS4 PyUnicode_READ(unsigned int kind,
    cache kind and use PyUnicode_READ instead. */
 static inline Py_UCS4 PyUnicode_READ_CHAR(PyObject *unicode, Py_ssize_t index)
 {
+    int kind;
     assert(PyUnicode_IS_READY(unicode));
-    unsigned int kind = PyUnicode_KIND(unicode);
+    kind = PyUnicode_KIND(unicode);
     if (kind == PyUnicode_1BYTE_KIND) {
         return PyUnicode_1BYTE_DATA(unicode)[index];
     }
@@ -431,12 +440,14 @@ static inline Py_UCS4 PyUnicode_READ_CHAR(PyObject *unicode, Py_ssize_t index)
    than iterating over the string. */
 static inline Py_UCS4 PyUnicode_MAX_CHAR_VALUE(PyObject *op)
 {
+    int kind;
+
     assert(PyUnicode_IS_READY(op));
     if (PyUnicode_IS_ASCII(op)) {
         return 0x7fU;
     }
 
-    unsigned int kind = PyUnicode_KIND(op);
+    kind = PyUnicode_KIND(op);
     if (kind == PyUnicode_1BYTE_KIND) {
        return 0xffU;
     }
