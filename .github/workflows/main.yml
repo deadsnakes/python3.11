@@ -9,6 +9,7 @@ on:
 jobs:
   update:
     name: update
+    runs-on: ubuntu-latest
     steps:
     - name: clone target
       uses: actions/checkout@v2
