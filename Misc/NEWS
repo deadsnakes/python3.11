@@ -2,6 +2,231 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.0 beta 3?
+===================================
+
+*Release date: 2022-06-01*
+
+Core and Builtins
+-----------------
+
+- gh-issue-93359: Ensure that custom :mod:`ast` nodes without explicit end
+  positions can be compiled. Patch by Pablo Galindo.
+
+- gh-issue-93345: Fix a crash in substitution of a ``TypeVar`` in nested
+  generic alias after ``TypeVarTuple``.
+
+Build
+-----
+
+- gh-issue-69093: Fix ``Modules/Setup.stdlib.in`` rule for ``_sqlite3``
+  extension.
+
+
+What's New in Python 3.11.0 beta 2?
+===================================
+
+*Release date: 2022-05-30*
+
+Core and Builtins
+-----------------
+
+- gh-issue-84694: The ``--experimental-isolated-subinterpreters`` configure
+  option and ``EXPERIMENTAL_ISOLATED_SUBINTERPRETERS`` macro have been
+  removed.
+
+- gh-issue-91924: Fix ``__lltrace__`` debug feature if the stdout encoding
+  is not UTF-8. Patch by Victor Stinner.
+
+- gh-issue-93061: Backward jumps after ``async for`` loops are no longer
+  given dubious line numbers.
+
+- gh-issue-93065: Fix contextvars HAMT implementation to handle iteration
+  over deep trees.
+
+  The bug was discovered and fixed by Eli Libman. See
+  `MagicStack/immutables#84
+  <https://github.com/MagicStack/immutables/issues/84>`_ for more details.
+
+- gh-issue-90473: Decrease default recursion limit on WASI to address
+  limited call stack size.
+
+- gh-issue-92804: Fix memory leak in ``memoryview`` iterator as it was not
+  finalized at exit. Patch by Kumar Aditya.
+
+- gh-issue-92236: Remove spurious "LINE" event when starting a generator or
+  coroutine, visible tracing functions implemented in C.
+
+- gh-issue-92619: Make the compiler duplicate an exit block only if none of
+  its instructions have a lineno (previously only the first instruction in
+  the block was checked, leading to unnecessarily duplicated blocks).
+
+- gh-issue-92261: Fix hang when trying to iterate over a ``typing.Union``.
+
+Library
+-------
+
+- gh-issue-93297: Make asyncio task groups prevent child tasks from being
+  GCed
+
+- gh-issue-90817: The :func:`locale.resetlocale` function is deprecated and
+  will be removed in Python 3.13. Use ``locale.setlocale(locale.LC_ALL,
+  "")`` instead. Patch by Victor Stinner.
+
+- gh-issue-92728: The :func:`re.template` function and the corresponding
+  :const:`re.TEMPLATE` and :const:`re.T` flags are restored after they were
+  removed in 3.11.0b1, but they are now deprecated, so they might be removed
+  from Python 3.13.
+
+- gh-issue-93044: No longer convert the database argument of
+  :func:`sqlite3.connect` to bytes before passing it to the factory.
+
+- gh-issue-93010: In a very special case, the email package tried to append
+  the nonexistent ``InvalidHeaderError`` to the defect list. It should have
+  been ``InvalidHeaderDefect``.
+
+- gh-issue-92675: Fix :func:`venv.ensure_directories` to accept
+  :class:`pathlib.Path` arguments in addition to :class:`str` paths. Patch
+  by David Foster.
+
+- gh-issue-87901: Removed the ``encoding`` argument from :func:`os.popen`
+  that was added in 3.11b1.
+
+- gh-issue-91922: Fix function :func:`sqlite.connect` and the
+  :class:`sqlite.Connection` constructor on non-UTF-8 locales. Also, they
+  now support bytes paths non-decodable with the current FS encoding.
+
+- gh-issue-92839: Fixed crash resulting from calling bisect.insort() or
+  bisect.insort_left() with the key argument not equal to None.
+
+- gh-issue-90473: :mod:`subprocess` now fails early on Emscripten and WASI
+  platforms to work around missing :func:`os.pipe` on WASI.
+
+- gh-issue-92671: Fixed :func:`ast.unparse` for empty tuples in the
+  assignment target context.
+
+- gh-issue-91581: :meth:`~datetime.datetime.utcfromtimestamp` no longer
+  attempts to resolve ``fold`` in the pure Python implementation, since the
+  fold is never 1 in UTC. In addition to being slightly faster in the common
+  case, this also prevents some errors when the timestamp is close to
+  :attr:`datetime.min <datetime.datetime.min>`.  Patch by Paul Ganssle.
+
+- gh-issue-92550: Fix :meth:`pathlib.Path.rglob` for empty pattern.
+
+- gh-issue-92530: Fix an issue that occurred after interrupting
+  :func:`threading.Condition.notify`.
+
+- gh-issue-92531: The statistics.median_grouped() function now always return
+  a float. Formerly, it did not convert the input type when for sequences of
+  length one.
+
+- gh-issue-91810: :class:`~xml.etree.ElementTree.ElementTree` method
+  :meth:`~xml.etree.ElementTree.ElementTree.write` and function
+  :func:`~xml.etree.ElementTree.tostring` now use the text file's encoding
+  ("UTF-8" if not available) instead of locale encoding in XML declaration
+  when ``encoding="unicode"`` is specified.
+
+- gh-issue-90622: Worker processes for
+  :class:`concurrent.futures.ProcessPoolExecutor` are no longer spawned on
+  demand (a feature added in 3.9) when the multiprocessing context start
+  method is ``"fork"`` as that can lead to deadlocks in the child processes
+  due to a fork happening while threads are running.
+
+- gh-issue-91581: Remove an unhandled error case in the C implementation of
+  calls to :meth:`datetime.fromtimestamp <datetime.datetime.fromtimestamp>`
+  with no time zone (i.e. getting a local time from an epoch timestamp).
+  This should have no user-facing effect other than giving a possibly more
+  accurate error message when called with timestamps that fall on
+  10000-01-01 in the local time. Patch by Paul Ganssle.
+
+- bpo-39064: :class:`zipfile.ZipFile` now raises :exc:`zipfile.BadZipFile`
+  instead of ``ValueError`` when reading a corrupt zip file in which the
+  central directory offset is negative.
+
+- bpo-45393: Fix the formatting for ``await x`` and ``not x`` in the
+  operator precedence table when using the :func:`help` system.
+
+- bpo-28249: Set :attr:`doctest.DocTest.lineno` to ``None`` when object does
+  not have :attr:`__doc__`.
+
+- bpo-45046: Add support of context managers in :mod:`unittest`: methods
+  :meth:`~unittest.TestCase.enterContext` and
+  :meth:`~unittest.TestCase.enterClassContext` of class
+  :class:`~unittest.TestCase`, method
+  :meth:`~unittest.IsolatedAsyncioTestCase.enterAsyncContext` of class
+  :class:`~unittest.IsolatedAsyncioTestCase` and function
+  :func:`unittest.enterModuleContext`.
+
+- bpo-42627: Fix incorrect parsing of Windows registry proxy settings
+
+Documentation
+-------------
+
+- gh-issue-86438: Clarify that :option:`-W` and :envvar:`PYTHONWARNINGS` are
+  matched literally and case-insensitively, rather than as regular
+  expressions, in :mod:`warnings`.
+
+- gh-issue-92240: Added release dates for "What's New in Python 3.X" for
+  3.0, 3.1, 3.2, 3.8 and 3.10
+
+- bpo-40838: Document that :func:`inspect.getdoc`,
+  :func:`inspect.getmodule`, and :func:`inspect.getsourcefile` might return
+  ``None``.
+
+- bpo-38056: Overhaul the :ref:`error-handlers` documentation in
+  :mod:`codecs`.
+
+- bpo-13553: Document tkinter.Tk args.
+
+Tests
+-----
+
+- gh-issue-92670: Skip
+  ``test_shutil.TestCopy.test_copyfile_nonexistent_dir`` test on AIX as the
+  test uses a trailing slash to force the OS consider the path as a
+  directory, but on AIX the trailing slash has no effect and is considered
+  as a file.
+
+Build
+-----
+
+- gh-issue-90473: Disable pymalloc and increase stack size on
+  ``wasm32-wasi``.
+
+- bpo-34449: Drop invalid compiler switch ``-fPIC`` for HP aCC on HP-UX.
+  Patch by Michael Osipov.
+
+Windows
+-------
+
+- gh-issue-92817: Ensures that :file:`py.exe` will prefer an active virtual
+  environment over default tags specified with environment variables or
+  through a :file:`py.ini` file.
+
+- gh-issue-92984: Explicitly disable incremental linking for non-Debug
+  builds
+
+- gh-issue-92841: :mod:`asyncio` no longer throws ``RuntimeError: Event loop
+  is closed`` on interpreter exit after asynchronous socket activity. Patch
+  by Oleg Iarygin.
+
+- bpo-46907: Update Windows installer to use SQLite 3.38.4.
+
+C API
+-----
+
+- gh-issue-92898: Fix C++ compiler warnings when casting function arguments
+  to ``PyObject*``. Patch by Serge Guelton.
+
+- gh-issue-92913: Ensures changes to
+  :c:member:`PyConfig.module_search_paths` are ignored unless
+  :c:member:`PyConfig.module_search_paths_set` is set
+
+- gh-issue-92781: Avoid mixing declarations and code in the C API to fix the
+  compiler warning: "ISO C90 forbids mixed declarations and code"
+  [-Werror=declaration-after-statement]. Patch by Victor Stinner.
+
+
 What's New in Python 3.11.0 beta 1?
 ===================================
 
@@ -226,9 +451,9 @@ Library
 - gh-issue-92332: Deprecate :class:`typing.Text` (removal of the class is
   currently not planned). Patch by Alex Waygood.
 
-- bpo-78157: Deprecate nested classes in enum definitions becoming members
-  -- in 3.13 they will be normal classes; add `member` and `nonmember`
-  functions to allow control over results now.
+- Deprecate nested classes in enum definitions becoming members -- in 3.13
+  they will be normal classes; add `member` and `nonmember` functions to
+  allow control over results now.
 
 - gh-issue-92356: Fixed a performance regression in ctypes function calls.
 
@@ -457,7 +682,7 @@ Library
 
 - gh-issue-91217: Deprecate the chunk module.
 
-- bpo-91498: Add the ``TCP_CONNECTION_INFO`` option (available on macOS) to
+- Add the ``TCP_CONNECTION_INFO`` option (available on macOS) to
   :mod:`socket`.
 
 - bpo-47260: Fix ``os.closerange()`` potentially being a no-op in a Linux
@@ -480,7 +705,8 @@ Library
 - bpo-47227: Suppress expression chaining for more :mod:`re` parsing errors.
 
 - bpo-47211: Remove undocumented and never working function
-  ``re.template()`` and flag ``re.TEMPLATE``.
+  ``re.template()`` and flag ``re.TEMPLATE``. This was later reverted in
+  3.11.0b2 and deprecated instead.
 
 - bpo-47135: :meth:`decimal.localcontext` now accepts context attributes via
   keyword arguments
@@ -4248,7 +4474,7 @@ Library
 - bpo-45225: use map function instead of genexpr in capwords.
 
 - bpo-42135: Fix typo: ``importlib.find_loader`` is really slated for
-  removal in Python 3.12 not 3.10, like the others in GH-25169.
+  removal in Python 3.12 not 3.10, like the others in PR 25169.
 
   Patch by Hugo van Kemenade.
 
@@ -5909,10 +6135,10 @@ Library
   discovery. Flagged use of dict result from ``entry_points()`` as
   deprecated.
 
-- bpo-47383: The ``P.args`` and ``P.kwargs`` attributes of
-  :class:`typing.ParamSpec` are now instances of the new classes
-  :class:`typing.ParamSpecArgs` and :class:`typing.ParamSpecKwargs`, which
-  enables a more useful ``repr()``. Patch by Jelle Zijlstra.
+- The ``P.args`` and ``P.kwargs`` attributes of :class:`typing.ParamSpec`
+  are now instances of the new classes :class:`typing.ParamSpecArgs` and
+  :class:`typing.ParamSpecKwargs`, which enables a more useful ``repr()``.
+  Patch by Jelle Zijlstra.
 
 - bpo-43731: Add an ``encoding`` parameter :func:`logging.fileConfig()`.
 
@@ -5929,7 +6155,7 @@ Library
 
 - bpo-43752: Fix :mod:`sqlite3` regression for zero-sized blobs with
   converters, where ``b""`` was returned instead of ``None``. The regression
-  was introduced by GH-24723. Patch by Erlend E. Aasland.
+  was introduced by PR 24723. Patch by Erlend E. Aasland.
 
 - bpo-43655: :mod:`tkinter` dialog windows are now recognized as dialogs by
   window managers on macOS and X Window.
@@ -6470,7 +6696,7 @@ Library
   ``SQLITE_NOMEM``, :exc:`MemoryError` is now raised. Patch by Erlend E.
   Aasland.
 
-- bpo-43368: Fix a regression introduced in GH-24562, where an empty
+- bpo-43368: Fix a regression introduced in PR 24562, where an empty
   bytestring was fetched as ``None`` instead of ``b''`` in :mod:`sqlite3`.
   Patch by Mariusz Felisiak.
 
@@ -6771,7 +6997,7 @@ Library
   by Erlend E. Aasland.
 
 - bpo-40956: Fix segfault in :meth:`sqlite3.Connection.backup` if no
-  argument was provided. The regression was introduced by GH-23838. Patch by
+  argument was provided. The regression was introduced by PR 23838. Patch by
   Erlend E. Aasland.
 
 - bpo-43172: The readline module now passes its tests when built directly
@@ -12472,7 +12698,7 @@ Library
 - bpo-38417: Added support for setting the umask in the child process to the
   subprocess module on POSIX systems.
 
-- bpo-38449: Revert GH-15522, which introduces a regression in
+- bpo-38449: Revert PR 15522, which introduces a regression in
   :meth:`mimetypes.guess_type` due to improper handling of filenames as
   urls.
 
@@ -17384,7 +17610,7 @@ Library
   the decoding. Based on patch by c-fos.
 
 - bpo-33604: Remove HMAC default to md5 marked for removal in 3.8 (removal
-  originally planned in 3.6, bump to 3.8 in gh-7062).
+  originally planned in 3.6, bump to 3.8 in PR 7062).
 
 - bpo-33582: Emit a deprecation warning for inspect.formatargspec
 
@@ -20541,7 +20767,7 @@ Library
   when getting the file size. Fixed hang of all threads with inaccessible
   NFS server. Patch by Nir Soffer.
 
-- bpo-321010: Add :attr:`sys.flags.dev_mode` flag
+- bpo-32101: Add :attr:`sys.flags.dev_mode` flag
 
 - bpo-32154: The ``asyncio.windows_utils.socketpair()`` function has been
   removed: use directly :func:`socket.socketpair` which is available on all
