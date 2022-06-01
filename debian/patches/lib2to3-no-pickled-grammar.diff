@@ -24,7 +24,7 @@ index 6471635..957fb5a 100644
              try:
                  g.dump(gp)
 diff --git a/Lib/lib2to3/tests/test_parser.py b/Lib/lib2to3/tests/test_parser.py
-index e2dddbe..5fdba0c 100644
+index 8e7773b..5fdba0c 100644
 --- a/Lib/lib2to3/tests/test_parser.py
 +++ b/Lib/lib2to3/tests/test_parser.py
 @@ -39,88 +39,6 @@ class TestDriver(support.TestCase):
@@ -55,7 +55,7 @@ index e2dddbe..5fdba0c 100644
 -
 -    @unittest.skipIf(sys.executable is None, 'sys.executable required')
 -    @unittest.skipIf(
--        sys.platform == 'emscripten', 'requires working subprocess'
+-        sys.platform in {'emscripten', 'wasi'}, 'requires working subprocess'
 -    )
 -    def test_load_grammar_from_subprocess(self):
 -        tmpdir = tempfile.mkdtemp()
