@@ -22,6 +22,7 @@ jobs:
       with:
         path: runbooks
         repository: deadsnakes/runbooks
+        ref: debug
     - name: pull upstream
       run: runbooks/import-upstream --repo target ${{ github.event.inputs.version }}
   build:
