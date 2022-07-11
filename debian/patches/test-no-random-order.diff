@@ -9,10 +9,10 @@ Subject: test-no-random-order
  1 file changed, 1 deletion(-)
 
 diff --git a/Tools/scripts/run_tests.py b/Tools/scripts/run_tests.py
-index 48feb3f..0426ced 100644
+index 445a34a..0f52604 100644
 --- a/Tools/scripts/run_tests.py
 +++ b/Tools/scripts/run_tests.py
-@@ -32,7 +32,6 @@ def main(regrtest_args):
+@@ -56,7 +56,6 @@ def main(regrtest_args):
      args.extend(test.support.args_from_interpreter_flags())
  
      args.extend(['-m', 'test',    # Run the test suite

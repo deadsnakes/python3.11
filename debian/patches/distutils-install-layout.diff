@@ -147,10 +147,10 @@ index 0ddc736..0a71b61 100644
          self.outputs = [self.target]
  
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 3414a76..28ea4e2 100644
+index 03b8558..a4fd23e 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -320,6 +320,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -315,6 +315,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -158,7 +158,7 @@ index 3414a76..28ea4e2 100644
      if prefix is None:
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
-@@ -338,6 +339,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -333,6 +334,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
                                   "python" + get_python_version())
          if standard_lib:
              return libpython
@@ -207,10 +207,10 @@ index c38f98b..12d021f 100644
  
      def test_debug_mode(self):
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 938f209..ad281b8 100755
+index 74e9165..ac735e8 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -516,6 +516,7 @@ class Doc:
+@@ -512,6 +512,7 @@ class Doc:
                                   'marshal', 'posix', 'signal', 'sys',
                                   '_thread', 'zipimport') or
               (file.startswith(basedir) and
@@ -219,7 +219,7 @@ index 938f209..ad281b8 100755
              object.__name__ not in ('xml.etree', 'test.pydoc_mod')):
              if docloc.startswith(("http://", "https://")):
 diff --git a/Lib/site.py b/Lib/site.py
-index b11cd48..e0ae563 100644
+index 69670d9..d1d587f 100644
 --- a/Lib/site.py
 +++ b/Lib/site.py
 @@ -7,12 +7,18 @@
@@ -268,7 +268,7 @@ index b11cd48..e0ae563 100644
              sitepackages.append(prefix)
              sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index e21b730..bc39abf 100644
+index ebe3711..a52592c 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
 @@ -95,6 +95,26 @@ _INSTALL_SCHEMES = {
@@ -298,7 +298,7 @@ index e21b730..bc39abf 100644
      }
  
  # For the OS-native venv scheme, we essentially provide an alias:
-@@ -288,11 +308,26 @@ def _get_preferred_schemes():
+@@ -289,11 +309,26 @@ def _get_preferred_schemes():
              'home': 'posix_home',
              'user': 'osx_framework_user',
          }
@@ -331,7 +331,7 @@ index e21b730..bc39abf 100644
  
  def get_preferred_scheme(key):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index dd018d6..8b31ca1 100644
+index b5dc381..762fcb3 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
 @@ -286,16 +286,16 @@ class HelperFunctionsTests(unittest.TestCase):

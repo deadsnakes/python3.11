@@ -10,7 +10,7 @@ Subject: deb-locations
  2 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 297ff96..938f209 100755
+index 4343166..74e9165 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
 @@ -31,6 +31,10 @@ to a file named "<name>.html".
@@ -25,10 +25,10 @@ index 297ff96..938f209 100755
  
  This can be overridden by setting the PYTHONDOCS environment variable
 diff --git a/Misc/python.man b/Misc/python.man
-index f6c2864..758b813 100644
+index c979f5d..703b289 100644
 --- a/Misc/python.man
 +++ b/Misc/python.man
-@@ -398,7 +398,7 @@ exception).  Error messages are written to stderr.
+@@ -421,7 +421,7 @@ exception).  Error messages are written to stderr.
  These are subject to difference depending on local installation
  conventions; ${prefix} and ${exec_prefix} are installation-dependent
  and should be interpreted as for GNU software; they may be the same.

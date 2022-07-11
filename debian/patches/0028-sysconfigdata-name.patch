@@ -15,10 +15,10 @@ Forwarded: no
  3 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index 6c1af59..4461c53 100644
+index cc7703b..8db6469 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -491,7 +491,7 @@ def _get_sysconfigdata_name():
+@@ -492,7 +492,7 @@ def _get_sysconfigdata_name():
      multiarch = getattr(sys.implementation, '_multiarch', '')
      return os.environ.get(
          '_PYTHON_SYSCONFIGDATA_NAME',
@@ -28,10 +28,10 @@ index 6c1af59..4461c53 100644
  
  
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index f9a171b..14996a3 100644
+index 879a632..8dafc0d 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2074,8 +2074,10 @@ libinstall:	all $(srcdir)/Modules/xxmodule.c
+@@ -2082,8 +2082,10 @@ libinstall:	all $(srcdir)/Modules/xxmodule.c
  			esac; \
  		done; \
  	done
@@ -44,7 +44,7 @@ index f9a171b..14996a3 100644
  	$(INSTALL_DATA) $(srcdir)/LICENSE $(DESTDIR)$(LIBDEST)/LICENSE.txt
  	if test -d $(DESTDIR)$(LIBDEST)/distutils/tests; then \
  		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
-@@ -2234,6 +2236,7 @@ sharedinstall: sharedmods
+@@ -2242,6 +2244,7 @@ sharedinstall: all
  		--install-scripts=$(BINDIR) \
  		--install-platlib=$(DESTSHARED) \
  		--root=$(DESTDIR)/
@@ -53,7 +53,7 @@ index f9a171b..14996a3 100644
  	-rm -r $(DESTDIR)$(DESTSHARED)/__pycache__
  
 diff --git a/configure.ac b/configure.ac
-index f669ac9..12db2e0 100644
+index bfdfe6a..4031b27 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -120,7 +120,7 @@ AC_ARG_WITH(
