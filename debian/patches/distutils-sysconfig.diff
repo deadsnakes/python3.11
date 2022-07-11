@@ -7,10 +7,10 @@ Subject: distutils-sysconfig
  1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 28ea4e2..83064a0 100644
+index a4fd23e..def8804 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -216,9 +216,11 @@ def customize_compiler(compiler):
+@@ -211,9 +211,11 @@ def customize_compiler(compiler):
                  _osx_support.customize_compiler(_config_vars)
                  _config_vars['CUSTOMIZED_OSX_COMPILER'] = 'True'
  
@@ -24,7 +24,7 @@ index 28ea4e2..83064a0 100644
  
          if 'CC' in os.environ:
              newcc = os.environ['CC']
-@@ -239,13 +241,22 @@ def customize_compiler(compiler):
+@@ -234,13 +236,22 @@ def customize_compiler(compiler):
              cpp = cc + " -E"           # not always
          if 'LDFLAGS' in os.environ:
              ldshared = ldshared + ' ' + os.environ['LDFLAGS']
@@ -47,7 +47,7 @@ index 28ea4e2..83064a0 100644
          if 'AR' in os.environ:
              ar = os.environ['AR']
          if 'ARFLAGS' in os.environ:
-@@ -259,7 +270,7 @@ def customize_compiler(compiler):
+@@ -254,7 +265,7 @@ def customize_compiler(compiler):
              compiler=cc_cmd,
              compiler_so=cc_cmd + ' ' + ccshared,
              compiler_cxx=cxx,

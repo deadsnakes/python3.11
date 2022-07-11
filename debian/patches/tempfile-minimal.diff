@@ -9,7 +9,7 @@ Subject: tempfile-minimal
  1 file changed, 141 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/tempfile.py b/Lib/tempfile.py
-index eb870c9..968e8fe 100644
+index 480c172..79670f9 100644
 --- a/Lib/tempfile.py
 +++ b/Lib/tempfile.py
 @@ -40,7 +40,146 @@ import functools as _functools
@@ -160,7 +160,7 @@ index eb870c9..968e8fe 100644
  import errno as _errno
  from random import Random as _Random
  import sys as _sys
-@@ -864,7 +1003,7 @@ class TemporaryDirectory:
+@@ -887,7 +1026,7 @@ class TemporaryDirectory:
                  if not ignore_errors:
                      raise
  
