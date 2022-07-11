@@ -30,9 +30,17 @@ is that all Python modules can participate in logging, so your application log
 can include your own messages integrated with messages from third-party
 modules.
 
+The simplest example:
+
+.. code-block:: none
+
+    >>> import logging
+    >>> logging.warning('Watch out!')
+    WARNING:root:Watch out!
+
 The module provides a lot of functionality and flexibility.  If you are
-unfamiliar with logging, the best way to get to grips with it is to see the
-tutorials (see the links on the right).
+unfamiliar with logging, the best way to get to grips with it is to view the
+tutorials (**see the links above and on the right**).
 
 The basic classes defined by the module, together with their functions, are
 listed below.
@@ -225,7 +233,7 @@ is the module's name in the Python package namespace.
          2006-02-08 22:20:02,165 192.168.0.1 fbloggs  Protocol problem: connection reset
 
       The keys in the dictionary passed in *extra* should not clash with the keys used
-      by the logging system. (See the :class:`Formatter` documentation for more
+      by the logging system. (See the section on :ref:`logrecord-attributes` for more
       information on which keys are used by the logging system.)
 
       If you choose to use these attributes in logged messages, you need to exercise
