@@ -31,7 +31,7 @@ Data members:
 #include "pycore_structseq.h"     // _PyStructSequence_InitType()
 #include "pycore_tuple.h"         // _PyTuple_FromArray()
 
-#include "frameobject.h"          // PyFrame_GetBack()
+#include "frameobject.h"          // PyFrame_FastToLocalsWithError()
 #include "pydtrace.h"
 #include "osdefs.h"               // DELIM
 #include "stdlib_module_names.h"  // _Py_stdlib_module_names
@@ -1784,9 +1784,17 @@ sys__getframe_impl(PyObject *module, int depth)
         return NULL;
     }
 
-    while (depth > 0 && frame != NULL) {
-        frame = frame->previous;
-        --depth;
+    if (frame != NULL) {
+        while (depth > 0) {
+            frame = frame->previous;
+            if (frame == NULL) {
+                break;
+            }
+            if (_PyFrame_IsIncomplete(frame)) {
+                continue;
+            }
+            --depth;
+        }
     }
     if (frame == NULL) {
         _PyErr_SetString(tstate, PyExc_ValueError,
