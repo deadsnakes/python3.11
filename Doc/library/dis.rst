@@ -6,6 +6,12 @@
 
 **Source code:** :source:`Lib/dis.py`
 
+.. testsetup::
+
+   import dis
+   def myfunc(alist):
+       return len(alist)
+
 --------------
 
 The :mod:`dis` module supports the analysis of CPython :term:`bytecode` by
@@ -37,17 +43,18 @@ Example: Given the function :func:`myfunc`::
        return len(alist)
 
 the following command can be used to display the disassembly of
-:func:`myfunc`::
+:func:`myfunc`:
+
+.. doctest::
 
    >>> dis.dis(myfunc)
-     1           0 RESUME                   0
-
-     2           2 PUSH_NULL
-                 4 LOAD_GLOBAL              1 (NULL + len)
-                 6 LOAD_FAST                0 (alist)
-                 8 PRECALL                  1
-                10 CALL                     1
-                12 RETURN_VALUE
+     2           0 RESUME                   0
+   <BLANKLINE>
+     3           2 LOAD_GLOBAL              1 (NULL + len)
+                14 LOAD_FAST                0 (alist)
+                16 PRECALL                  1
+                20 CALL                     1
+                30 RETURN_VALUE
 
 (The "2" is a line number).
 
@@ -109,14 +116,15 @@ code.
    .. versionchanged:: 3.11
       Added the ``show_caches`` parameter.
 
-Example::
+Example:
+
+.. doctest::
 
     >>> bytecode = dis.Bytecode(myfunc)
     >>> for instr in bytecode:
     ...     print(instr.opname)
     ...
     RESUME
-    PUSH_NULL
     LOAD_GLOBAL
     LOAD_FAST
     PRECALL
@@ -260,14 +268,16 @@ operation is being performed, so the intermediate analysis object isn't useful:
 
 .. function:: findlinestarts(code)
 
-   This generator function uses the ``co_firstlineno`` and ``co_lnotab``
-   attributes of the code object *code* to find the offsets which are starts of
+   This generator function uses the ``co_lines`` method
+   of the code object *code* to find the offsets which are starts of
    lines in the source code.  They are generated as ``(offset, lineno)`` pairs.
-   See :source:`Objects/lnotab_notes.txt` for the ``co_lnotab`` format and
-   how to decode it.
 
    .. versionchanged:: 3.6
       Line numbers can be decreasing. Before, they were always increasing.
+
+   .. versionchanged:: 3.10
+      The :pep:`626` ``co_lines`` method is used instead of the ``co_firstlineno``
+      and ``co_lnotab`` attributes of the code object.
 
 
 .. function:: findlabels(code)
@@ -506,8 +516,8 @@ the original TOS1.
 
 .. opcode:: GET_ANEXT
 
-   Implements ``PUSH(get_awaitable(TOS.__anext__()))``.  See ``GET_AWAITABLE``
-   for details about ``get_awaitable``
+   Pushes ``get_awaitable(TOS.__anext__())`` to the stack.  See
+   ``GET_AWAITABLE`` for details about ``get_awaitable``.
 
    .. versionadded:: 3.5
 
