@@ -28,10 +28,10 @@ index cc7703b..8db6469 100644
  
  
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 879a632..8dafc0d 100644
+index 8cc4ef1..7f1ecad 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -2082,8 +2082,10 @@ libinstall:	all $(srcdir)/Modules/xxmodule.c
+@@ -2083,8 +2083,10 @@ libinstall:	all $(srcdir)/Modules/xxmodule.c
  			esac; \
  		done; \
  	done
@@ -44,7 +44,7 @@ index 879a632..8dafc0d 100644
  	$(INSTALL_DATA) $(srcdir)/LICENSE $(DESTDIR)$(LIBDEST)/LICENSE.txt
  	if test -d $(DESTDIR)$(LIBDEST)/distutils/tests; then \
  		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
-@@ -2242,6 +2244,7 @@ sharedinstall: all
+@@ -2243,6 +2245,7 @@ sharedinstall: all
  		--install-scripts=$(BINDIR) \
  		--install-platlib=$(DESTSHARED) \
  		--root=$(DESTDIR)/
@@ -53,10 +53,10 @@ index 879a632..8dafc0d 100644
  	-rm -r $(DESTDIR)$(DESTSHARED)/__pycache__
  
 diff --git a/configure.ac b/configure.ac
-index bfdfe6a..4031b27 100644
+index 85ddf47..cd86d94 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -120,7 +120,7 @@ AC_ARG_WITH(
+@@ -162,7 +162,7 @@ AC_ARG_WITH(
      dnl Build Python interpreter is used for regeneration and freezing.
      ac_cv_prog_PYTHON_FOR_REGEN=$with_build_python
      PYTHON_FOR_FREEZE="$with_build_python"
