@@ -9,10 +9,10 @@ Subject: link-opt
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index a12d143..333080f 100644
+index 09f3f90..72ee356 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -3090,8 +3090,8 @@ then
+@@ -3132,8 +3132,8 @@ then
  		LDSHARED='$(CC) -shared'
  		LDCXXSHARED='$(CXX) -shared';;
  	Linux*|GNU*|QNX*|VxWorks*|Haiku*)
@@ -23,7 +23,7 @@ index a12d143..333080f 100644
  	FreeBSD*)
  		if [[ "`$CC -dM -E - </dev/null | grep __ELF__`" != "" ]]
  		then
-@@ -3204,7 +3204,7 @@ then
+@@ -3246,7 +3246,7 @@ then
  	    LINKFORSHARED="-Wl,-E -Wl,+s";;
  #	    LINKFORSHARED="-Wl,-E -Wl,+s -Wl,+b\$(BINLIBDEST)/lib-dynload";;
  	Linux-android*) LINKFORSHARED="-pie -Xlinker -export-dynamic";;
