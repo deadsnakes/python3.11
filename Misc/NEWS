@@ -2,6 +2,147 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.0 beta 5?
+===================================
+
+*Release date: 2022-07-25*
+
+Core and Builtins
+-----------------
+
+- gh-issue-93351: :class:`ast.AST` node positions are now validated when
+  provided to :func:`compile` and other related functions. If invalid
+  positions are detected, a :exc:`ValueError` will be raised.
+
+- gh-issue-94438: Fix an issue that caused extended opcode arguments and
+  some conditional pops to be ignored when calculating valid jump targets
+  for assignments to the ``f_lineno`` attribute of frame objects. In some
+  cases, this could cause inconsistent internal state, resulting in a hard
+  crash of the interpreter.
+
+- gh-issue-95060: Undocumented ``PyCode_Addr2Location`` function now
+  properly returns when ``addrq`` argument is less than zero.
+
+- gh-issue-95113: Replace all ``EXTENDED_ARG_QUICK`` instructions with basic
+  :opcode:`EXTENDED_ARG` instructions in unquickened code. Consumers of
+  non-adaptive bytecode should be able to handle extended arguments the same
+  way they were handled in CPython 3.10 and older.
+
+- gh-issue-91409: Fix incorrect source location info caused by certain
+  optimizations in the bytecode compiler.
+
+- gh-issue-94036: Fix incorrect source location info for some multi-line
+  attribute accesses and method calls.
+
+- gh-issue-94739: Allow jumping within, out of, and across exception
+  handlers in the debugger.
+
+- gh-issue-94949: :func:`ast.parse` will no longer parse parenthesized
+  context managers when passed ``feature_version`` less than ``(3, 9)``.
+  Patch by Shantanu Jain.
+
+- gh-issue-94947: :func:`ast.parse` will no longer parse assignment
+  expressions when passed ``feature_version`` less than ``(3, 8)``. Patch by
+  Shantanu Jain.
+
+- gh-issue-91256: Ensures the program name is known for help text during
+  interpreter startup.
+
+- gh-issue-94869: Fix the column offsets for some expressions in multi-line
+  f-strings :mod:`ast` nodes. Patch by Pablo Galindo.
+
+- gh-issue-94822: Fix an issue where lookups of metaclass descriptors may be
+  ignored when an identically-named attribute also exists on the class
+  itself.
+
+- gh-issue-91153: Fix an issue where a :class:`bytearray` item assignment
+  could crash if it's resized by the new value's :meth:`__index__` method.
+
+- gh-issue-90699: Fix reference counting bug in :meth:`bool.__repr__`. Patch
+  by Kumar Aditya.
+
+Library
+-------
+
+- gh-issue-95087: Fix IndexError in parsing invalid date in the :mod:`email`
+  module.
+
+- gh-issue-95199: Upgrade bundled setuptools to 63.2.0.
+
+- gh-issue-95194: Upgrade bundled pip to 22.2.
+
+- gh-issue-95132: Fix a :mod:`sqlite3` regression where ``*args`` and
+  ``**kwds`` were incorrectly relayed from :py:func:`~sqlite3.connect` to
+  the :class:`~sqlite3.Connection` factory. The regression was introduced in
+  3.11a1 with PR 24421 (:gh:`85128`). Patch by Erlend E. Aasland.`
+
+- gh-issue-93157: Fix :mod:`fileinput` module didn't support ``errors``
+  option when ``inplace`` is true.
+
+- gh-issue-95105: :meth:`wsgiref.types.InputStream.__iter__` should return
+  ``Iterator[bytes]``, not ``Iterable[bytes]``. Patch by Shantanu Jain.
+
+- gh-issue-94857: Fix refleak in ``_io.TextIOWrapper.reconfigure``. Patch by
+  Kumar Aditya.
+
+- gh-issue-94821: Fix binding of unix socket to empty address on Linux to
+  use an available address from the abstract namespace, instead of "\0".
+
+- gh-issue-89988: Fix memory leak in :class:`pickle.Pickler` when looking up
+  :attr:`dispatch_table`. Patch by Kumar Aditya.
+
+- bpo-47025: Drop support for :class:`bytes` on :attr:`sys.path`.
+
+Tests
+-----
+
+- gh-issue-95212: Make multiprocessing test case
+  ``test_shared_memory_recreate`` parallel-safe.
+
+Build
+-----
+
+- gh-issue-94847: Fixed ``_decimal`` module build issue on GCC when
+  compiling with LTO and pydebug. Debug builds no longer force inlining of
+  functions.
+
+- gh-issue-94841: Fix the possible performance regression of
+  :c:func:`PyObject_Free` compiled with MSVC version 1932.
+
+- gh-issue-94801: ``configure`` now uses custom flags like ``ZLIB_CFLAGS``
+  and ``ZLIB_LIBS`` when searching for headers and libraries.
+
+- gh-issue-94773: ``deepfreeze.py`` now supports code object with frozensets
+  that contain incompatible, unsortable types.
+
+Windows
+-------
+
+- gh-issue-90844: Allow virtual environments to correctly launch when they
+  have spaces in the path.
+
+- gh-issue-94772: Fix incorrect handling of shebang lines in py.exe launcher
+
+C API
+-----
+
+- gh-issue-92678: Adds unstable C-API functions
+  ``_PyObject_VisitManagedDict`` and ``_PyObject_ClearManagedDict`` to allow
+  C extensions to allow the VM to manage their object's dictionaries.
+
+- gh-issue-94930: Fix ``SystemError`` raised when
+  :c:func:`PyArg_ParseTupleAndKeywords` is used with ``#`` in ``(...)`` but
+  without ``PY_SSIZE_T_CLEAN`` defined.
+
+- gh-issue-94864: Fix ``PyArg_Parse*`` with deprecated format units "u" and
+  "Z". It returned 1 (success) when warnings are turned into exceptions.
+
+- gh-issue-94731: Python again uses C-style casts for most casting
+  operations when compiled with C++. This may trigger compiler warnings, if
+  they are enabled with e.g. ``-Wold-style-cast `` or
+  ``-Wzero-as-null-pointer-constant`` options for ``g++``.
+
+
 What's New in Python 3.11.0 beta 4?
 ===================================
 
@@ -323,11 +464,6 @@ Tests
 
 - gh-issue-91330: Added more tests for :mod:`dataclasses` to cover behavior
   with data descriptor-based fields.
-
-  # Write your Misc/NEWS entry below.  It should be a simple ReST paragraph.
-  # Don't start with "- Issue #<n>: " or "- gh-issue-<n>: " or that sort of
-  stuff.
-  ###########################################################################
 
 - gh-issue-94208: ``test_ssl`` is now checking for supported TLS version and
   protocols in more tests.
@@ -4053,9 +4189,6 @@ Library
 - bpo-40321: Adds support for HTTP 308 redirects to :mod:`urllib`. See
   :rfc:`7538` for details. Patch by Jochem Schulenklopper.
 
-- bpo-10572: Move :mod:`sqlite3` tests to ``/Lib/test/test_sqlite3``. Patch
-  by Erlend E. Aasland.
-
 - bpo-41374: Ensure that ``socket.TCP_*`` constants are exposed on Cygwin
   3.1.6 and greater.
 
@@ -4141,6 +4274,10 @@ Tests
   test_exceptions if a directory name contains "a1" (like
   "Python-3.11.0a1"): use a stricter regular expression. Patch by Victor
   Stinner.
+
+- bpo-10572: Rename :mod:`sqlite3` tests from ``test_sqlite`` to
+  ``test_sqlite3``, and relocate them to ``Lib/test/test_sqlite3``. Patch by
+  Erlend E. Aasland.
 
 Build
 -----
