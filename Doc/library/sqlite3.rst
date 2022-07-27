@@ -573,7 +573,7 @@ Connection Objects
 
    .. method:: set_authorizer(authorizer_callback)
 
-      This routine registers a callback. The callback is invoked for each attempt to
+      Register callable *authorizer_callback* to be invoked for each attempt to
       access a column of a table in the database. The callback should return
       :const:`SQLITE_OK` if access is allowed, :const:`SQLITE_DENY` if the entire SQL
       statement should be aborted with an error and :const:`SQLITE_IGNORE` if the
@@ -599,7 +599,7 @@ Connection Objects
 
    .. method:: set_progress_handler(progress_handler, n)
 
-      This routine registers a callback. The callback is invoked for every *n*
+      Register callable *progress_handler* to be invoked for every *n*
       instructions of the SQLite virtual machine. This is useful if you want to
       get called from SQLite during long-running operations, for example to update
       a GUI.
@@ -614,8 +614,8 @@ Connection Objects
 
    .. method:: set_trace_callback(trace_callback)
 
-      Registers *trace_callback* to be called for each SQL statement that is
-      actually executed by the SQLite backend.
+      Register callable *trace_callback* to be invoked for each SQL statement
+      that is actually executed by the SQLite backend.
 
       The only argument passed to the callback is the statement (as
       :class:`str`) that is being executed. The return value of the callback is
@@ -638,8 +638,10 @@ Connection Objects
 
    .. method:: enable_load_extension(enabled, /)
 
-      This routine allows/disallows the SQLite engine to load SQLite extensions
-      from shared libraries.  SQLite extensions can define new functions,
+      Enable the SQLite engine to load SQLite extensions from shared libraries
+      if *enabled* is :const:`True`;
+      else, disallow loading SQLite extensions.
+      SQLite extensions can define new functions,
       aggregates or whole new virtual table implementations.  One well-known
       extension is the fulltext-search extension distributed with SQLite.
 
@@ -656,9 +658,9 @@ Connection Objects
 
    .. method:: load_extension(path, /)
 
-      This routine loads an SQLite extension from a shared library.  You have to
-      enable extension loading with :meth:`enable_load_extension` before you can
-      use this routine.
+      Load an SQLite extension from a shared library located at *path*.
+      Enable extension loading with :meth:`enable_load_extension` before
+      calling this method.
 
       Loadable extensions are disabled by default. See [#f1]_.
 
@@ -867,8 +869,10 @@ Cursor Objects
 
    .. method:: execute(sql, parameters=(), /)
 
-      Execute an SQL statement. Values may be bound to the statement using
-      :ref:`placeholders <sqlite3-placeholders>`.
+      Execute SQL statement *sql*.
+      Bind values to the statement using :ref:`placeholders
+      <sqlite3-placeholders>` that map to the :term:`sequence` or :class:`dict`
+      *parameters*.
 
       :meth:`execute` will only execute a single SQL statement. If you try to execute
       more than one statement with it, it will raise a :exc:`ProgrammingError`. Use
@@ -883,7 +887,7 @@ Cursor Objects
 
    .. method:: executemany(sql, seq_of_parameters, /)
 
-      Execute a :ref:`parameterized <sqlite3-placeholders>` SQL command
+      Execute :ref:`parameterized <sqlite3-placeholders>` SQL statement *sql*
       against all parameter sequences or mappings found in the sequence
       *seq_of_parameters*.  It is also possible to use an
       :term:`iterator` yielding parameters instead of a sequence.
@@ -898,7 +902,7 @@ Cursor Objects
 
    .. method:: executescript(sql_script, /)
 
-      Execute multiple SQL statements at once.
+      Execute the SQL statements in *sql_script*.
       If there is a pending transaciton,
       an implicit ``COMMIT`` statement is executed first.
       No other implicit transaction control is performed;
@@ -956,18 +960,11 @@ Cursor Objects
 
    .. attribute:: rowcount
 
-      Although the :class:`Cursor` class of the :mod:`sqlite3` module implements this
-      attribute, the database engine's own support for the determination of "rows
-      affected"/"rows selected" is quirky.
-
-      For :meth:`executemany` statements, the number of modifications are summed up
-      into :attr:`rowcount`.
-
-      As required by the Python DB API Spec, the :attr:`rowcount` attribute "is -1 in
-      case no ``executeXX()`` has been performed on the cursor or the rowcount of the
-      last operation is not determinable by the interface". This includes ``SELECT``
-      statements because we cannot determine the number of rows a query produced
-      until all rows were fetched.
+      Read-only attribute that provides the number of modified rows for
+      ``INSERT``, ``UPDATE``, ``DELETE``, and ``REPLACE`` statements;
+      is ``-1`` for other statements,
+      including :abbr:`CTE (Common Table Expression)` queries.
+      It is only updated by the :meth:`execute` and :meth:`executemany` methods.
 
    .. attribute:: lastrowid
 
@@ -1356,7 +1353,7 @@ of :func:`connect`. There are three options:
 * Explicit: set *detect_types* to :const:`PARSE_COLNAMES`
 * Both: set *detect_types* to
   ``sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES``.
-  Colum names take precedence over declared types.
+  Column names take precedence over declared types.
 
 The following example illustrates the implicit and explicit approaches:
 
