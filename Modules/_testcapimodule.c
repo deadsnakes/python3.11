@@ -5952,21 +5952,79 @@ test_code_api(PyObject *self, PyObject *Py_UNUSED(args))
     if (co == NULL) {
         return NULL;
     }
-    PyObject *co_code = PyCode_GetCode(co);
-    if (co_code == NULL) {
-        Py_DECREF(co);
-        return NULL;
-    }
-    assert(PyBytes_CheckExact(co_code));
-    if (PyObject_Length(co_code) == 0) {
-        PyErr_SetString(PyExc_ValueError, "empty co_code");
-        Py_DECREF(co);
+    /* co_code */
+    {
+        PyObject *co_code = PyCode_GetCode(co);
+        if (co_code == NULL) {
+            goto fail;
+        }
+        assert(PyBytes_CheckExact(co_code));
+        if (PyObject_Length(co_code) == 0) {
+            PyErr_SetString(PyExc_ValueError, "empty co_code");
+            Py_DECREF(co_code);
+            goto fail;
+        }
         Py_DECREF(co_code);
-        return NULL;
+    }
+    /* co_varnames */
+    {
+        PyObject *co_varnames = PyCode_GetVarnames(co);
+        if (co_varnames == NULL) {
+            goto fail;
+        }
+        if (!PyTuple_CheckExact(co_varnames)) {
+            PyErr_SetString(PyExc_TypeError, "co_varnames not tuple");
+            Py_DECREF(co_varnames);
+            goto fail;
+        }
+        if (PyTuple_GET_SIZE(co_varnames) != 0) {
+            PyErr_SetString(PyExc_ValueError, "non-empty co_varnames");
+            Py_DECREF(co_varnames);
+            goto fail;
+        }
+        Py_DECREF(co_varnames);
+    }
+    /* co_cellvars */
+    {
+        PyObject *co_cellvars = PyCode_GetCellvars(co);
+        if (co_cellvars == NULL) {
+            goto fail;
+        }
+        if (!PyTuple_CheckExact(co_cellvars)) {
+            PyErr_SetString(PyExc_TypeError, "co_cellvars not tuple");
+            Py_DECREF(co_cellvars);
+            goto fail;
+        }
+        if (PyTuple_GET_SIZE(co_cellvars) != 0) {
+            PyErr_SetString(PyExc_ValueError, "non-empty co_cellvars");
+            Py_DECREF(co_cellvars);
+            goto fail;
+        }
+        Py_DECREF(co_cellvars);
+    }
+    /* co_freevars */
+    {
+        PyObject *co_freevars = PyCode_GetFreevars(co);
+        if (co_freevars == NULL) {
+            goto fail;
+        }
+        if (!PyTuple_CheckExact(co_freevars)) {
+            PyErr_SetString(PyExc_TypeError, "co_freevars not tuple");
+            Py_DECREF(co_freevars);
+            goto fail;
+        }
+        if (PyTuple_GET_SIZE(co_freevars) != 0) {
+            PyErr_SetString(PyExc_ValueError, "non-empty co_freevars");
+            Py_DECREF(co_freevars);
+            goto fail;
+        }
+        Py_DECREF(co_freevars);
     }
     Py_DECREF(co);
-    Py_DECREF(co_code);
     Py_RETURN_NONE;
+fail:
+    Py_DECREF(co);
+    return NULL;
 }
 
 static int
@@ -6013,14 +6071,6 @@ settrace_to_record(PyObject *self, PyObject *list)
     PyEval_SetTrace(record_func, list);
     Py_RETURN_NONE;
 }
-
-static PyObject *
-clear_managed_dict(PyObject *self, PyObject *obj)
-{
-    _PyObject_ClearManagedDict(obj);
-    Py_RETURN_NONE;
-}
-
 
 static PyObject *negative_dictoffset(PyObject *, PyObject *);
 static PyObject *test_buildvalue_issue38913(PyObject *, PyObject *);
@@ -6323,7 +6373,6 @@ static PyMethodDef TestMethods[] = {
     {"get_feature_macros", get_feature_macros, METH_NOARGS, NULL},
     {"test_code_api", test_code_api, METH_NOARGS, NULL},
     {"settrace_to_record", settrace_to_record, METH_O, NULL},
-    {"clear_managed_dict", clear_managed_dict, METH_O, NULL},
     {NULL, NULL} /* sentinel */
 };
 
@@ -7321,6 +7370,14 @@ static PyType_Spec HeapCTypeWithDict_spec = {
     HeapCTypeWithDict_slots
 };
 
+static PyType_Spec HeapCTypeWithDict2_spec = {
+    "_testcapi.HeapCTypeWithDict2",
+    sizeof(HeapCTypeWithDictObject),
+    0,
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    HeapCTypeWithDict_slots
+};
+
 static struct PyMemberDef heapctypewithnegativedict_members[] = {
     {"dictobj", T_OBJECT, offsetof(HeapCTypeWithDictObject, dict)},
     {"__dictoffset__", T_PYSSIZET, -(Py_ssize_t)sizeof(void*), READONLY},
@@ -7374,6 +7431,14 @@ static PyType_Slot HeapCTypeWithWeakref_slots[] = {
 
 static PyType_Spec HeapCTypeWithWeakref_spec = {
     "_testcapi.HeapCTypeWithWeakref",
+    sizeof(HeapCTypeWithWeakrefObject),
+    0,
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    HeapCTypeWithWeakref_slots
+};
+
+static PyType_Spec HeapCTypeWithWeakref2_spec = {
+    "_testcapi.HeapCTypeWithWeakref2",
     sizeof(HeapCTypeWithWeakrefObject),
     0,
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
@@ -7757,6 +7822,12 @@ PyInit__testcapi(void)
     }
     PyModule_AddObject(m, "HeapCTypeWithDict", HeapCTypeWithDict);
 
+    PyObject *HeapCTypeWithDict2 = PyType_FromSpec(&HeapCTypeWithDict2_spec);
+    if (HeapCTypeWithDict2 == NULL) {
+        return NULL;
+    }
+    PyModule_AddObject(m, "HeapCTypeWithDict2", HeapCTypeWithDict2);
+
     PyObject *HeapCTypeWithNegativeDict = PyType_FromSpec(&HeapCTypeWithNegativeDict_spec);
     if (HeapCTypeWithNegativeDict == NULL) {
         return NULL;
@@ -7774,6 +7845,12 @@ PyInit__testcapi(void)
         return NULL;
     }
     PyModule_AddObject(m, "HeapCTypeWithBuffer", HeapCTypeWithBuffer);
+
+    PyObject *HeapCTypeWithWeakref2 = PyType_FromSpec(&HeapCTypeWithWeakref2_spec);
+    if (HeapCTypeWithWeakref2 == NULL) {
+        return NULL;
+    }
+    PyModule_AddObject(m, "HeapCTypeWithWeakref2", HeapCTypeWithWeakref2);
 
     PyObject *HeapCTypeSetattr = PyType_FromSpec(&HeapCTypeSetattr_spec);
     if (HeapCTypeSetattr == NULL) {
