@@ -2,6 +2,186 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.0 release candidate 1?
+================================================
+
+*Release date: 2022-08-05*
+
+Core and Builtins
+-----------------
+
+- gh-issue-95150: Update code object hashing and equality to consider all
+  debugging and exception handling tables. This fixes an issue where certain
+  non-identical code objects could be "deduplicated" during compilation.
+
+- gh-issue-95355: ``_PyPegen_Parser_New`` now properly detects token memory
+  allocation errors. Patch by Honglin Zhu.
+
+- gh-issue-90081: Run Python code in tracer/profiler function at full speed.
+  Fixes slowdown in earlier versions of 3.11.
+
+- gh-issue-95324: Emit a warning in debug mode if an object does not call
+  :c:func:`PyObject_GC_UnTrack` before deallocation. Patch by Pablo Galindo.
+
+- gh-issue-95185: Prevented crashes in the AST constructor when compiling
+  some absurdly long expressions like ``"+0"*1000000``.
+  :exc:`RecursionError` is now raised instead. Patch by Pablo Galindo
+
+- gh-issue-93351: :class:`ast.AST` node positions are now validated when
+  provided to :func:`compile` and other related functions. If invalid
+  positions are detected, a :exc:`ValueError` will be raised.
+
+- gh-issue-94938: Fix error detection in some builtin functions when keyword
+  argument name is an instance of a str subclass with overloaded ``__eq__``
+  and ``__hash__``. Previously it could cause SystemError or other undesired
+  behavior.
+
+Library
+-------
+
+- gh-issue-95609: Update bundled pip to 22.2.2.
+
+- gh-issue-95289: Fix :class:`asyncio.TaskGroup` to propagate exception when
+  :exc:`asyncio.CancelledError` was replaced with another exception by a
+  context manger. Patch by Kumar Aditya and Guido van Rossum.
+
+- gh-issue-95339: Update bundled pip to 22.2.1.
+
+- gh-issue-95045: Fix GC crash when deallocating ``_lsprof.Profiler`` by
+  untracking it before calling any callbacks. Patch by Kumar Aditya.
+
+- gh-issue-95097: Fix :func:`asyncio.run` for :class:`asyncio.Task`
+  implementations without :meth:`~asyncio.Task.uncancel` method. Patch by
+  Kumar Aditya.
+
+- gh-issue-93899: Fix check for existence of :data:`os.EFD_CLOEXEC`,
+  :data:`os.EFD_NONBLOCK` and :data:`os.EFD_SEMAPHORE` flags on older kernel
+  versions where these flags are not present. Patch by Kumar Aditya.
+
+- gh-issue-95166: Fix :meth:`concurrent.futures.Executor.map` to cancel the
+  currently waiting on future on an error - e.g. TimeoutError or
+  KeyboardInterrupt.
+
+- gh-issue-95109: Ensure that timeouts scheduled with
+  :class:`asyncio.Timeout` that have already expired are delivered promptly.
+
+- gh-issue-91810: Suppress writing an XML declaration in open files in
+  ``ElementTree.write()`` with ``encoding='unicode'`` and
+  ``xml_declaration=None``.
+
+- gh-issue-91447: Fix findtext in the xml module to only give an empty
+  string when the text attribute is set to None.
+
+Documentation
+-------------
+
+- gh-issue-91207: Fix stylesheet not working in Windows CHM htmlhelp docs
+  and add warning that they are deprecated. Contributed by C.A.M. Gerlach.
+
+- gh-issue-95451: Update library documentation with :ref:`availability
+  information <wasm-availability>` on WebAssembly platforms
+  ``wasm32-emscripten`` and ``wasm32-wasi``.
+
+- gh-issue-95415: Use consistent syntax for platform availability. The
+  directive now supports a content body and emits a warning when it
+  encounters an unknown platform.
+
+- gh-issue-86128: Document a limitation in ThreadPoolExecutor where its exit
+  handler is executed before any handlers in atexit.
+
+Tests
+-----
+
+- gh-issue-95573: :source:`Lib/test/test_asyncio/test_ssl.py` exposed a bug
+  in the macOS kernel where intense concurrent load on non-blocking sockets
+  occasionally causes :const:`errno.ENOBUFS` ("No buffer space available")
+  to be emitted. FB11063974 filed with Apple, in the mean time as a
+  workaround buffer size used in tests on macOS is decreased to avoid
+  intermittent failures.  Patch by Fantix King.
+
+- gh-issue-95280: Fix problem with ``test_ssl`` ``test_get_ciphers`` on
+  systems that require perfect forward secrecy (PFS) ciphers.
+
+- gh-issue-94675: Add a regression test for :mod:`re` exponentional slowdown
+  when using rjsmin.
+
+Build
+-----
+
+- gh-issue-94801: Fix a regression in ``configure`` script that caused some
+  header checks to ignore custom ``CPPFLAGS``. The regression was introduced
+  in :gh:`94802`.
+
+- gh-issue-95145: wasm32-wasi builds no longer depend on WASIX's pthread
+  stubs. Python now has its own stubbed pthread API.
+
+- gh-issue-95174: Python now detects missing ``dup`` function in WASI and
+  works around some missing :mod:`errno`, :mod:`select`, and :mod:`socket`
+  constants.
+
+- gh-issue-95174: Python now skips missing :mod:`socket` functions and
+  methods on WASI. WASI can only create sockets from existing fd / accept
+  and has no netdb.
+
+- gh-issue-95085: Platforms ``wasm32-unknown-emscripten`` and
+  ``wasm32-unknown-wasi`` have been promoted to :pep:`11` tier 3 platform
+  support.
+
+Windows
+-------
+
+- gh-issue-95656: Enable the
+  :meth:`~sqlite3.Connection.enable_load_extension` :mod:`sqlite3` API.
+
+- gh-issue-95587: Fixes some issues where the Windows installer would
+  incorrectly detect certain features of an existing install when upgrading.
+
+- gh-issue-94399: Restores the behaviour of :ref:`launcher` for
+  ``/usr/bin/env`` shebang lines, which will now search :envvar:`PATH` for
+  an executable matching the given command. If none is found, the usual
+  search process is used.
+
+- gh-issue-95445: Fixes the unsuccessful removal of the HTML document
+  directory when uninstalling with Windows msi.
+
+- gh-issue-95359: Fix :ref:`launcher` handling of :file:`py.ini` commands
+  (it was incorrectly expecting a ``py_`` prefix on keys) and crashes when
+  reading per-user configuration file.
+
+- gh-issue-95285: Fix :ref:`launcher` handling of command lines where it is
+  only passed a short executable name.
+
+IDLE
+----
+
+- gh-issue-65802: Document handling of extensions in Save As dialogs.
+
+- gh-issue-95191: Include prompts when saving Shell (interactive input and
+  output).
+
+- gh-issue-95511: Fix the Shell context menu copy-with-prompts bug of
+  copying an extra line when one selects whole lines.
+
+- gh-issue-95471: In the Edit menu, move ``Select All`` and add a new
+  separator.
+
+- gh-issue-95411: Enable using IDLE's module browser with .pyw files.
+
+- gh-issue-89610: Add .pyi as a recognized extension for IDLE on macOS.
+  This allows opening stub files by double clicking on them in the Finder.
+
+C API
+-----
+
+- gh-issue-92678: Restore the 3.10 behavior for multiple inheritance of C
+  extension classes that store their dictionary at the end of the struct.
+
+- gh-issue-94936: Added :c:func:`PyCode_GetVarnames`,
+  :c:func:`PyCode_GetCellvars` and :c:func:`PyCode_GetFreevars` for
+  accessing ``co_varnames``, ``co_cellvars`` and ``co_freevars``
+  respectively via the C API.
+
+
 What's New in Python 3.11.0 beta 5?
 ===================================
 
