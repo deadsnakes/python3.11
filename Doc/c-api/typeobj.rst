@@ -1709,18 +1709,11 @@ and :c:type:`PyType_Type` effectively act as defaults.)
    :c:member:`~PyTypeObject.tp_dictoffset` should be set to ``-4`` to indicate that the dictionary is
    at the very end of the structure.
 
-   The real dictionary offset in an instance can be computed from a negative
-   :c:member:`~PyTypeObject.tp_dictoffset` as follows::
-
-      dictoffset = tp_basicsize + abs(ob_size)*tp_itemsize + tp_dictoffset
-      if dictoffset is not aligned on sizeof(void*):
-          round up to sizeof(void*)
-
-   where :c:member:`~PyTypeObject.tp_basicsize`, :c:member:`~PyTypeObject.tp_itemsize` and :c:member:`~PyTypeObject.tp_dictoffset` are
-   taken from the type object, and :attr:`ob_size` is taken from the instance.  The
-   absolute value is taken because ints use the sign of :attr:`ob_size` to
-   store the sign of the number.  (There's never a need to do this calculation
-   yourself; it is done for you by :c:func:`_PyObject_GetDictPtr`.)
+   The :c:member:`~PyTypeObject.tp_dictoffset` should be regarded as write-only.
+   To get the pointer to the dictionary call :c:func:`PyObject_GenericGetDict`.
+   Calling :c:func:`PyObject_GenericGetDict` may need to allocate memory for the
+   dictionary, so it is may be more efficient to call :c:func:`PyObject_GetAttr`
+   when accessing an attribute on the object.
 
    **Inheritance:**
 
@@ -1991,9 +1984,6 @@ and :c:type:`PyType_Type` effectively act as defaults.)
           PyErr_Restore(error_type, error_value, error_traceback);
       }
 
-   For this field to be taken into account (even through inheritance),
-   you must also set the :const:`Py_TPFLAGS_HAVE_FINALIZE` flags bit.
-
    Also, note that, in a garbage collected Python,
    :c:member:`~PyTypeObject.tp_dealloc` may be called from
    any Python thread, not just the thread which created the object (if the object
@@ -2010,6 +2000,12 @@ and :c:type:`PyType_Type` effectively act as defaults.)
    This field is inherited by subtypes.
 
    .. versionadded:: 3.4
+
+   .. versionchanged:: 3.8
+
+      Before version 3.8 it was necessary to set the
+      :const:`Py_TPFLAGS_HAVE_FINALIZE` flags bit in order for this field to be
+      used.  This is no longer required.
 
    .. seealso:: "Safe object finalization" (:pep:`442`)
 
@@ -2048,9 +2044,9 @@ This results in types that are limited relative to types defined in Python:
   :ref:`sub-interpreters <sub-interpreter-support>`, so they should not
   include any subinterpreter-specific state.
 
-Also, since :c:type:`PyTypeObject` is not part of the :ref:`stable ABI <stable>`,
-any extension modules using static types must be compiled for a specific
-Python minor version.
+Also, since :c:type:`PyTypeObject` is only part of the :ref:`Limited API
+<stable>` as an opaque struct, any extension modules using static types must be
+compiled for a specific Python minor version.
 
 
 .. _heap-types:

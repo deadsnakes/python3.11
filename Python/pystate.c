@@ -795,7 +795,15 @@ new_threadstate(PyInterpreterState *interp)
 {
     PyThreadState *tstate;
     _PyRuntimeState *runtime = interp->runtime;
-
+    // We don't need to allocate a thread state for the main interpreter
+    // (the common case), but doing it later for the other case revealed a
+    // reentrancy problem (deadlock).  So for now we always allocate before
+    // taking the interpreters lock.  See GH-96071.
+    PyThreadState *new_tstate = alloc_threadstate();
+    int used_newtstate;
+    if (new_tstate == NULL) {
+        return NULL;
+    }
     /* We serialize concurrent creation to protect global state. */
     HEAD_LOCK(runtime);
 
@@ -807,18 +815,15 @@ new_threadstate(PyInterpreterState *interp)
     if (old_head == NULL) {
         // It's the interpreter's initial thread state.
         assert(id == 1);
-
+        used_newtstate = 0;
         tstate = &interp->_initial_thread;
     }
     else {
         // Every valid interpreter must have at least one thread.
         assert(id > 1);
         assert(old_head->prev == NULL);
-
-        tstate = alloc_threadstate();
-        if (tstate == NULL) {
-            goto error;
-        }
+        used_newtstate = 1;
+        tstate = new_tstate;
         // Set to _PyThreadState_INIT.
         memcpy(tstate,
                &initial._main_interpreter._initial_thread,
@@ -829,11 +834,11 @@ new_threadstate(PyInterpreterState *interp)
     init_threadstate(tstate, interp, id, old_head);
 
     HEAD_UNLOCK(runtime);
+    if (!used_newtstate) {
+        // Must be called with lock unlocked to avoid re-entrancy deadlock.
+        PyMem_RawFree(new_tstate);
+    }
     return tstate;
-
-error:
-    HEAD_UNLOCK(runtime);
-    return NULL;
 }
 
 PyThreadState *
@@ -1255,10 +1260,14 @@ PyFrameObject*
 PyThreadState_GetFrame(PyThreadState *tstate)
 {
     assert(tstate != NULL);
-    if (tstate->cframe->current_frame == NULL) {
+    _PyInterpreterFrame *f = tstate->cframe->current_frame;
+    while (f && _PyFrame_IsIncomplete(f)) {
+        f = f->previous;
+    }
+    if (f == NULL) {
         return NULL;
     }
-    PyFrameObject *frame = _PyFrame_GetFrameObject(tstate->cframe->current_frame);
+    PyFrameObject *frame = _PyFrame_GetFrameObject(f);
     if (frame == NULL) {
         PyErr_Clear();
     }
@@ -1389,7 +1398,12 @@ _PyThread_CurrentFrames(void)
             if (id == NULL) {
                 goto fail;
             }
-            int stat = PyDict_SetItem(result, id, (PyObject *)_PyFrame_GetFrameObject(frame));
+            PyObject *frameobj = (PyObject *)_PyFrame_GetFrameObject(frame);
+            if (frameobj == NULL) {
+                Py_DECREF(id);
+                goto fail;
+            }
+            int stat = PyDict_SetItem(result, id, frameobj);
             Py_DECREF(id);
             if (stat < 0) {
                 goto fail;
@@ -2169,16 +2183,16 @@ push_chunk(PyThreadState *tstate, int size)
 _PyInterpreterFrame *
 _PyThreadState_BumpFramePointerSlow(PyThreadState *tstate, size_t size)
 {
-    assert(size < INT_MAX/sizeof(PyObject *));
-    PyObject **base = tstate->datastack_top;
-    PyObject **top = base + size;
-    if (top >= tstate->datastack_limit) {
-        base = push_chunk(tstate, (int)size);
+    if (_PyThreadState_HasStackSpace(tstate, size)) {
+        _PyInterpreterFrame *res = (_PyInterpreterFrame *)tstate->datastack_top;
+        tstate->datastack_top += size;
+        return res;
     }
-    else {
-        tstate->datastack_top = top;
+    if (size > INT_MAX/2) {
+        PyErr_NoMemory();
+        return NULL;
     }
-    return (_PyInterpreterFrame *)base;
+    return (_PyInterpreterFrame *)push_chunk(tstate, (int)size);
 }
 
 void
