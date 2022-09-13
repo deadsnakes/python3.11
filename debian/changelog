@@ -1,3 +1,9 @@
+python3.11 (3.11.0~rc2-1+bionic1) bionic; urgency=medium
+
+  * Python 3.11.0 release candidate 2.
+
+ -- Anthony Sottile (deadsnakes) <asottile+deadsnakes@umich.edu>  Tue, 13 Sep 2022 15:07:24 +0000
+
 python3.11 (3.11.0~rc1-1+bionic1) bionic; urgency=medium
 
   * Python 3.11.0 release candidate 1.
