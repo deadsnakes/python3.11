@@ -207,11 +207,6 @@ class Task(futures._PyFuture):  # Inherit Python Task implementation
 
         This also increases the task's count of cancellation requests.
         """
-        if msg is not None:
-            warnings.warn("Passing 'msg' argument to Task.cancel() "
-                          "is deprecated since Python 3.11, and "
-                          "scheduled for removal in Python 3.14.",
-                          DeprecationWarning, stacklevel=2)
         self._log_traceback = False
         if self.done():
             return False
@@ -243,8 +238,8 @@ class Task(futures._PyFuture):  # Inherit Python Task implementation
     def uncancel(self):
         """Decrement the task's count of cancellation requests.
 
-        This should be used by tasks that catch CancelledError
-        and wish to continue indefinitely until they are cancelled again.
+        This should be called by the party that called `cancel()` on the task
+        beforehand.
 
         Returns the remaining number of cancellation requests.
         """
