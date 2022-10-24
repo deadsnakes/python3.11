@@ -1,6 +1,8 @@
 .. currentmodule:: asyncio
 
 
+.. _asyncio-event-loop:
+
 ==========
 Event Loop
 ==========
@@ -92,7 +94,7 @@ This documentation page contains the following sections:
   loop APIs.
 
 
-.. _asyncio-event-loop:
+.. _asyncio-event-loop-methods:
 
 Event Loop Methods
 ==================
@@ -456,6 +458,12 @@ Opening network connections
      *happy_eyeballs_delay*, *interleave*
      and *local_addr* should be specified.
 
+     .. note::
+
+        The *sock* argument transfers ownership of the socket to the
+        transport created. To close the socket, call the transport's
+        :meth:`~asyncio.BaseTransport.close` method.
+
    * *local_addr*, if given, is a ``(local_host, local_port)`` tuple used
      to bind the socket locally.  The *local_host* and *local_port*
      are looked up using ``getaddrinfo()``, similarly to *host* and *port*.
@@ -553,6 +561,12 @@ Opening network connections
      already connected, :class:`socket.socket` object to be used by the
      transport. If specified, *local_addr* and *remote_addr* should be omitted
      (must be :const:`None`).
+
+     .. note::
+
+        The *sock* argument transfers ownership of the socket to the
+        transport created. To close the socket, call the transport's
+        :meth:`~asyncio.BaseTransport.close` method.
 
    See :ref:`UDP echo client protocol <asyncio-udp-echo-client-protocol>` and
    :ref:`UDP echo server protocol <asyncio-udp-echo-server-protocol>` examples.
@@ -665,6 +679,12 @@ Creating network servers
    * *sock* can optionally be specified in order to use a preexisting
      socket object. If specified, *host* and *port* must not be specified.
 
+     .. note::
+
+        The *sock* argument transfers ownership of the socket to the
+        server created. To close the socket, call the server's
+        :meth:`~asyncio.Server.close` method.
+
    * *backlog* is the maximum number of queued connections passed to
      :meth:`~socket.socket.listen` (defaults to 100).
 
@@ -765,6 +785,12 @@ Creating network servers
 
    * *sock* is a preexisting socket object returned from
      :meth:`socket.accept <socket.socket.accept>`.
+
+     .. note::
+
+        The *sock* argument transfers ownership of the socket to the
+        transport created. To close the socket, call the transport's
+        :meth:`~asyncio.BaseTransport.close` method.
 
    * *ssl* can be set to an :class:`~ssl.SSLContext` to enable SSL over
      the accepted connections.
@@ -1206,7 +1232,13 @@ Executing code in thread or process pools
                   pool, cpu_bound)
               print('custom process pool', result)
 
-      asyncio.run(main())
+      if __name__ == '__main__':
+          asyncio.run(main())
+
+   Note that the entry point guard (``if __name__ == '__main__'``)
+   is required for option 3 due to the peculiarities of :mod:`multiprocessing`,
+   which is used by :class:`~concurrent.futures.ProcessPoolExecutor`.
+   See :ref:`Safe importing of main module <multiprocessing-safe-main-import>`.
 
    This method returns a :class:`asyncio.Future` object.
 
@@ -1586,6 +1618,7 @@ Do not instantiate the class directly.
 
 
 .. _asyncio-event-loops:
+.. _asyncio-event-loop-implementations:
 
 Event Loop Implementations
 ==========================
@@ -1608,9 +1641,12 @@ on Unix and :class:`ProactorEventLoop` on Windows.
       import asyncio
       import selectors
 
-      selector = selectors.SelectSelector()
-      loop = asyncio.SelectorEventLoop(selector)
-      asyncio.set_event_loop(loop)
+      class MyPolicy(asyncio.DefaultEventLoopPolicy):
+         def new_event_loop(self):
+            selector = selectors.SelectSelector()
+            return asyncio.SelectorEventLoop(selector)
+
+      asyncio.set_event_loop_policy(MyPolicy())
 
 
    .. availability:: Unix, Windows.
@@ -1632,7 +1668,7 @@ on Unix and :class:`ProactorEventLoop` on Windows.
 
    Abstract base class for asyncio-compliant event loops.
 
-   The :ref:`Event Loop Methods <asyncio-event-loop>` section lists all
+   The :ref:`asyncio-event-loop-methods` section lists all
    methods that an alternative implementation of ``AbstractEventLoop``
    should have defined.
 
@@ -1663,7 +1699,7 @@ event loop::
         print('Hello World')
         loop.stop()
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
 
     # Schedule a call to hello_world()
     loop.call_soon(hello_world, loop)
@@ -1699,7 +1735,7 @@ after 5 seconds, and then stops the event loop::
         else:
             loop.stop()
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
 
     # Schedule the first call to display_date()
     end_time = loop.time() + 5.0
@@ -1731,7 +1767,7 @@ Wait until a file descriptor received some data using the
     # Create a pair of connected file descriptors
     rsock, wsock = socketpair()
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
 
     def reader():
         data = rsock.recv(100)
