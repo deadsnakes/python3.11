@@ -335,7 +335,7 @@ Other objects
       status = converter(object, address);
 
    where *object* is the Python object to be converted and *address* is the
-   :c:type:`void*` argument that was passed to the ``PyArg_Parse*`` function.
+   :c:expr:`void*` argument that was passed to the ``PyArg_Parse*`` function.
    The returned *status* should be ``1`` for a successful conversion and ``0`` if
    the conversion has failed.  When the conversion fails, the *converter* function
    should raise an exception and leave the content of *address* unmodified.

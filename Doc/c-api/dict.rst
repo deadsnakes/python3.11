@@ -118,7 +118,7 @@ Dictionary Objects
 .. c:function:: PyObject* PyDict_GetItemString(PyObject *p, const char *key)
 
    This is the same as :c:func:`PyDict_GetItem`, but *key* is specified as a
-   :c:type:`const char*`, rather than a :c:expr:`PyObject*`.
+   :c:expr:`const char*`, rather than a :c:expr:`PyObject*`.
 
    Note that exceptions which occur while calling :meth:`__hash__` and
    :meth:`__eq__` methods and creating a temporary string object
