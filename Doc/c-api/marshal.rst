@@ -43,7 +43,7 @@ The following functions allow marshalled values to be read back in.
 
 .. c:function:: long PyMarshal_ReadLongFromFile(FILE *file)
 
-   Return a C :c:type:`long` from the data stream in a :c:expr:`FILE*` opened
+   Return a C :c:expr:`long` from the data stream in a :c:expr:`FILE*` opened
    for reading.  Only a 32-bit value can be read in using this function,
    regardless of the native size of :c:expr:`long`.
 
@@ -53,7 +53,7 @@ The following functions allow marshalled values to be read back in.
 
 .. c:function:: int PyMarshal_ReadShortFromFile(FILE *file)
 
-   Return a C :c:type:`short` from the data stream in a :c:expr:`FILE*` opened
+   Return a C :c:expr:`short` from the data stream in a :c:expr:`FILE*` opened
    for reading.  Only a 16-bit value can be read in using this function,
    regardless of the native size of :c:expr:`short`.
 

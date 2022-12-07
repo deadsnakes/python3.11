@@ -7,7 +7,7 @@
 Policies
 ========
 
-An event loop policy is a global (per-interpreter) object
+An event loop policy is a global object
 used to get and set the current :ref:`event loop <asyncio-event-loop>`,
 as well as create new event loops.
 The default policy can be :ref:`replaced <asyncio-policy-get-set>` with
@@ -111,6 +111,11 @@ asyncio ships with the following built-in policies:
    .. versionchanged:: 3.8
 
       On Windows, :class:`ProactorEventLoop` is now used by default.
+
+   .. deprecated:: 3.11.1
+      :meth:`get_event_loop` now emits a :exc:`DeprecationWarning` if there
+      is no current event loop set and a new event loop has been implicitly
+      created. In Python 3.12 it will be an error.
 
 
 .. class:: WindowsSelectorEventLoopPolicy
