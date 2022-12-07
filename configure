@@ -888,6 +888,7 @@ AR
 LINK_PYTHON_OBJS
 LINK_PYTHON_DEPS
 LIBRARY_DEPS
+NODE
 HOSTRUNNER
 STATIC_LIBPYTHON
 GNULD
@@ -4038,6 +4039,16 @@ if test -z "$CFLAGS"; then
         CFLAGS=
 fi
 
+case $host in #(
+  wasm64-*-emscripten) :
+
+    as_fn_append CFLAGS " -sMEMORY64=1"
+    as_fn_append LDFLAGS " -sMEMORY64=1"
+   ;; #(
+  *) :
+     ;;
+esac
+
 if test "$ac_sys_system" = "Darwin"
 then
 	# Compiler selection on MacOSX is more complicated than
@@ -6158,7 +6169,7 @@ cat > conftest.c <<EOF
 #    error unknown wasm32 platform
 #  endif
 #elif defined(__wasm64__)
-#  if defined(__EMSCRIPTEN)
+#  if defined(__EMSCRIPTEN__)
 	wasm64-emscripten
 #  elif defined(__wasi__)
 	wasm64-wasi
@@ -6670,7 +6681,7 @@ if test "x$enable_profiling" = xyes; then
   CC="$CC -pg"
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-int main() { return 0; }
+int main(void) { return 0; }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
 
@@ -6778,19 +6789,162 @@ if test "$cross_compiling" = yes; then
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking HOSTRUNNER" >&5
-$as_echo_n "checking HOSTRUNNER... " >&6; }
 if test -z "$HOSTRUNNER"
 then
   case $ac_sys_system/$ac_sys_emscripten_target in #(
   Emscripten/node*) :
 
+      if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}node", so it can be a program name with args.
+set dummy ${ac_tool_prefix}node; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_NODE+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $NODE in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_NODE="$NODE" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_NODE="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+NODE=$ac_cv_path_NODE
+if test -n "$NODE"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODE" >&5
+$as_echo "$NODE" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_NODE"; then
+  ac_pt_NODE=$NODE
+  # Extract the first word of "node", so it can be a program name with args.
+set dummy node; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_NODE+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_NODE in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_NODE="$ac_pt_NODE" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_ac_pt_NODE="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_NODE=$ac_cv_path_ac_pt_NODE
+if test -n "$ac_pt_NODE"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_NODE" >&5
+$as_echo "$ac_pt_NODE" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_NODE" = x; then
+    NODE="node"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    NODE=$ac_pt_NODE
+  fi
+else
+  NODE="$ac_cv_path_NODE"
+fi
+
+      HOSTRUNNER="$NODE"
       # bigint for ctypes c_longlong, c_longdouble
-      HOSTRUNNER="node --experimental-wasm-bigint"
+      # no longer available in Node 16
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for node --experimental-wasm-bigint" >&5
+$as_echo_n "checking for node --experimental-wasm-bigint... " >&6; }
+if ${ac_cv_tool_node_wasm_bigint+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+        if $NODE -v --experimental-wasm-bigint > /dev/null 2>&1; then
+          ac_cv_tool_node_wasm_bigint=yes
+        else
+          ac_cv_tool_node_wasm_bigint=no
+        fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tool_node_wasm_bigint" >&5
+$as_echo "$ac_cv_tool_node_wasm_bigint" >&6; }
+      if test "x$ac_cv_tool_node_wasm_bigint" = xyes; then :
+
+        as_fn_append HOSTRUNNER " --experimental-wasm-bigint"
+
+fi
+
       if test "x$enable_wasm_pthreads" = xyes; then :
 
-        HOSTRUNNER="$HOSTRUNNER --experimental-wasm-threads --experimental-wasm-bulk-memory"
+        as_fn_append HOSTRUNNER " --experimental-wasm-threads"
+        # no longer available in Node 16
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for node --experimental-wasm-bulk-memory" >&5
+$as_echo_n "checking for node --experimental-wasm-bulk-memory... " >&6; }
+if ${ac_cv_tool_node_wasm_bulk_memory+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
 
+          if $NODE -v --experimental-wasm-bulk-memory > /dev/null 2>&1; then
+            ac_cv_tool_node_wasm_bulk_memory=yes
+          else
+            ac_cv_tool_node_wasm_bulk_memory=no
+          fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tool_node_wasm_bulk_memory" >&5
+$as_echo "$ac_cv_tool_node_wasm_bulk_memory" >&6; }
+        if test "x$ac_cv_tool_node_wasm_bulk_memory" = xyes; then :
+
+          as_fn_append HOSTRUNNER " --experimental-wasm-bulk-memory"
+
+fi
+
+fi
+
+      if test "x$host_cpu" = xwasm64; then :
+  as_fn_append HOSTRUNNER " --experimental-wasm-memory64"
 fi
      ;; #(
               WASI/*) :
@@ -6801,6 +6955,8 @@ fi
 esac
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking HOSTRUNNER" >&5
+$as_echo_n "checking HOSTRUNNER... " >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HOSTRUNNER" >&5
 $as_echo "$HOSTRUNNER" >&6; }
 
@@ -6814,7 +6970,7 @@ $as_echo "$LDLIBRARY" >&6; }
 # LIBRARY_DEPS, LINK_PYTHON_OBJS and LINK_PYTHON_DEPS variable
 case $ac_sys_system/$ac_sys_emscripten_target in #(
   Emscripten/browser*) :
-    LIBRARY_DEPS='$(PY3LIBRARY) $(WASM_STDLIB)' ;; #(
+    LIBRARY_DEPS='$(PY3LIBRARY) $(WASM_STDLIB) python.html python.worker.js' ;; #(
   *) :
     LIBRARY_DEPS='$(PY3LIBRARY) $(EXPORTSYMS)'
  ;;
@@ -7410,7 +7566,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PROFILE_TASK" >&5
 $as_echo "$PROFILE_TASK" >&6; }
 
-# Make llvm-relatec checks work on systems where llvm tools are not installed with their
+# Make llvm-related checks work on systems where llvm tools are not installed with their
 # normal names in the default $PATH (ie: Ubuntu).  They exist under the
 # non-suffixed name in their versioned llvm directory.
 
@@ -7475,7 +7631,42 @@ fi
 if test "$Py_LTO" = 'true' ; then
   case $CC in
     *clang*)
-            LDFLAGS_NOLTO="-fno-lto"
+      LDFLAGS_NOLTO="-fno-lto"
+                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -flto=thin" >&5
+$as_echo_n "checking whether C compiler accepts -flto=thin... " >&6; }
+if ${ax_cv_check_cflags___flto_thin+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+
+  ax_check_save_flags=$CFLAGS
+  CFLAGS="$CFLAGS  -flto=thin"
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_cv_check_cflags___flto_thin=yes
+else
+  ax_cv_check_cflags___flto_thin=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  CFLAGS=$ax_check_save_flags
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags___flto_thin" >&5
+$as_echo "$ax_cv_check_cflags___flto_thin" >&6; }
+if test "x$ax_cv_check_cflags___flto_thin" = xyes; then :
+  LDFLAGS_NOLTO="-flto=thin"
+else
+  LDFLAGS_NOLTO="-flto"
+fi
+
 
       if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}llvm-ar", so it can be a program name with args.
@@ -8734,7 +8925,7 @@ else
 
 void* routine(void* p){return NULL;}
 
-int main(){
+int main(void){
   pthread_t p;
   if(pthread_create(&p,NULL,routine,NULL)!=0)
     return 1;
@@ -8789,7 +8980,7 @@ else
 
 void* routine(void* p){return NULL;}
 
-int main(){
+int main(void){
   pthread_t p;
   if(pthread_create(&p,NULL,routine,NULL)!=0)
     return 1;
@@ -8838,7 +9029,7 @@ else
 
 void* routine(void* p){return NULL;}
 
-int main(){
+int main(void){
   pthread_t p;
   if(pthread_create(&p,NULL,routine,NULL)!=0)
     return 1;
@@ -8887,7 +9078,7 @@ else
 
 void* routine(void* p){return NULL;}
 
-int main(){
+int main(void){
   pthread_t p;
   if(pthread_create(&p,NULL,routine,NULL)!=0)
     return 1;
@@ -11643,7 +11834,7 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-int main()
+int main(void)
 {
     char s[16];
     int i, *p1, *p2;
@@ -11919,7 +12110,7 @@ else
 
   LIBEXPAT_CFLAGS="-I\$(srcdir)/Modules/expat"
   LIBEXPAT_LDFLAGS="-lm \$(LIBEXPAT_A)"
-  LIBEXPAT_INTERNAL="\$(LIBEXPAT_A)"
+  LIBEXPAT_INTERNAL="\$(LIBEXPAT_HEADERS) \$(LIBEXPAT_A)"
 
 fi
 
@@ -11993,7 +12184,7 @@ else
 
   LIBMPDEC_CFLAGS="-I\$(srcdir)/Modules/_decimal/libmpdec"
   LIBMPDEC_LDFLAGS="-lm \$(LIBMPDEC_A)"
-  LIBMPDEC_INTERNAL="\$(LIBMPDEC_A)"
+  LIBMPDEC_INTERNAL="\$(LIBMPDEC_HEADERS) \$(LIBMPDEC_A)"
 
     if test "x$with_pydebug" = xyes; then :
 
@@ -13953,6 +14144,7 @@ $as_echo_n "checking for pthread_create in -lpthread... " >&6; }
 /* end confdefs.h.  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 
 void * start_routine (void *arg) { exit (0); }
@@ -14263,7 +14455,7 @@ else
       void *foo(void *parm) {
         return NULL;
       }
-      main() {
+      int main(void) {
         pthread_attr_t attr;
         pthread_t id;
         if (pthread_attr_init(&attr)) return (-1);
@@ -15867,7 +16059,7 @@ else
 
 #include <sys/stat.h>
 #include <unistd.h>
-int main(int argc, char*argv[])
+int main(int argc, char *argv[])
 {
   if(chflags(argv[0], 0) != 0)
     return 1;
@@ -15916,7 +16108,7 @@ else
 
 #include <sys/stat.h>
 #include <unistd.h>
-int main(int argc, char*argv[])
+int main(int argc, char *argv[])
 {
   if(lchflags(argv[0], 0) != 0)
     return 1;
@@ -18610,7 +18802,7 @@ else
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-int main()
+int main(void)
 {
   int passive, gaierr, inet4 = 0, inet6 = 0;
   struct addrinfo hints, *ai, *aitop;
@@ -19853,7 +20045,7 @@ else
 
 #include <stdlib.h>
 #include <math.h>
-int main() {
+int main(void) {
     volatile double x, y, z;
     /* 1./(1-2**-53) -> 1+2**-52 (correct), 1.0 (double rounding) */
     x = 0.99999999999999989; /* 1-2**-53 */
@@ -20632,7 +20824,7 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-int main()
+int main(void)
 {
 	return (((-1)>>3 == -1) ? 0 : 1);
 }
@@ -21078,7 +21270,7 @@ else
 
 #include <stdlib.h>
 #include <unistd.h>
-int main()
+int main(void)
 {
 	int val1 = nice(1);
 	if (val1 != -1 && val1 == nice(2))
@@ -21120,7 +21312,7 @@ else
 #include <poll.h>
 #include <unistd.h>
 
-int main()
+int main(void)
 {
     struct pollfd poll_struct = { 42, POLLIN|POLLPRI|POLLOUT, 0 };
     int poll_test;
@@ -21177,7 +21369,7 @@ else
 extern char *tzname[];
 #endif
 
-int main()
+int main(void)
 {
 	/* Note that we need to ensure that not only does tzset(3)
 	   do 'something' with localtime, but it works as documented
@@ -22057,9 +22249,10 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+#include <stddef.h>
 #include <stdio.h>
-#include<stdlib.h>
-int main() {
+#include <stdlib.h>
+int main(void) {
     size_t len = -1;
     const char *str = "text";
     len = mbstowcs(NULL, str, 0);
@@ -22258,7 +22451,7 @@ else
 #include <stdlib.h>
 #include <string.h>
 void foo(void *p, void *q) { memmove(p, q, 19); }
-int main() {
+int main(void) {
   char a[32] = "123456789000000000";
   foo(&a[9], a);
   if (strcmp(a, "123456789123456789000000000") != 0)
@@ -22313,7 +22506,7 @@ else
               );
               return r;
             }
-            int main() {
+            int main(void) {
               int p = 8;
               if ((foo(&p) ? : p) != 6)
                 return 1;
@@ -22356,7 +22549,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
     #include <stdatomic.h>
     atomic_int int_var;
     atomic_uintptr_t uintptr_var;
-    int main() {
+    int main(void) {
       atomic_store_explicit(&int_var, 5, memory_order_relaxed);
       atomic_store_explicit(&uintptr_var, 0, memory_order_relaxed);
       int loaded_value = atomic_load_explicit(&int_var, memory_order_seq_cst);
@@ -22397,7 +22590,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
 
     int val;
-    int main() {
+    int main(void) {
       __atomic_store_n(&val, 1, __ATOMIC_SEQ_CST);
       (void)__atomic_load_n(&val, __ATOMIC_SEQ_CST);
       return 0;
@@ -22473,7 +22666,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 
     #include <dirent.h>
 
-    int main() {
+    int main(void) {
       struct dirent entry;
       return entry.d_type == DT_UNKNOWN;
     }
@@ -22511,11 +22704,12 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 
+    #include <stddef.h>
     #include <unistd.h>
     #include <sys/syscall.h>
     #include <linux/random.h>
 
-    int main() {
+    int main(void) {
         char buffer[1];
         const size_t buflen = sizeof(buffer);
         const int flags = GRND_NONBLOCK;
@@ -22558,9 +22752,10 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 
+    #include <stddef.h>
     #include <sys/random.h>
 
-    int main() {
+    int main(void) {
         char buffer[1];
         const size_t buflen = sizeof(buffer);
         const int flags = 0;
@@ -23376,6 +23571,7 @@ case $ac_sys_system in #(
     py_cv_module_nis=n/a
     py_cv_module_ossaudiodev=n/a
     py_cv_module_pwd=n/a
+    py_cv_module_resource=n/a
     py_cv_module_spwd=n/a
     py_cv_module_syslog=n/a
     py_cv_module_=n/a
@@ -23386,7 +23582,6 @@ case $ac_sys_system in #(
 
 
     py_cv_module_fcntl=n/a
-    py_cv_module_resource=n/a
     py_cv_module_readline=n/a
     py_cv_module_termios=n/a
     py_cv_module_=n/a
@@ -23401,7 +23596,6 @@ case $ac_sys_system in #(
     py_cv_module__ctypes_test=n/a
     py_cv_module_fcntl=n/a
     py_cv_module_mmap=n/a
-    py_cv_module_resource=n/a
     py_cv_module_termios=n/a
     py_cv_module_=n/a
 

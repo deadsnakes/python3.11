@@ -139,8 +139,9 @@ class CAPITest(unittest.TestCase):
         class Z(object):
             def __len__(self):
                 return 1
-        self.assertRaises(TypeError, _posixsubprocess.fork_exec,
-                          1,Z(),3,(1, 2),5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
+        with self.assertRaisesRegex(TypeError, 'indexing'):
+            _posixsubprocess.fork_exec(
+                          1,Z(),True,(1, 2),5,6,7,8,9,10,11,12,13,14,True,True,17,False,19,20,21,22,False)
         # Issue #15736: overflow in _PySequence_BytesToCharpArray()
         class Z(object):
             def __len__(self):
@@ -148,7 +149,7 @@ class CAPITest(unittest.TestCase):
             def __getitem__(self, i):
                 return b'x'
         self.assertRaises(MemoryError, _posixsubprocess.fork_exec,
-                          1,Z(),3,(1, 2),5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
+                          1,Z(),True,(1, 2),5,6,7,8,9,10,11,12,13,14,True,True,17,False,19,20,21,22,False)
 
     @unittest.skipUnless(_posixsubprocess, '_posixsubprocess required for this test.')
     def test_subprocess_fork_exec(self):
@@ -158,7 +159,7 @@ class CAPITest(unittest.TestCase):
 
         # Issue #15738: crash in subprocess_fork_exec()
         self.assertRaises(TypeError, _posixsubprocess.fork_exec,
-                          Z(),[b'1'],3,(1, 2),5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
+                          Z(),[b'1'],True,(1, 2),5,6,7,8,9,10,11,12,13,14,True,True,17,False,19,20,21,22,False)
 
     @unittest.skipIf(MISSING_C_DOCSTRINGS,
                      "Signature information for builtins requires docstrings")
@@ -402,6 +403,98 @@ class CAPITest(unittest.TestCase):
         self.assertRaises(TypeError, _testcapi.get_mapping_keys, bad_mapping)
         self.assertRaises(TypeError, _testcapi.get_mapping_values, bad_mapping)
         self.assertRaises(TypeError, _testcapi.get_mapping_items, bad_mapping)
+
+    def test_mapping_has_key(self):
+        dct = {'a': 1}
+        self.assertTrue(_testcapi.mapping_has_key(dct, 'a'))
+        self.assertFalse(_testcapi.mapping_has_key(dct, 'b'))
+
+        class SubDict(dict):
+            pass
+
+        dct2 = SubDict({'a': 1})
+        self.assertTrue(_testcapi.mapping_has_key(dct2, 'a'))
+        self.assertFalse(_testcapi.mapping_has_key(dct2, 'b'))
+
+    def test_sequence_set_slice(self):
+        # Correct case:
+        data = [1, 2, 3, 4, 5]
+        data_copy = data.copy()
+
+        _testcapi.sequence_set_slice(data, 1, 3, [8, 9])
+        data_copy[1:3] = [8, 9]
+        self.assertEqual(data, data_copy)
+        self.assertEqual(data, [1, 8, 9, 4, 5])
+
+        # Custom class:
+        class Custom:
+            def __setitem__(self, index, value):
+                self.index = index
+                self.value = value
+
+        c = Custom()
+        _testcapi.sequence_set_slice(c, 0, 5, 'abc')
+        self.assertEqual(c.index, slice(0, 5))
+        self.assertEqual(c.value, 'abc')
+
+        # Immutable sequences must raise:
+        bad_seq1 = (1, 2, 3, 4)
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_set_slice(bad_seq1, 1, 3, (8, 9))
+        self.assertEqual(bad_seq1, (1, 2, 3, 4))
+
+        bad_seq2 = 'abcd'
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_set_slice(bad_seq2, 1, 3, 'xy')
+        self.assertEqual(bad_seq2, 'abcd')
+
+        # Not a sequence:
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_set_slice(None, 1, 3, 'xy')
+
+        mapping = {1: 'a', 2: 'b', 3: 'c'}
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_set_slice(mapping, 1, 3, 'xy')
+        self.assertEqual(mapping, {1: 'a', 2: 'b', 3: 'c'})
+
+    def test_sequence_del_slice(self):
+        # Correct case:
+        data = [1, 2, 3, 4, 5]
+        data_copy = data.copy()
+
+        _testcapi.sequence_del_slice(data, 1, 3)
+        del data_copy[1:3]
+        self.assertEqual(data, data_copy)
+        self.assertEqual(data, [1, 4, 5])
+
+        # Custom class:
+        class Custom:
+            def __delitem__(self, index):
+                self.index = index
+
+        c = Custom()
+        _testcapi.sequence_del_slice(c, 0, 5)
+        self.assertEqual(c.index, slice(0, 5))
+
+        # Immutable sequences must raise:
+        bad_seq1 = (1, 2, 3, 4)
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_del_slice(bad_seq1, 1, 3)
+        self.assertEqual(bad_seq1, (1, 2, 3, 4))
+
+        bad_seq2 = 'abcd'
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_del_slice(bad_seq2, 1, 3)
+        self.assertEqual(bad_seq2, 'abcd')
+
+        # Not a sequence:
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_del_slice(None, 1, 3)
+
+        mapping = {1: 'a', 2: 'b', 3: 'c'}
+        with self.assertRaises(TypeError):
+            _testcapi.sequence_del_slice(mapping, 1, 3)
+        self.assertEqual(mapping, {1: 'a', 2: 'b', 3: 'c'})
 
     @unittest.skipUnless(hasattr(_testcapi, 'negative_refcount'),
                          'need _testcapi.negative_refcount')
@@ -723,6 +816,71 @@ class CAPITest(unittest.TestCase):
         for name in names:
             with self.subTest(name=name):
                 self.assertTrue(hasattr(ctypes.pythonapi, name))
+
+    def test_eval_get_func_name(self):
+        def function_example(): ...
+
+        class A:
+            def method_example(self): ...
+
+        self.assertEqual(_testcapi.eval_get_func_name(function_example),
+                         "function_example")
+        self.assertEqual(_testcapi.eval_get_func_name(A.method_example),
+                         "method_example")
+        self.assertEqual(_testcapi.eval_get_func_name(A().method_example),
+                         "method_example")
+        self.assertEqual(_testcapi.eval_get_func_name(sum), "sum")  # c function
+        self.assertEqual(_testcapi.eval_get_func_name(A), "type")
+
+    def test_eval_get_func_desc(self):
+        def function_example(): ...
+
+        class A:
+            def method_example(self): ...
+
+        self.assertEqual(_testcapi.eval_get_func_desc(function_example),
+                         "()")
+        self.assertEqual(_testcapi.eval_get_func_desc(A.method_example),
+                         "()")
+        self.assertEqual(_testcapi.eval_get_func_desc(A().method_example),
+                         "()")
+        self.assertEqual(_testcapi.eval_get_func_desc(sum), "()")  # c function
+        self.assertEqual(_testcapi.eval_get_func_desc(A), " object")
+
+    def test_function_get_code(self):
+        import types
+
+        def some():
+            pass
+
+        code = _testcapi.function_get_code(some)
+        self.assertIsInstance(code, types.CodeType)
+        self.assertEqual(code, some.__code__)
+
+        with self.assertRaises(SystemError):
+            _testcapi.function_get_code(None)  # not a function
+
+    def test_function_get_globals(self):
+        def some():
+            pass
+
+        globals_ = _testcapi.function_get_globals(some)
+        self.assertIsInstance(globals_, dict)
+        self.assertEqual(globals_, some.__globals__)
+
+        with self.assertRaises(SystemError):
+            _testcapi.function_get_globals(None)  # not a function
+
+    def test_function_get_module(self):
+        def some():
+            pass
+
+        module = _testcapi.function_get_module(some)
+        self.assertIsInstance(module, str)
+        self.assertEqual(module, some.__module__)
+
+        with self.assertRaises(SystemError):
+            _testcapi.function_get_module(None)  # not a function
 
 
 class TestPendingCalls(unittest.TestCase):
