@@ -88,6 +88,7 @@ tok_new(void)
     tok->async_def_nl = 0;
     tok->interactive_underflow = IUNDERFLOW_NORMAL;
     tok->str = NULL;
+    tok->report_warnings = 1;
     return tok;
 }
 
@@ -396,7 +397,11 @@ tok_readline_recode(struct tok_state *tok) {
         error_ret(tok);
         goto error;
     }
-    if (!tok_reserve_buf(tok, buflen + 1)) {
+    // Make room for the null terminator *and* potentially
+    // an extra newline character that we may need to artificially
+    // add.
+    size_t buffer_size = buflen + 2;
+    if (!tok_reserve_buf(tok, buffer_size)) {
         goto error;
     }
     memcpy(tok->inp, buf, buflen);
@@ -983,6 +988,7 @@ tok_underflow_file(struct tok_state *tok) {
         return 0;
     }
     if (tok->inp[-1] != '\n') {
+        assert(tok->inp + 1 < tok->end);
         /* Last line does not end in \n, fake one */
         *tok->inp++ = '\n';
         *tok->inp = '\0';
@@ -1181,6 +1187,10 @@ indenterror(struct tok_state *tok)
 static int
 parser_warn(struct tok_state *tok, PyObject *category, const char *format, ...)
 {
+    if (!tok->report_warnings) {
+        return 0;
+    }
+
     PyObject *errmsg;
     va_list vargs;
 #ifdef HAVE_STDARG_PROTOTYPES
@@ -1542,7 +1552,7 @@ tok_get(struct tok_state *tok, const char **p_start, const char **p_end)
     } while (c == ' ' || c == '\t' || c == '\014');
 
     /* Set start of current token */
-    tok->start = tok->cur - 1;
+    tok->start = tok->cur == NULL ? NULL : tok->cur - 1;
 
     /* Skip comment, unless it's a type comment */
     if (c == '#') {
@@ -2189,6 +2199,9 @@ _PyTokenizer_FindEncodingFilename(int fd, PyObject *filename)
             return encoding;
         }
     }
+    // We don't want to report warnings here because it could cause infinite recursion
+    // if fetching the encoding shows a warning.
+    tok->report_warnings = 0;
     while (tok->lineno < 2 && tok->done == E_OK) {
         _PyTokenizer_Get(tok, &p_start, &p_end);
     }

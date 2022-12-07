@@ -1617,14 +1617,6 @@ trace_function_exit(PyThreadState *tstate, _PyInterpreterFrame *frame, PyObject 
     return 0;
 }
 
-static _PyInterpreterFrame *
-pop_frame(PyThreadState *tstate, _PyInterpreterFrame *frame)
-{
-    _PyInterpreterFrame *prev_frame = frame->previous;
-    _PyEvalFrameClearAndPop(tstate, frame);
-    return prev_frame;
-}
-
 /* It is only between the PRECALL instruction and the following CALL,
  * that this has any meaning.
  */
@@ -2158,6 +2150,7 @@ handle_eval_breaker:
                 PyObject *container = SECOND();
                 next_instr--;
                 if (_Py_Specialize_BinarySubscr(container, sub, next_instr) < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
@@ -2323,6 +2316,7 @@ handle_eval_breaker:
                 PyObject *container = SECOND();
                 next_instr--;
                 if (_Py_Specialize_StoreSubscr(container, sub, next_instr) < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
@@ -2439,7 +2433,10 @@ handle_eval_breaker:
             DTRACE_FUNCTION_EXIT();
             _Py_LeaveRecursiveCallTstate(tstate);
             if (!frame->is_entry) {
-                frame = cframe.current_frame = pop_frame(tstate, frame);
+                // GH-99729: We need to unlink the frame *before* clearing it:
+                _PyInterpreterFrame *dying = frame;
+                frame = cframe.current_frame = dying->previous;
+                _PyEvalFrameClearAndPop(tstate, dying);
                 _PyFrame_StackPush(frame, retval);
                 goto resume_frame;
             }
@@ -3056,6 +3053,7 @@ handle_eval_breaker:
                 PyObject *name = GETITEM(names, oparg>>1);
                 next_instr--;
                 if (_Py_Specialize_LoadGlobal(GLOBALS(), BUILTINS(), next_instr, name) < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
@@ -3481,6 +3479,7 @@ handle_eval_breaker:
                 PyObject *name = GETITEM(names, oparg);
                 next_instr--;
                 if (_Py_Specialize_LoadAttr(owner, next_instr, name) < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
@@ -3582,7 +3581,6 @@ handle_eval_breaker:
             DISPATCH();
         }
 
-            DISPATCH();
         TARGET(STORE_ATTR_ADAPTIVE) {
             assert(cframe.use_tracing == 0);
             _PyAttrCache *cache = (_PyAttrCache *)next_instr;
@@ -3591,6 +3589,7 @@ handle_eval_breaker:
                 PyObject *name = GETITEM(names, oparg);
                 next_instr--;
                 if (_Py_Specialize_StoreAttr(owner, next_instr, name) < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
@@ -4528,6 +4527,7 @@ handle_eval_breaker:
                 PyObject *name = GETITEM(names, oparg);
                 next_instr--;
                 if (_Py_Specialize_LoadMethod(owner, next_instr, name) < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
@@ -4794,7 +4794,7 @@ handle_eval_breaker:
 
         TARGET(PRECALL_ADAPTIVE) {
             _PyPrecallCache *cache = (_PyPrecallCache *)next_instr;
-            if (cache->counter == 0) {
+            if (ADAPTIVE_COUNTER_IS_ZERO(cache)) {
                 next_instr--;
                 int is_meth = is_method(stack_pointer, oparg);
                 int nargs = oparg + is_meth;
@@ -4802,13 +4802,14 @@ handle_eval_breaker:
                 int err = _Py_Specialize_Precall(callable, next_instr, nargs,
                                                  call_shape.kwnames, oparg);
                 if (err < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
             }
             else {
                 STAT_INC(PRECALL, deferred);
-                cache->counter--;
+                DECREMENT_ADAPTIVE_COUNTER(cache);
                 JUMP_TO_INSTRUCTION(PRECALL);
             }
         }
@@ -4823,6 +4824,7 @@ handle_eval_breaker:
                 int err = _Py_Specialize_Call(callable, next_instr, nargs,
                                               call_shape.kwnames);
                 if (err < 0) {
+                    next_instr++;
                     goto error;
                 }
                 DISPATCH_SAME_OPARG();
@@ -5018,7 +5020,7 @@ handle_eval_breaker:
                 goto error;
             }
             PyObject *arg = TOP();
-            PyObject *res = cfunc(PyCFunction_GET_SELF(callable), arg);
+            PyObject *res = _PyCFunction_TrampolineCall(cfunc, PyCFunction_GET_SELF(callable), arg);
             _Py_LeaveRecursiveCallTstate(tstate);
             assert((res != NULL) ^ (_PyErr_Occurred(tstate) != NULL));
 
@@ -5185,9 +5187,6 @@ handle_eval_breaker:
             PyObject *list = SECOND();
             DEOPT_IF(!PyList_Check(list), PRECALL);
             STAT_INC(PRECALL, hit);
-            // PRECALL + CALL + POP_TOP
-            JUMPBY(INLINE_CACHE_ENTRIES_PRECALL + 1 + INLINE_CACHE_ENTRIES_CALL + 1);
-            assert(_Py_OPCODE(next_instr[-1]) == POP_TOP);
             PyObject *arg = POP();
             if (_PyList_AppendTakeRef((PyListObject *)list, arg) < 0) {
                 goto error;
@@ -5195,6 +5194,9 @@ handle_eval_breaker:
             STACK_SHRINK(2);
             Py_DECREF(list);
             Py_DECREF(callable);
+            // PRECALL + CALL + POP_TOP
+            JUMPBY(INLINE_CACHE_ENTRIES_PRECALL + 1 + INLINE_CACHE_ENTRIES_CALL + 1);
+            assert(_Py_OPCODE(next_instr[-1]) == POP_TOP);
             DISPATCH();
         }
 
@@ -5219,7 +5221,7 @@ handle_eval_breaker:
             if (_Py_EnterRecursiveCallTstate(tstate, " while calling a Python object")) {
                 goto error;
             }
-            PyObject *res = cfunc(self, arg);
+            PyObject *res = _PyCFunction_TrampolineCall(cfunc, self, arg);
             _Py_LeaveRecursiveCallTstate(tstate);
             assert((res != NULL) ^ (_PyErr_Occurred(tstate) != NULL));
             Py_DECREF(self);
@@ -5291,7 +5293,7 @@ handle_eval_breaker:
             if (_Py_EnterRecursiveCallTstate(tstate, " while calling a Python object")) {
                 goto error;
             }
-            PyObject *res = cfunc(self, NULL);
+            PyObject *res = _PyCFunction_TrampolineCall(cfunc, self, NULL);
             _Py_LeaveRecursiveCallTstate(tstate);
             assert((res != NULL) ^ (_PyErr_Occurred(tstate) != NULL));
             Py_DECREF(self);
@@ -5747,9 +5749,11 @@ error:
 #endif
 
         /* Log traceback info. */
-        PyFrameObject *f = _PyFrame_GetFrameObject(frame);
-        if (f != NULL) {
-            PyTraceBack_Here(f);
+        if (!_PyFrame_IsIncomplete(frame)) {
+            PyFrameObject *f = _PyFrame_GetFrameObject(frame);
+            if (f != NULL) {
+                PyTraceBack_Here(f);
+            }
         }
 
         if (tstate->c_tracefunc != NULL) {
@@ -5824,7 +5828,10 @@ exit_unwind:
         assert(tstate->cframe->current_frame == frame->previous);
         return NULL;
     }
-    frame = cframe.current_frame = pop_frame(tstate, frame);
+    // GH-99729: We need to unlink the frame *before* clearing it:
+    _PyInterpreterFrame *dying = frame;
+    frame = cframe.current_frame = dying->previous;
+    _PyEvalFrameClearAndPop(tstate, dying);
 
 resume_with_error:
     SET_LOCALS_FROM_FRAME();
@@ -6931,7 +6938,7 @@ maybe_call_line_trace(Py_tracefunc func, PyObject *obj,
         }
     }
     /* Always emit an opcode event if we're tracing all opcodes. */
-    if (f->f_trace_opcodes) {
+    if (f->f_trace_opcodes && result == 0) {
         result = call_trace(func, obj, tstate, frame, PyTrace_OPCODE, Py_None);
     }
     return result;

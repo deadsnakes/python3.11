@@ -1617,6 +1617,9 @@ expression support in the :mod:`re` module).
    range [*start*, *end*].  Optional arguments *start* and *end* are
    interpreted as in slice notation.
 
+   If *sub* is empty, returns the number of empty strings between characters
+   which is the length of the string plus one.
+
 
 .. method:: str.encode(encoding="utf-8", errors="strict")
 
@@ -2697,6 +2700,9 @@ arbitrary binary data.
 
    The subsequence to search for may be any :term:`bytes-like object` or an
    integer in the range 0 to 255.
+
+   If *sub* is empty, returns the number of empty slices between characters
+   which is the length of the bytes object plus one.
 
    .. versionchanged:: 3.3
       Also accept an integer in the range 0 to 255 as the subsequence.
@@ -4370,11 +4376,9 @@ type, the :dfn:`dictionary`.  (For other containers see the built-in
 A dictionary's keys are *almost* arbitrary values.  Values that are not
 :term:`hashable`, that is, values containing lists, dictionaries or other
 mutable types (that are compared by value rather than by object identity) may
-not be used as keys.  Numeric types used for keys obey the normal rules for
-numeric comparison: if two numbers compare equal (such as ``1`` and ``1.0``)
-then they can be used interchangeably to index the same dictionary entry.  (Note
-however, that since computers store floating-point numbers as approximations it
-is usually unwise to use them as dictionary keys.)
+not be used as keys.
+Values that compare equal (such as ``1``, ``1.0``, and ``True``)
+can be used interchangeably to index the same dictionary entry.
 
 .. class:: dict(**kwargs)
            dict(mapping, **kwargs)

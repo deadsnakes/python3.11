@@ -339,13 +339,6 @@ get_event_loop(int stacklevel)
         return loop;
     }
 
-    if (PyErr_WarnEx(PyExc_DeprecationWarning,
-                     "There is no current event loop",
-                     stacklevel))
-    {
-        return NULL;
-    }
-
     policy = PyObject_CallNoArgs(asyncio_get_event_loop_policy);
     if (policy == NULL) {
         return NULL;
@@ -1052,7 +1045,11 @@ _asyncio_Future_remove_done_callback(FutureObj *self, PyObject *fn)
         return NULL;
     }
 
-    for (i = 0; i < PyList_GET_SIZE(self->fut_callbacks); i++) {
+    // Beware: PyObject_RichCompareBool below may change fut_callbacks.
+    // See GH-97592.
+    for (i = 0;
+         self->fut_callbacks != NULL && i < PyList_GET_SIZE(self->fut_callbacks);
+         i++) {
         int ret;
         PyObject *item = PyList_GET_ITEM(self->fut_callbacks, i);
         Py_INCREF(item);
@@ -1071,7 +1068,8 @@ _asyncio_Future_remove_done_callback(FutureObj *self, PyObject *fn)
         }
     }
 
-    if (j == 0) {
+    // Note: fut_callbacks may have been cleared.
+    if (j == 0 || self->fut_callbacks == NULL) {
         Py_CLEAR(self->fut_callbacks);
         Py_DECREF(newlist);
         return PyLong_FromSsize_t(len + cleared_callback0);
@@ -3124,6 +3122,11 @@ _asyncio_get_event_loop_impl(PyObject *module)
     return get_event_loop(1);
 }
 
+// This internal method is going away in Python 3.12, left here only for
+// backwards compatibility with 3.10.0 - 3.10.8 and 3.11.0.
+// Similarly, this method's Python equivalent in asyncio.events is going
+// away as well.
+// See GH-99949 for more details.
 /*[clinic input]
 _asyncio._get_event_loop
     stacklevel: int = 3
