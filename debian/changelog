@@ -1,3 +1,9 @@
+python3.11 (3.11.1-1+focal2) focal; urgency=medium
+
+  * fix sysconfig paths for deb_system and posix_local
+
+ -- Anthony Sottile <asottile@umich.edu>  Sat, 28 Jan 2023 13:50:01 -0500
+
 python3.11 (3.11.1-1+focal1) focal; urgency=medium
 
   * Python 3.11.1 release.
