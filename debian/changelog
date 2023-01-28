@@ -1,3 +1,9 @@
+python3.11 (3.11.1-1+bionic2) bionic; urgency=medium
+
+  * fix sysconfig paths for deb_system and posix_local
+
+ -- Anthony Sottile <asottile@umich.edu>  Sat, 28 Jan 2023 13:57:41 -0500
+
 python3.11 (3.11.1-1+bionic1) bionic; urgency=medium
 
   * Python 3.11.1 release.
