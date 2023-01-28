@@ -3,16 +3,16 @@ Date: Thu, 14 Feb 2019 18:59:14 -0800
 Subject: distutils-install-layout
 
 ---
- Lib/distutils/command/install.py          | 33 ++++++++++++++++++++---
- Lib/distutils/command/install_egg_info.py | 30 +++++++++++++++++----
+ Lib/distutils/command/install.py          | 33 +++++++++++++++++++--
+ Lib/distutils/command/install_egg_info.py | 30 +++++++++++++++----
  Lib/distutils/sysconfig.py                |  7 +++++
  Lib/distutils/tests/test_bdist_dumb.py    |  2 +-
  Lib/distutils/tests/test_install.py       |  4 +--
  Lib/pydoc.py                              |  1 +
- Lib/site.py                               | 26 ++++++++++++++----
- Lib/sysconfig.py                          | 45 +++++++++++++++++++++++++++----
- Lib/test/test_site.py                     |  6 ++---
- 9 files changed, 130 insertions(+), 24 deletions(-)
+ Lib/site.py                               | 26 ++++++++++++----
+ Lib/sysconfig.py                          | 49 +++++++++++++++++++++++++++----
+ Lib/test/test_site.py                     |  6 ++--
+ 9 files changed, 134 insertions(+), 24 deletions(-)
 
 diff --git a/Lib/distutils/command/install.py b/Lib/distutils/command/install.py
 index 01d5331..81b501e 100644
@@ -268,37 +268,41 @@ index 69670d9..d1d587f 100644
              sitepackages.append(prefix)
              sitepackages.append(os.path.join(prefix, "Lib", "site-packages"))
 diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
-index ebe3711..a52592c 100644
+index ebe3711..41a5ad6 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -95,6 +95,26 @@ _INSTALL_SCHEMES = {
+@@ -95,6 +95,30 @@ _INSTALL_SCHEMES = {
          'scripts': '{base}/Scripts',
          'data': '{base}',
          },
 +    'deb_system': {
-+        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
-+        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
++        'stdlib': '{installed_base}/lib/python{py_version_short}',
++        'platstdlib': '{platbase}/lib/python{py_version_short}',
 +        'purelib': '{base}/lib/python3/dist-packages',
-+        'platlib': '{platbase}/{platlibdir}/python3/dist-packages',
-+        'include': '{installed_base}/include/python{py_version_short}{abiflags}',
-+        'platinclude': '{installed_platbase}/include/python{py_version_short}{abiflags}',
++        'platlib': '{platbase}/lib/python3/dist-packages',
++        'include':
++            '{installed_base}/include/python{py_version_short}{abiflags}',
++        'platinclude':
++            '{installed_platbase}/include/python{py_version_short}{abiflags}',
 +        'scripts': '{base}/bin',
 +        'data': '{base}',
 +        },
 +    'posix_local': {
-+        'stdlib': '{installed_base}/{platlibdir}/python{py_version_short}',
-+        'platstdlib': '{platbase}/{platlibdir}/python{py_version_short}',
++        'stdlib': '{installed_base}/lib/python{py_version_short}',
++        'platstdlib': '{platbase}/lib/python{py_version_short}',
 +        'purelib': '{base}/local/lib/python{py_version_short}/dist-packages',
 +        'platlib': '{platbase}/local/lib/python{py_version_short}/dist-packages',
-+        'include': '{installed_base}/local/include/python{py_version_short}{abiflags}',
-+        'platinclude': '{installed_platbase}/local/include/python{py_version_short}{abiflags}',
++        'include':
++            '{installed_base}/include/python{py_version_short}{abiflags}',
++        'platinclude':
++            '{installed_platbase}/include/python{py_version_short}{abiflags}',
 +        'scripts': '{base}/local/bin',
-+        'data': '{base}',
++        'data': '{base}/local',
 +        },
      }
  
  # For the OS-native venv scheme, we essentially provide an alias:
-@@ -289,11 +309,26 @@ def _get_preferred_schemes():
+@@ -289,11 +313,26 @@ def _get_preferred_schemes():
              'home': 'posix_home',
              'user': 'osx_framework_user',
          }
