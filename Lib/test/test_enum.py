@@ -2727,6 +2727,59 @@ class TestSpecial(unittest.TestCase):
         self.assertEqual(deep, flags)
         self.assertEqual(copied.value, 1 | 2 | 8)
 
+    def test_namedtuple_as_value(self):
+        from collections import namedtuple
+        TTuple = namedtuple('TTuple', 'id a blist')
+        class NTEnum(Enum):
+            NONE = TTuple(0, 0, [])
+            A = TTuple(1, 2, [4])
+            B = TTuple(2, 4, [0, 1, 2])
+        self.assertEqual(repr(NTEnum.NONE), "<NTEnum.NONE: TTuple(id=0, a=0, blist=[])>")
+        self.assertEqual(NTEnum.NONE.value, TTuple(id=0, a=0, blist=[]))
+        self.assertEqual(
+                [x.value for x in NTEnum],
+                [TTuple(id=0, a=0, blist=[]), TTuple(id=1, a=2, blist=[4]), TTuple(id=2, a=4, blist=[0, 1, 2])],
+                )
+
+    def test_flag_with_custom_new(self):
+        class FlagFromChar(IntFlag):
+            def __new__(cls, c):
+                value = 1 << c
+                self = int.__new__(cls, value)
+                self._value_ = value
+                return self
+            #
+            a = ord('a')
+        #
+        self.assertEqual(FlagFromChar.a, 158456325028528675187087900672)
+        self.assertEqual(FlagFromChar.a|1, 158456325028528675187087900673)
+        #
+        #
+        class FlagFromChar(Flag):
+            def __new__(cls, c):
+                value = 1 << c
+                self = object.__new__(cls)
+                self._value_ = value
+                return self
+            #
+            a = ord('a')
+            z = 1
+        #
+        self.assertEqual(FlagFromChar.a.value, 158456325028528675187087900672)
+        self.assertEqual((FlagFromChar.a|FlagFromChar.z).value, 158456325028528675187087900674)
+        #
+        #
+        class FlagFromChar(int, Flag, boundary=KEEP):
+            def __new__(cls, c):
+                value = 1 << c
+                self = int.__new__(cls, value)
+                self._value_ = value
+                return self
+            #
+            a = ord('a')
+        #
+        self.assertEqual(FlagFromChar.a, 158456325028528675187087900672)
+        self.assertEqual(FlagFromChar.a|1, 158456325028528675187087900673)
 
 class TestOrder(unittest.TestCase):
     "test usage of the `_order_` attribute"
