@@ -53,7 +53,7 @@ index efeaf5a..947d891 100644
  	-rm -r $(DESTDIR)$(DESTSHARED)/__pycache__
  
 diff --git a/configure.ac b/configure.ac
-index ced2cd2..a0cc9bf 100644
+index 31e612d..a431a45 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -162,7 +162,7 @@ AC_ARG_WITH(
