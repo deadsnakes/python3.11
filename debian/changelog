@@ -1,3 +1,9 @@
+python3.11 (3.11.2-1+jammy1) jammy; urgency=medium
+
+  * Python 3.11.2 release.
+
+ -- Anthony Sottile (deadsnakes) <asottile+deadsnakes@umich.edu>  Wed, 08 Feb 2023 14:49:25 +0000
+
 python3.11 (3.11.1-1+jammy2) jammy; urgency=medium
 
   * fix sysconfig paths for deb_system and posix_local
