@@ -2,6 +2,194 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.3 final?
+==================================
+
+*Release date: 2023-04-04*
+
+Security
+--------
+
+- gh-issue-101727: Updated the OpenSSL version used in Windows and macOS
+  binary release builds to 1.1.1t to address CVE-2023-0286, CVE-2022-4303,
+  and CVE-2022-4303 per `the OpenSSL 2023-02-07 security advisory
+  <https://www.openssl.org/news/secadv/20230207.txt>`_.
+
+- gh-issue-101283: :class:`subprocess.Popen` now uses a safer approach to
+  find ``cmd.exe`` when launching with ``shell=True``. Patch by Eryk Sun,
+  based on a patch by Oleg Iarygin.
+
+Core and Builtins
+-----------------
+
+- gh-issue-101975: Fixed ``stacktop`` value on tracing entries to avoid
+  corruption on garbage collection.
+
+- gh-issue-102701: Fix overflow when creating very large dict.
+
+- gh-issue-102416: Do not memoize incorrectly automatically generated loop
+  rules in the parser. Patch by Pablo Galindo.
+
+- gh-issue-102356: Fix a bug that caused a crash when deallocating deeply
+  nested filter objects. Patch by Marta Gómez Macías.
+
+- gh-issue-102397: Fix segfault from race condition in signal handling
+  during garbage collection. Patch by Kumar Aditya.
+
+- gh-issue-102281: Fix potential nullptr dereference and use of
+  uninitialized memory in fileutils. Patch by Max Bachmann.
+
+- gh-issue-102126: Fix deadlock at shutdown when clearing thread states if
+  any finalizer tries to acquire the runtime head lock. Patch by Kumar
+  Aditya.
+
+- gh-issue-102027: Fix SSE2 and SSE3 detection in ``_blake2`` internal
+  module. Patch by Max Bachmann.
+
+- gh-issue-101967: Fix possible segfault in
+  ``positional_only_passed_as_keyword`` function, when new list created.
+
+- gh-issue-101765: Fix SystemError / segmentation fault in iter
+  ``__reduce__`` when internal access of ``builtins.__dict__`` keys mutates
+  the iter object.
+
+- gh-issue-101696: Invalidate type version tag in ``_PyStaticType_Dealloc``
+  for static types, avoiding bug where a false cache hit could crash the
+  interpreter. Patch by Kumar Aditya.
+
+Library
+-------
+
+- gh-issue-102549: Don't ignore exceptions in member type creation.
+
+- gh-issue-102947: Improve traceback when :func:`dataclasses.fields` is
+  called on a non-dataclass. Patch by Alex Waygood
+
+- gh-issue-102780: The :class:`asyncio.Timeout` context manager now works
+  reliably even when performing cleanup due to task cancellation.
+  Previously it could raise a :exc:`~asyncio.CancelledError` instead of an
+  :exc:`~asyncio.TimeoutError` in such cases.
+
+- gh-issue-88965: typing: Fix a bug relating to substitution in custom
+  classes generic over a :class:`~typing.ParamSpec`. Previously, if the
+  ``ParamSpec`` was substituted with a parameters list that itself contained
+  a :class:`~typing.TypeVar`, the ``TypeVar`` in the parameters list could
+  not be subsequently substituted. This is now fixed.
+
+  Patch by Nikita Sobolev.
+
+- gh-issue-101979: Fix a bug where parentheses in the ``metavar`` argument
+  to :meth:`argparse.ArgumentParser.add_argument` were dropped. Patch by
+  Yeojin Kim.
+
+- gh-issue-102179: Fix :func:`os.dup2` error message for negative fds.
+
+- gh-issue-101961: For the binary mode, :func:`fileinput.hookcompressed`
+  doesn't set the ``encoding`` value even if the value is ``None``. Patch by
+  Gihwan Kim.
+
+- gh-issue-101936: The default value of ``fp`` becomes :class:`io.BytesIO`
+  if :exc:`~urllib.error.HTTPError` is initialized without a designated
+  ``fp`` parameter. Patch by Long Vo.
+
+- gh-issue-102069: Fix ``__weakref__`` descriptor generation for custom
+  dataclasses.
+
+- gh-issue-101566: In zipfile, apply fix for extractall on the underlying
+  zipfile after being wrapped in ``Path``.
+
+- gh-issue-101892: Callable iterators no longer raise :class:`SystemError`
+  when the callable object exhausts the iterator but forgets to either
+  return a sentinel value or raise :class:`StopIteration`.
+
+- gh-issue-97786: Fix potential undefined behaviour in corner cases of
+  floating-point-to-time conversions.
+
+- gh-issue-101517: Fixed bug where :mod:`bdb` looks up the source line with
+  :mod:`linecache` with a ``lineno=None``, which causes it to fail with an
+  unhandled exception.
+
+- gh-issue-101673: Fix a :mod:`pdb` bug where ``ll`` clears the changes to
+  local variables.
+
+- gh-issue-96931: Fix incorrect results from
+  :meth:`ssl.SSLSocket.shared_ciphers`
+
+- gh-issue-88233: Correctly preserve "extra" fields in ``zipfile``
+  regardless of their ordering relative to a zip64 "extra."
+
+- gh-issue-96127: ``inspect.signature`` was raising ``TypeError`` on call
+  with mock objects. Now it correctly returns ``(*args, **kwargs)`` as
+  infered signature.
+
+- gh-issue-95495: When built against OpenSSL 3.0, the :mod:`ssl` module had
+  a bug where it reported unauthenticated EOFs (i.e. without close_notify)
+  as a clean TLS-level EOF. It now raises :exc:`~ssl.SSLEOFError`, matching
+  the behavior in previous versions of OpenSSL. The
+  :attr:`~ssl.SSLContext.options` attribute on :class:`~ssl.SSLContext` also
+  no longer includes :data:`~ssl.OP_IGNORE_UNEXPECTED_EOF` by default. This
+  option may be set to specify the previous OpenSSL 3.0 behavior.
+
+- gh-issue-94440: Fix a :mod:`concurrent.futures.process` bug where
+  ``ProcessPoolExecutor`` shutdown could hang after a future has been
+  quickly submitted and canceled.
+
+Documentation
+-------------
+
+- gh-issue-103112: Add docstring to :meth:`http.client.HTTPResponse.read` to
+  fix ``pydoc`` output.
+
+- gh-issue-85417: Update :mod:`cmath` documentation to clarify behaviour on
+  branch cuts.
+
+- gh-issue-97725: Fix :meth:`asyncio.Task.print_stack` description for
+  ``file=None``. Patch by Oleg Iarygin.
+
+Tests
+-----
+
+- gh-issue-102980: Improve test coverage on :mod:`pdb`.
+
+- gh-issue-102537: Adjust the error handling strategy in
+  ``test_zoneinfo.TzPathTest.python_tzpath_context``. Patch by Paul Ganssle.
+
+- gh-issue-89792: ``test_tools`` now copies up to 10x less source data to a
+  temporary directory during the ``freeze`` test by ignoring git metadata
+  and other artifacts.  It also limits its python build parallelism based on
+  os.cpu_count instead of hard coding it as 8 cores.
+
+- gh-issue-101377: Improved test_locale_calendar_formatweekday of calendar.
+
+Build
+-----
+
+- gh-issue-102711: Fix ``-Wstrict-prototypes`` compiler warnings.
+
+Windows
+-------
+
+- gh-issue-101849: Ensures installer will correctly upgrade existing
+  ``py.exe`` launcher installs.
+
+- gh-issue-101763: Updates copy of libffi bundled with Windows installs to
+  3.4.4.
+
+- gh-issue-101759: Update Windows installer to SQLite 3.40.1.
+
+- gh-issue-101614: Correctly handle extensions built against debug binaries
+  that reference ``python3_d.dll``.
+
+macOS
+-----
+
+- gh-issue-103207: Add instructions to the macOS installer welcome display
+  on how to workaround the macOS 13 Ventura “The installer encountered an
+  error” failure.
+
+- gh-issue-101759: Update macOS installer to SQLite 3.40.1.
+
+
 What's New in Python 3.11.2 final?
 ==================================
 
@@ -3887,7 +4075,7 @@ Build
   features are not required. Patch by Victor Stinner.
 
 - bpo-46656: Building Python now requires support for floating point
-  Not-a-Number (NaN): remove the ``Py_NO_NAN`` macro. Patch by by Victor
+  Not-a-Number (NaN): remove the ``Py_NO_NAN`` macro. Patch by Victor
   Stinner.
 
 - bpo-46640: Building Python now requires a C99 ``<math.h>`` header file
