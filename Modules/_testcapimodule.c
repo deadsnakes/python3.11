@@ -2524,6 +2524,20 @@ pyobject_bytes_from_null(PyObject *self, PyObject *Py_UNUSED(ignored))
 }
 
 static PyObject *
+exc_set_object(PyObject *self, PyObject *args)
+{
+    PyObject *exc;
+    PyObject *obj;
+
+    if (!PyArg_ParseTuple(args, "OO:exc_set_object", &exc, &obj)) {
+        return NULL;
+    }
+
+    PyErr_SetObject(exc, obj);
+    return NULL;
+}
+
+static PyObject *
 raise_exception(PyObject *self, PyObject *args)
 {
     PyObject *exc;
@@ -6179,11 +6193,11 @@ eval_eval_code_ex(PyObject *mod, PyObject *pos_args)
         globals,
         locals,
         c_args,
-        c_args_len,
+        (int)c_args_len,
         c_kwargs,
-        c_kwargs_len,
+        (int)c_kwargs_len,
         c_defaults,
-        c_defaults_len,
+        (int)c_defaults_len,
         kw_defaults,
         closure
     );
@@ -6379,6 +6393,7 @@ static PyObject *getargs_s_hash_int2(PyObject *, PyObject *, PyObject*);
 static PyObject *gh_99240_clear_args(PyObject *, PyObject *);
 
 static PyMethodDef TestMethods[] = {
+    {"exc_set_object",          exc_set_object,                  METH_VARARGS},
     {"raise_exception",         raise_exception,                 METH_VARARGS},
     {"raise_memoryerror",       raise_memoryerror,               METH_NOARGS},
     {"set_errno",               set_errno,                       METH_VARARGS},
