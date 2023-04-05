@@ -1,3 +1,9 @@
+python3.11 (3.11.3-1+jammy1) jammy; urgency=medium
+
+  * Python 3.11.3 release.
+
+ -- Anthony Sottile (deadsnakes) <asottile+deadsnakes@umich.edu>  Wed, 05 Apr 2023 14:14:37 +0000
+
 python3.11 (3.11.2-1+jammy1) jammy; urgency=medium
 
   * Python 3.11.2 release.
