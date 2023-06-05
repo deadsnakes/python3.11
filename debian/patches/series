@@ -8,7 +8,6 @@ tkinter-import.diff
 gdbm-import.diff
 link-opt.diff
 setup-modules.diff
-profiled-build.diff
 langpack-gettext.diff
 disable-sem-check.diff
 lib-argparse.diff
