@@ -440,7 +440,7 @@ always available.
    object <traceback-objects>` which typically encapsulates the call
    stack at the point where the exception last occurred.
 
-   .. index:: object: traceback
+   .. index:: pair: object; traceback
 
    If no exception is being handled anywhere on the stack, this function
    return a tuple containing three ``None`` values.
@@ -697,7 +697,7 @@ always available.
    the encoding used with the :term:`filesystem error handler <filesystem
    encoding and error handler>` to convert between Unicode filenames and bytes
    filenames. The filesystem error handler is returned from
-   :func:`getfilesystemencoding`.
+   :func:`getfilesystemencodeerrors`.
 
    For best compatibility, str should be used for filenames in all cases,
    although representing filenames as bytes is also supported. Functions
@@ -781,7 +781,7 @@ always available.
    additional garbage collector overhead if the object is managed by the garbage
    collector.
 
-   See `recursive sizeof recipe <https://code.activestate.com/recipes/577504>`_
+   See `recursive sizeof recipe <https://code.activestate.com/recipes/577504/>`_
    for an example of using :func:`getsizeof` recursively to find the size of
    containers and all their contents.
 
