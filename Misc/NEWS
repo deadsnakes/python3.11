@@ -2,6 +2,302 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.4 final?
+==================================
+
+*Release date: 2023-06-06*
+
+Security
+--------
+
+- gh-issue-103142: The version of OpenSSL used in our binary builds has been
+  upgraded to 1.1.1u to address several CVEs.
+
+- gh-issue-99889: Fixed a security in flaw in :func:`uu.decode` that could
+  allow for directory traversal based on the input if no ``out_file`` was
+  specified.
+
+- gh-issue-104049: Do not expose the local on-disk location in directory
+  indexes produced by :class:`http.client.SimpleHTTPRequestHandler`.
+
+- gh-issue-102153: :func:`urllib.parse.urlsplit` now strips leading C0
+  control and space characters following the specification for URLs defined
+  by WHATWG in response to CVE-2023-24329. Patch by Illia Volochii.
+
+Core and Builtins
+-----------------
+
+- gh-issue-105164: Ensure annotations are set up correctly if the only
+  annotation in a block is within a :keyword:`match` block. Patch by Jelle
+  Zijlstra.
+
+- gh-issue-104615: Fix wrong ordering of assignments in code like ``a, a =
+  x, y``. Contributed by Carl Meyer.
+
+- gh-issue-104482: Fix three error handling bugs in ast.c's validation of
+  pattern matching statements.
+
+- gh-issue-102818: Do not add a frame to the traceback in the
+  ``sys.setprofile`` and ``sys.settrace`` trampoline functions. This ensures
+  that frames are not duplicated if an exception is raised in the callback
+  function, and ensures that frames are not omitted if a C callback is used
+  and that does not add the frame.
+
+- gh-issue-104405: Fix an issue where some :term:`bytecode` instructions
+  could ignore :pep:`523` when "inlining" calls.
+
+- gh-issue-104018: Disallow the "z" format specifier in %-format of bytes
+  objects.
+
+- gh-issue-103971: Fix an issue where incorrect locations numbers could be
+  assigned to code following ``case`` blocks.
+
+- gh-issue-102310: Change the error range for invalid bytes literals.
+
+- gh-issue-103590: Do not wrap a single exception raised from a
+  ``try-except*`` construct in an :exc:`ExceptionGroup`.
+
+- gh-issue-101517: Fix bug in line numbers of instructions emitted for
+  :keyword:`except* <except_star>`.
+
+- gh-issue-103242: Migrate :meth:`~ssl.SSLContext.set_ecdh_curve` method not
+  to use deprecated OpenSSL APIs. Patch by Dong-hee Na.
+
+- gh-issue-102700: Allow built-in modules to be submodules. This allows
+  submodules to be statically linked into a CPython binary.
+
+- gh-issue-101857: Fix xattr support detection on Linux systems by widening
+  the check to linux, not just glibc. This fixes support for musl.
+
+- gh-issue-99184: Bypass instance attribute access of ``__name__`` in
+  ``repr`` of :class:`weakref.ref`.
+
+- gh-issue-96670: The parser now raises :exc:`SyntaxError` when parsing
+  source code containing null bytes. Backported from ``aab01e3``. Patch by
+  Pablo Galindo
+
+- bpo-31821: Fix :func:`!pause_reading` to work when called from
+  :func:`!connection_made` in :mod:`asyncio`.
+
+Library
+-------
+
+- gh-issue-105080: Fixed inconsistent signature on derived classes for
+  :func:`inspect.signature`
+
+- gh-issue-104874: Document the ``__name__`` and ``__supertype__``
+  attributes of :class:`typing.NewType`. Patch by Jelle Zijlstra.
+
+- gh-issue-104340: When an ``asyncio`` pipe protocol loses its connection
+  due to an error, and the caller doesn't await ``wait_closed()`` on the
+  corresponding ``StreamWriter``, don't log a warning about an exception
+  that was never retrieved. After all, according to the
+  ``StreamWriter.close()`` docs, the ``wait_closed()`` call is optional
+  ("not mandatory").
+
+- gh-issue-104372: Refactored the ``_posixsubprocess`` internals to avoid
+  Python C API usage between fork and exec when marking ``pass_fds=`` file
+  descriptors inheritable.
+
+- gh-issue-75367: Fix data descriptor detection in
+  :func:`inspect.getattr_static`.
+
+- gh-issue-104536: Fix a race condition in the internal
+  :mod:`multiprocessing.process` cleanup logic that could manifest as an
+  unintended ``AttributeError`` when calling ``process.close()``.
+
+- gh-issue-104399: Prepare the ``_tkinter`` module for building with Tcl 9.0
+  and future libtommath by replacing usage of deprecated functions
+  :c:func:`mp_to_unsigned_bin_n` and :c:func:`mp_unsigned_bin_size` when
+  necessary.
+
+- gh-issue-104307: :func:`socket.getnameinfo` now releases the GIL while
+  contacting the DNS server
+
+- gh-issue-87695: Fix issue where :meth:`pathlib.Path.glob` raised
+  :exc:`OSError` when it encountered a symlink to an overly long path.
+
+- gh-issue-104265: Prevent possible crash by disallowing instantiation of
+  the :class:`!_csv.Reader` and :class:`!_csv.Writer` types. The regression
+  was introduced in 3.10.0a4 with PR 23224 (:issue:`14935`). Patch by
+  Radislav Chugunov.
+
+- gh-issue-104035: Do not ignore user-defined ``__getstate__`` and
+  ``__setstate__`` methods for slotted frozen dataclasses.
+
+- gh-issue-103987: In :mod:`mmap`, fix several bugs that could lead to
+  access to memory-mapped files after they have been invalidated.
+
+- gh-issue-103935: Use :func:`io.open_code` for files to be executed instead
+  of raw :func:`open`
+
+- gh-issue-100370: Fix potential :exc:`OverflowError` in
+  :meth:`sqlite3.Connection.blobopen` for 32-bit builds. Patch by Erlend E.
+  Aasland.
+
+- gh-issue-103848: Add checks to ensure that ``[`` bracketed ``]`` hosts
+  found by :func:`urllib.parse.urlsplit` are of IPv6 or IPvFuture format.
+
+- gh-issue-103872: Update the bundled copy of pip to version 23.1.2.
+
+- gh-issue-103861: Fix ``zipfile.Zipfile`` creating invalid zip files when
+  ``force_zip64`` was used to add files to them. Patch by Carey Metcalfe.
+
+- gh-issue-103685: Prepare :meth:`tkinter.Menu.index` for Tk 8.7 so that it
+  does not raise ``TclError: expected integer but got ""`` when it should
+  return ``None``.
+
+- gh-issue-81403: :class:`urllib.request.CacheFTPHandler` no longer raises
+  :class:`URLError` if a cached FTP instance is reused. ftplib's endtransfer
+  method calls voidresp to drain the connection to handle FTP instance reuse
+  properly.
+
+- gh-issue-103578: Fixed a bug where :mod:`pdb` crashes when reading source
+  file with different encoding by replacing :func:`io.open` with
+  :func:`io.open_code`. The new method would also call into the hook set by
+  :func:`PyFile_SetOpenCodeHook`.
+
+- gh-issue-103556: Now creating :class:`inspect.Signature` objects with
+  positional-only parameter with a default followed by a
+  positional-or-keyword parameter without one is impossible.
+
+- gh-issue-103559: Update the bundled copy of pip to version 23.1.1.
+
+- gh-issue-103365: Set default Flag boundary to ``STRICT`` and fix bitwise
+  operations.
+
+- gh-issue-103472: Avoid a potential :exc:`ResourceWarning` in
+  :class:`http.client.HTTPConnection` by closing the proxy / tunnel's
+  CONNECT response explicitly.
+
+- gh-issue-103449: Fix a bug in doc string generation in
+  :func:`dataclasses.dataclass`.
+
+- gh-issue-103256: Fixed a bug that caused :mod:`hmac` to raise an exception
+  when the requested hash algorithm was not available in OpenSSL despite
+  being available separately as part of ``hashlib`` itself.  It now falls
+  back properly to the built-in. This could happen when, for example, your
+  OpenSSL does not include SHA3 support and you want to compute
+  ``hmac.digest(b'K', b'M', 'sha3_256')``.
+
+- gh-issue-103225: Fix a bug in :mod:`pdb` when displaying line numbers of
+  module-level source code.
+
+- gh-issue-93910: Remove deprecation of enum ``memmber.member`` access.
+
+- gh-issue-102978: Fixes :func:`unittest.mock.patch` not enforcing function
+  signatures for methods decorated with ``@classmethod`` or
+  ``@staticmethod`` when patch is called with ``autospec=True``.
+
+- gh-issue-103204: Fixes :mod:`http.server` accepting HTTP requests with
+  HTTP version numbers preceded by '+', or '-', or with digit-separating '_'
+  characters.  The length of the version numbers is also constrained.
+
+- gh-issue-102953: The extraction methods in :mod:`tarfile`, and
+  :func:`shutil.unpack_archive`, have a new a *filter* argument that allows
+  limiting tar features than may be surprising or dangerous, such as
+  creating files outside the destination directory. See
+  :ref:`tarfile-extraction-filter` for details.
+
+- gh-issue-101640: :class:`argparse.ArgumentParser` now catches errors when
+  writing messages, such as when :data:`sys.stderr` is ``None``. Patch by
+  Oleg Iarygin.
+
+- gh-issue-96522: Fix potential deadlock in pty.spawn()
+
+- gh-issue-87474: Fix potential file descriptor leaks in
+  :class:`subprocess.Popen`.
+
+Documentation
+-------------
+
+- gh-issue-89455: Add missing documentation for the ``max_group_depth`` and
+  ``max_group_width`` parameters and the ``exceptions`` attribute of the
+  :class:`traceback.TracebackException` class.
+
+- gh-issue-89412: Add missing documentation for the ``end_lineno`` and
+  ``end_offset`` attributes of the :class:`traceback.TracebackException`
+  class.
+
+- gh-issue-104943: Remove mentions of old Python versions in
+  :class:`typing.NamedTuple`.
+
+- gh-issue-67056: Document that the effect of registering or unregistering
+  an :mod:`atexit` cleanup function from within a registered cleanup
+  function is undefined.
+
+- gh-issue-48241: Clarifying documentation about the url parameter to
+  urllib.request.urlopen and urllib.request.Requst needing to be encoded
+  properly.
+
+Tests
+-----
+
+- gh-issue-104494: Update ``test_pack_configure_in`` and
+  ``test_place_configure_in`` for changes to error message formatting in Tk
+  8.7.
+
+- gh-issue-104461: Run test_configure_screen on X11 only, since the
+  ``DISPLAY`` environment variable and ``-screen`` option for toplevels are
+  not useful on Tk for Win32 or Aqua.
+
+- gh-issue-103329: Regression tests for the behaviour of
+  ``unittest.mock.PropertyMock`` were added.
+
+- gh-issue-85984: Utilize new "winsize" functions from termios in pty tests.
+
+- gh-issue-75729: Fix the :func:`os.spawn* <os.spawnl>` tests failing on
+  Windows when the working directory or interpreter path contains spaces.
+
+Build
+-----
+
+- gh-issue-90005: Fix a regression in :file:`configure` where we could end
+  up unintentionally linking with ``libbsd``.
+
+- gh-issue-104106: Add gcc fallback of mkfifoat/mknodat for macOS. Patch by
+  Dong-hee Na.
+
+- gh-issue-99069: Extended workaround defining ``static_assert`` when
+  missing from the libc headers to all clang and gcc builds. In particular,
+  this fixes building on macOS <= 10.10.
+
+Windows
+-------
+
+- gh-issue-105146: Updated the links at the end of the installer to point to
+  Discourse rather than the mailing lists.
+
+- gh-issue-104623: Update Windows installer to use SQLite 3.42.0.
+
+- gh-issue-102997: Update Windows installer to use SQLite 3.41.2.
+
+- gh-issue-88013: Fixed a bug where :exc:`TypeError` was raised when calling
+  :func:`ntpath.realpath` with a bytes parameter in some cases.
+
+macOS
+-----
+
+- gh-issue-103142: Update macOS installer to use OpenSSL 1.1.1u.
+
+- gh-issue-104623: Update macOS installer to SQLite 3.42.0.
+
+- gh-issue-102997: Update macOS installer to SQLite 3.41.2.
+
+IDLE
+----
+
+- gh-issue-104719: Remove IDLE's modification of tokenize.tabsize and test
+  other uses of tokenize data and methods.
+
+- gh-issue-104499: Fix completions for Tk Aqua 8.7 (currently blank).
+
+- gh-issue-104496: About prints both tcl and tk versions if different
+  (expected someday).
+
+- gh-issue-88496: Fix IDLE test hang on macOS.
+
+
 What's New in Python 3.11.3 final?
 ==================================
 
@@ -13399,7 +13695,7 @@ Library
 - bpo-39595: Improved performance of zipfile.Path for files with a large
   number of entries. Also improved performance and fixed minor issue as
   published with `importlib_metadata 1.5
-  <https://importlib-metadata.readthedocs.io/en/latest/changelog%20(links).html#v1-5-0>`_.
+  <https://importlib-metadata.readthedocs.io/en/latest/history.html#v1-5-0>`_.
 
 - bpo-39350: Fix regression in :class:`fractions.Fraction` if the numerator
   and/or the denominator is an :class:`int` subclass. The :func:`math.gcd`
@@ -14229,7 +14525,7 @@ Documentation
 
 - bpo-38899: Update documentation to state that to activate virtual
   environments under fish one should use `source`, not `.` as documented at
-  https://fishshell.com/docs/current/commands.html#source.
+  https://fishshell.com/docs/current/cmds/source.html.
 
 - bpo-22377: Improves documentation of the values that
   :meth:`datetime.datetime.strptime` accepts for ``%Z``. Patch by Karl
@@ -15996,7 +16292,7 @@ Windows
   Store app.
 
 - bpo-37702: Fix memory leak on Windows in creating an SSLContext object or
-  running urllib.request.urlopen('https://...').
+  running ``urllib.request.urlopen('https://...')``.
 
 - bpo-37672: Switch Windows Store package's pip to use bundled
   :file:`pip.ini` instead of :envvar:`PIP_USER` variable.
@@ -20163,7 +20459,7 @@ Library
 
 - bpo-31453: Add TLSVersion constants and SSLContext.maximum_version /
   minimum_version attributes. The new API wraps OpenSSL 1.1
-  https://www.openssl.org/docs/man1.1.0/ssl/SSL_CTX_set_min_proto_version.html
+  https://web.archive.org/web/20180309043602/https://www.openssl.org/docs/man1.1.0/ssl/SSL_CTX_set_min_proto_version.html
   feature.
 
 - bpo-24334: Internal implementation details of ssl module were cleaned up.
@@ -22012,7 +22308,7 @@ Library
 
 - bpo-31453: Add TLSVersion constants and SSLContext.maximum_version /
   minimum_version attributes. The new API wraps OpenSSL 1.1
-  https://www.openssl.org/docs/man1.1.0/ssl/SSL_CTX_set_min_proto_version.html
+  https://web.archive.org/web/20180309043602/https://www.openssl.org/docs/man1.1.0/ssl/SSL_CTX_set_min_proto_version.html
   feature.
 
 - bpo-24334: Internal implementation details of ssl module were cleaned up.
@@ -25649,8 +25945,8 @@ Tools/Demos
 
 - bpo-15369: The pybench and pystone microbenchmark have been removed from
   Tools. Please use the new Python benchmark suite
-  https://github.com/python/performance which is more reliable and includes
-  a portable version of pybench working on Python 2 and Python 3.
+  https://github.com/python/pyperformance which is more reliable and
+  includes a portable version of pybench working on Python 2 and Python 3.
 
 - bpo-28102: The zipfile module CLI now prints usage to stderr. Patch by
   Stephen J. Turnbull.

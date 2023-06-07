@@ -404,17 +404,18 @@ Data Types
    with an *IntEnum* member, the resulting value loses its enumeration status.
 
       >>> from enum import IntEnum
-      >>> class Numbers(IntEnum):
+      >>> class Number(IntEnum):
       ...     ONE = 1
       ...     TWO = 2
       ...     THREE = 3
-      >>> Numbers.THREE
-      <Numbers.THREE: 3>
-      >>> Numbers.ONE + Numbers.TWO
+      ...
+      >>> Number.THREE
+      <Number.THREE: 3>
+      >>> Number.ONE + Number.TWO
       3
-      >>> Numbers.THREE + 5
+      >>> Number.THREE + 5
       8
-      >>> Numbers.THREE == 3
+      >>> Number.THREE == 3
       True
 
    .. note::
@@ -692,7 +693,8 @@ Data Types
 
    .. attribute:: STRICT
 
-      Out-of-range values cause a :exc:`ValueError` to be raised::
+      Out-of-range values cause a :exc:`ValueError` to be raised. This is the
+      default for :class:`Flag`::
 
          >>> from enum import Flag, STRICT, auto
          >>> class StrictFlag(Flag, boundary=STRICT):
@@ -709,7 +711,7 @@ Data Types
    .. attribute:: CONFORM
 
       Out-of-range values have invalid values removed, leaving a valid *Flag*
-      value. This is the default for :class:`Flag`::
+      value::
 
          >>> from enum import Flag, CONFORM, auto
          >>> class ConformFlag(Flag, boundary=CONFORM):
