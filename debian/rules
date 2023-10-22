@@ -973,7 +973,6 @@ endif
 	: # The test framework into $(p_lbase)
 	$(dh_compat2) dh_movefiles -p$(p_lbase) --sourcedir=$(d) \
 		$(scriptdir)/test/{libregrtest,support} \
-		$(scriptdir)/test/{ann_module,ann_module2,ann_module3}.py \
 		$(scriptdir)/test/{regrtest,test_support,__init__,__main__}.py
 
 	: # The complete testsuite into $(p_ltst)
