@@ -18,8 +18,8 @@ General Options
 
 .. cmdoption:: --enable-loadable-sqlite-extensions
 
-   Support loadable extensions in the :mod:`_sqlite` extension module (default
-   is no).
+   Support loadable extensions in the :mod:`!_sqlite` extension module (default
+   is no) of the :mod:`sqlite3` module.
 
    See the :meth:`sqlite3.Connection.enable_load_extension` method of the
    :mod:`sqlite3` module.
@@ -117,7 +117,7 @@ General Options
    Some Linux distribution packaging policies recommend against bundling
    dependencies. For example, Fedora installs wheel packages in the
    ``/usr/share/python-wheels/`` directory and don't install the
-   :mod:`ensurepip._bundled` package.
+   :mod:`!ensurepip._bundled` package.
 
    .. versionadded:: 3.10
 
@@ -179,7 +179,7 @@ Install Options
    Install architecture-independent files in PREFIX. On Unix, it
    defaults to :file:`/usr/local`.
 
-   This value can be retrived at runtime using :data:`sys.prefix`.
+   This value can be retrieved at runtime using :data:`sys.prefix`.
 
    As an example, one can use ``--prefix="$HOME/.local/"`` to install
    a Python in its home directory.
@@ -188,12 +188,12 @@ Install Options
 
    Install architecture-dependent files in EPREFIX, defaults to :option:`--prefix`.
 
-   This value can be retrived at runtime using :data:`sys.exec_prefix`.
+   This value can be retrieved at runtime using :data:`sys.exec_prefix`.
 
 .. cmdoption:: --disable-test-modules
 
    Don't build nor install test modules, like the :mod:`test` package or the
-   :mod:`_testcapi` extension module (built and installed by default).
+   :mod:`!_testcapi` extension module (built and installed by default).
 
    .. versionadded:: 3.10
 
@@ -292,7 +292,7 @@ Effects of a debug build:
 * Display all warnings by default: the list of default warning filters is empty
   in the :mod:`warnings` module.
 * Add ``d`` to :data:`sys.abiflags`.
-* Add :func:`sys.gettotalrefcount` function.
+* Add :func:`!sys.gettotalrefcount` function.
 * Add :option:`-X showrefcount <-X>` command line option.
 * Add :envvar:`PYTHONTHREADDEBUG` environment variable.
 * Add support for the ``__lltrace__`` variable: enable low-level tracing in the
@@ -313,7 +313,7 @@ Effects of a debug build:
   * Check that deallocator functions don't change the current exception.
   * The garbage collector (:func:`gc.collect` function) runs some basic checks
     on objects consistency.
-  * The :c:macro:`Py_SAFE_DOWNCAST()` macro checks for integer underflow and
+  * The :c:macro:`!Py_SAFE_DOWNCAST()` macro checks for integer underflow and
     overflow when downcasting from wide types to narrow types.
 
 See also the :ref:`Python Development Mode <devmode>` and the
@@ -341,7 +341,7 @@ Debug options
    Effects:
 
    * Define the ``Py_TRACE_REFS`` macro.
-   * Add :func:`sys.getobjects` function.
+   * Add :func:`!sys.getobjects` function.
    * Add :envvar:`PYTHONDUMPREFS` environment variable.
 
    This build is not ABI compatible with release build (default build) or debug
@@ -419,7 +419,7 @@ Libraries options
 
 .. cmdoption:: --with-system-expat
 
-   Build the :mod:`pyexpat` module using an installed ``expat`` library
+   Build the :mod:`!pyexpat` module using an installed ``expat`` library
    (default is no).
 
 .. cmdoption:: --with-system-ffi
@@ -679,7 +679,7 @@ Extensions defined after the ``*shared*`` marker are built as dynamic libraries.
 The :file:`setup.py` script only builds C extensions as shared libraries using
 the :mod:`distutils` module.
 
-The :c:macro:`PyAPI_FUNC()`, :c:macro:`PyAPI_DATA()` and
+The :c:macro:`!PyAPI_FUNC()`, :c:macro:`!PyAPI_DATA()` and
 :c:macro:`PyMODINIT_FUNC` macros of :file:`Include/pyport.h` are defined
 differently depending if the ``Py_BUILD_CORE_MODULE`` macro is defined:
 
@@ -687,7 +687,7 @@ differently depending if the ``Py_BUILD_CORE_MODULE`` macro is defined:
 * Use ``Py_IMPORTED_SYMBOL`` otherwise.
 
 If the ``Py_BUILD_CORE_BUILTIN`` macro is used by mistake on a C extension
-built as a shared library, its ``PyInit_xxx()`` function is not exported,
+built as a shared library, its :samp:`PyInit_{xxx}()` function is not exported,
 causing an :exc:`ImportError` on import.
 
 
@@ -708,8 +708,8 @@ Preprocessor flags
 
 .. envvar:: CPPFLAGS
 
-   (Objective) C/C++ preprocessor flags, e.g. ``-I<include dir>`` if you have
-   headers in a nonstandard directory ``<include dir>``.
+   (Objective) C/C++ preprocessor flags, e.g. :samp:`-I{include_dir}` if you have
+   headers in a nonstandard directory *include_dir*.
 
    Both :envvar:`CPPFLAGS` and :envvar:`LDFLAGS` need to contain the shell's
    value for setup.py to be able to build extension modules using the
@@ -903,8 +903,8 @@ Linker flags
 
 .. envvar:: LDFLAGS
 
-   Linker flags, e.g. ``-L<lib dir>`` if you have libraries in a nonstandard
-   directory ``<lib dir>``.
+   Linker flags, e.g. :samp:`-L{lib_dir}` if you have libraries in a nonstandard
+   directory *lib_dir*.
 
    Both :envvar:`CPPFLAGS` and :envvar:`LDFLAGS` need to contain the shell's
    value for setup.py to be able to build extension modules using the
