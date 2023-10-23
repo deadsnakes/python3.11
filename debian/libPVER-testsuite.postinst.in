@@ -4,7 +4,7 @@ set -e
 
 case "$1" in
     configure)
-    files=$(dpkg -L lib@PVER@-testsuite | sed -n '/^\/usr\/lib\/@PVER@\/.*\.py$/p' | egrep -v '/lib2to3/tests/data|/test/bad')
+    files=$(dpkg -L lib@PVER@-testsuite | sed -n '/^\/usr\/lib\/@PVER@\/.*\.py$/p' | grep -Ev '/lib2to3/tests/data|/test/tokenizedata/bad|/badsyntax')
     if [ -n "$files" ]; then
 	/usr/bin/@PVER@ -E -S /usr/lib/@PVER@/py_compile.py $files
 	if grep -sq '^byte-compile[^#]*optimize' /etc/python/debian_config; then
