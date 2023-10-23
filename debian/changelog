@@ -1,3 +1,9 @@
+python3.11 (3.11.6-1+jammy2) jammy; urgency=medium
+
+  * update postinst for -testsuite pyc compilation
+
+ -- Anthony Sottile <asottile@umich.edu>  Mon, 23 Oct 2023 18:48:54 -0400
+
 python3.11 (3.11.6-1+jammy1) jammy; urgency=medium
 
   * Python 3.11.6 release.
