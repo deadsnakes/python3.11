@@ -9,7 +9,7 @@ Subject: pydoc-use-pager
  1 file changed, 2 insertions(+)
 
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 48c6f2a..f500598 100755
+index e5e800b..bfa3e58 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
 @@ -1582,6 +1582,8 @@ def getpager():
