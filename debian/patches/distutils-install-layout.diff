@@ -172,10 +172,10 @@ index 03b8558..a4fd23e 100644
              return os.path.join(libpython, "site-packages")
      elif os.name == "nt":
 diff --git a/Lib/distutils/tests/test_bdist_dumb.py b/Lib/distutils/tests/test_bdist_dumb.py
-index bb860c8..c13a1df 100644
+index b41812b..95a49f4 100644
 --- a/Lib/distutils/tests/test_bdist_dumb.py
 +++ b/Lib/distutils/tests/test_bdist_dumb.py
-@@ -85,7 +85,7 @@ class BuildDumbTestCase(support.TempdirManager,
+@@ -84,7 +84,7 @@ class BuildDumbTestCase(support.TempdirManager,
              fp.close()
  
          contents = sorted(filter(None, map(os.path.basename, contents)))
@@ -185,7 +185,7 @@ index bb860c8..c13a1df 100644
              wanted.append('foo.%s.pyc' % sys.implementation.cache_tag)
          self.assertEqual(contents, sorted(wanted))
 diff --git a/Lib/distutils/tests/test_install.py b/Lib/distutils/tests/test_install.py
-index c38f98b..12d021f 100644
+index c30414d..eece987 100644
 --- a/Lib/distutils/tests/test_install.py
 +++ b/Lib/distutils/tests/test_install.py
 @@ -205,7 +205,7 @@ class InstallTestCase(support.TempdirManager,
@@ -207,7 +207,7 @@ index c38f98b..12d021f 100644
  
      def test_debug_mode(self):
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index e676536..48c6f2a 100755
+index ef35473..e5e800b 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
 @@ -512,6 +512,7 @@ class Doc:
