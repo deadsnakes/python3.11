@@ -1,3 +1,9 @@
+python3.11 (3.11.7-1+focal1) focal; urgency=medium
+
+  * Python 3.11.7 release.
+
+ -- Anthony Sottile (deadsnakes) <asottile+deadsnakes@umich.edu>  Fri, 08 Dec 2023 18:56:57 +0000
+
 python3.11 (3.11.6-1+focal2) focal; urgency=medium
 
   * update postinst for -testsuite pyc compilation
