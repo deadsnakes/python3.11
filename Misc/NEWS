@@ -2,6 +2,310 @@
 Python News
 +++++++++++
 
+What's New in Python 3.11.7 final?
+==================================
+
+*Release date: 2023-12-04*
+
+Core and Builtins
+-----------------
+
+- gh-issue-112625: Fixes a bug where a bytearray object could be cleared
+  while iterating over an argument in the ``bytearray.join()`` method that
+  could result in reading memory after it was freed.
+
+- gh-issue-112388: Fix an error that was causing the parser to try to
+  overwrite tokenizer errors. Patch by pablo Galindo
+
+- gh-issue-112387: Fix error positions for decoded strings with backwards
+  tokenize errors. Patch by Pablo Galindo
+
+- gh-issue-112266: Change docstrings of :attr:`~object.__dict__` and
+  :attr:`~object.__weakref__`.
+
+- gh-issue-109181: Speed up :obj:`Traceback` object creation by lazily
+  compute the line number. Patch by Pablo Galindo
+
+- gh-issue-102388: Fix a bug where ``iso2022_jp_3`` and ``iso2022_jp_2004``
+  codecs read out of bounds
+
+- gh-issue-111366: Fix an issue in the :mod:`codeop` that was causing
+  :exc:`SyntaxError` exceptions raised in the presence of invalid syntax to
+  not contain precise error messages. Patch by Pablo Galindo
+
+- gh-issue-111380: Fix a bug that was causing :exc:`SyntaxWarning` to appear
+  twice when parsing if invalid syntax is encountered later. Patch by Pablo
+  galindo
+
+- gh-issue-88116: Traceback location ranges involving wide unicode
+  characters (like emoji and asian characters) now are properly highlighted.
+  Patch by Batuhan Taskaya and Pablo Galindo.
+
+- gh-issue-94438: Fix a regression that prevented jumping across ``is None``
+  and ``is not None`` when debugging. Patch by Savannah Ostrowski.
+
+- gh-issue-110696: Fix incorrect error message for invalid argument
+  unpacking. Patch by Pablo Galindo
+
+- gh-issue-110237: Fix missing error checks for calls to ``PyList_Append``
+  in ``_PyEval_MatchClass``.
+
+- gh-issue-109216: Fix possible memory leak in :opcode:`BUILD_MAP`.
+
+Library
+-------
+
+- gh-issue-112618: Fix a caching bug relating to :data:`typing.Annotated`.
+  ``Annotated[str, True]`` is no longer identical to ``Annotated[str, 1]``.
+
+- gh-issue-112509: Fix edge cases that could cause a key to be present in
+  both the ``__required_keys__`` and ``__optional_keys__`` attributes of a
+  :class:`typing.TypedDict`. Patch by Jelle Zijlstra.
+
+- gh-issue-94722: Fix bug where comparison between instances of
+  :class:`~doctest.DocTest` fails if one of them has ``None`` as its lineno.
+
+- gh-issue-112105: Make :func:`readline.set_completer_delims` work with
+  libedit
+
+- gh-issue-111942: Fix SystemError in the TextIOWrapper constructor with
+  non-encodable "errors" argument in non-debug mode.
+
+- gh-issue-109538: Issue warning message instead of having
+  :class:`RuntimeError` be displayed when event loop has already been closed
+  at :meth:`StreamWriter.__del__`.
+
+- gh-issue-111942: Fix crashes in :meth:`io.TextIOWrapper.reconfigure` when
+  pass invalid arguments, e.g. non-string encoding.
+
+- gh-issue-111804: Remove posix.fallocate() under WASI as the underlying
+  posix_fallocate() is not available in WASI preview2.
+
+- gh-issue-111841: Fix truncating arguments on an embedded null character in
+  :meth:`os.putenv` and :meth:`os.unsetenv` on Windows.
+
+- gh-issue-111541: Fix :mod:`doctest` for :exc:`SyntaxError` not-builtin
+  subclasses.
+
+- gh-issue-110894: Call loop exception handler for exceptions in
+  ``client_connected_cb`` of :func:`asyncio.start_server` so that
+  applications can handle it. Patch by Kumar Aditya.
+
+- gh-issue-111531: Fix reference leaks in ``bind_class()`` and
+  ``bind_all()`` methods of :mod:`tkinter` widgets.
+
+- gh-issue-111356: Added :func:`io.text_encoding()`,
+  :data:`io.DEFAULT_BUFFER_SIZE`, and :class:`io.IncrementalNewlineDecoder`
+  to ``io.__all__``.
+
+- gh-issue-68166: Remove mention of not supported "vsapi" element type in
+  :meth:`tkinter.ttk.Style.element_create`. Add tests for
+  ``element_create()`` and other ``ttk.Style`` methods. Add examples for
+  ``element_create()`` in the documentation.
+
+- gh-issue-111251: Fix :mod:`_blake2` not checking for errors when
+  initializing.
+
+- gh-issue-111174: Fix crash in :meth:`io.BytesIO.getbuffer` called
+  repeatedly for empty BytesIO.
+
+- gh-issue-111187: Postpone removal version for locale.getdefaultlocale() to
+  Python 3.15.
+
+- gh-issue-111159: Fix :mod:`doctest` output comparison for exceptions with
+  notes.
+
+- gh-issue-110910: Fix invalid state handling in :class:`asyncio.TaskGroup`
+  and :class:`asyncio.Timeout`. They now raise proper RuntimeError if they
+  are improperly used and are left in consistent state after this.
+
+- gh-issue-111092: Make turtledemo run without default root enabled.
+
+- gh-issue-110590: Fix a bug in :meth:`!_sre.compile` where :exc:`TypeError`
+  would be overwritten by :exc:`OverflowError` when the *code* argument was
+  a list of non-ints.
+
+- gh-issue-65052: Prevent :mod:`pdb` from crashing when trying to display
+  undisplayable objects
+
+- gh-issue-110519: Deprecation warning about non-integer number in
+  :mod:`gettext` now alwais refers to the line in the user code where
+  gettext function or method is used. Previously it could refer to a line in
+  ``gettext`` code.
+
+- gh-issue-110378: :func:`~contextlib.contextmanager` and
+  :func:`~contextlib.asynccontextmanager` context managers now close an
+  invalid underlying generator object that yields more then one value.
+
+- gh-issue-110365: Fix :func:`termios.tcsetattr` bug that was overwritting
+  existing errors during parsing integers from ``term`` list.
+
+- gh-issue-110196: Add ``__reduce__`` method to :class:`IPv6Address` in
+  order to keep ``scope_id``
+
+- gh-issue-109747: Improve errors for unsupported look-behind patterns. Now
+  re.error is raised instead of OverflowError or RuntimeError for too large
+  width of look-behind pattern.
+
+- gh-issue-109786: Fix possible reference leaks and crash when re-enter the
+  ``__next__()`` method of :class:`itertools.pairwise`.
+
+- gh-issue-108791: Improved error handling in :mod:`pdb` command line
+  interface, making it produce more concise error messages.
+
+- gh-issue-73561: Omit the interface scope from an IPv6 address when used as
+  Host header by :mod:`http.client`.
+
+- gh-issue-86826: :mod:`zipinfo` now supports the full range of values in
+  the TZ string determined by RFC 8536 and detects all invalid formats. Both
+  Python and C implementations now raise exceptions of the same type on
+  invalid data.
+
+- bpo-41422: Fixed memory leaks of :class:`pickle.Pickler` and
+  :class:`pickle.Unpickler` involving cyclic references via the internal
+  memo mapping.
+
+- bpo-40262: The :meth:`ssl.SSLSocket.recv_into` method no longer requires
+  the *buffer* argument to implement ``__len__`` and supports buffers with
+  arbitrary item size.
+
+- bpo-35191: Fix unexpected integer truncation in :meth:`socket.setblocking`
+  which caused it to interpret multiples of ``2**32`` as ``False``.
+
+Documentation
+-------------
+
+- gh-issue-108826: :mod:`dis` module command-line interface is now mentioned
+  in documentation.
+
+Tests
+-----
+
+- gh-issue-110367: Make regrtest ``--verbose3`` option compatible with
+  ``--huntrleaks -jN`` options. The ``./python -m test -j1 -R 3:3
+  --verbose3`` command now works as expected. Patch by Victor Stinner.
+
+- gh-issue-111309: :mod:`distutils` tests can now be run via
+  :mod:`unittest`.
+
+- gh-issue-111165: Remove no longer used functions ``run_unittest()`` and
+  ``run_doctest()`` and class ``BasicTestRunner`` from the
+  :mod:`test.support` module.
+
+- gh-issue-110932: Fix regrtest if the ``SOURCE_DATE_EPOCH`` environment
+  variable is defined: use the variable value as the random seed. Patch by
+  Victor Stinner.
+
+- gh-issue-110995: test_gdb: Fix detection of gdb built without Python
+  scripting support. Patch by Victor Stinner.
+
+- gh-issue-110918: Test case matching patterns specified by options
+  ``--match``, ``--ignore``, ``--matchfile`` and ``--ignorefile`` are now
+  tested in the order of specification, and the last match determines
+  whether the test case be run or ignored.
+
+- gh-issue-110647: Fix test_stress_modifying_handlers() of test_signal.
+  Patch by Victor Stinner.
+
+- gh-issue-103053: Fix test_tools.test_freeze on FreeBSD: run "make
+  distclean" instead of "make clean" in the copied source directory to
+  remove also the "python" program. Patch by Victor Stinner.
+
+- gh-issue-110167: Fix a deadlock in test_socket when server fails with a
+  timeout but the client is still running in its thread. Don't hold a lock
+  to call cleanup functions in doCleanups(). One of the cleanup function
+  waits until the client completes, whereas the client could deadlock if it
+  called addCleanup() in such situation. Patch by Victor Stinner.
+
+- gh-issue-110388: Add tests for :mod:`tty`.
+
+- gh-issue-81002: Add tests for :mod:`termios`.
+
+- gh-issue-110267: Add tests for pickling and copying PyStructSequence
+  objects. Patched by Xuehai Pan.
+
+- gh-issue-109974: Fix race conditions in test_threading lock tests. Wait
+  until a condition is met rather than using :func:`time.sleep` with a
+  hardcoded number of seconds. Patch by Victor Stinner.
+
+- gh-issue-109972: Split test_gdb.py file into a test_gdb package made of
+  multiple tests, so tests can now be run in parallel. Patch by Victor
+  Stinner.
+
+- gh-issue-104736: Fix test_gdb on Python built with LLVM clang 16 on Linux
+  ppc64le (ex: Fedora 38). Search patterns in gdb "bt" command output to
+  detect when gdb fails to retrieve the traceback. For example, skip a test
+  if ``Backtrace stopped: frame did not save the PC`` is found. Patch by
+  Victor Stinner.
+
+- gh-issue-108927: Fixed order dependence in running tests in the same
+  process when a test that has submodules (e.g. test_importlib) follows a
+  test that imports its submodule (e.g. test_importlib.util) and precedes a
+  test (e.g. test_unittest or test_compileall) that uses that submodule.
+
+Build
+-----
+
+- gh-issue-103053: "make check-clean-src" now also checks if the "python"
+  program is found in the source directory: fail with an error if it does
+  exist. Patch by Victor Stinner.
+
+- gh-issue-109191: Fix compile error when building with recent versions of
+  libedit.
+
+Windows
+-------
+
+- gh-issue-110913: WindowsConsoleIO now correctly chunks large buffers
+  without splitting up UTF-8 sequences.
+
+- gh-issue-110437: Allows overriding the source of VC redistributables so
+  that releases can be guaranteed to never downgrade between updates.
+
+- gh-issue-109286: Update Windows installer to use SQLite 3.43.1.
+
+macOS
+-----
+
+- gh-issue-110950: Update macOS installer to include an upstream Tcl/Tk fix
+  for the ``Secure coding is not enabled for restorable state!`` warning
+  encountered in Tkinter on macOS 14 Sonoma.
+
+- gh-issue-111015: Ensure that IDLE.app and Python Launcher.app are
+  installed with appropriate permissions on macOS builds.
+
+- gh-issue-109286: Update macOS installer to use SQLite 3.43.1.
+
+- gh-issue-71383: Update macOS installer to include an upstream Tcl/Tk fix
+  for the ``ttk::ThemeChanged`` error encountered in Tkinter.
+
+- gh-issue-92603: Update macOS installer to include a fix accepted by
+  upstream Tcl/Tk for a crash encountered after the first :meth:`tkinter.Tk`
+  instance is destroyed.
+
+- gh-issue-99834: Update macOS installer to Tcl/Tk 8.6.13.
+
+IDLE
+----
+
+- bpo-35668: Add docstrings to the IDLE debugger module. Fix two bugs:
+  initialize Idb.botframe (should be in Bdb); in Idb.in_rpc_code, check
+  whether prev_frame is None before trying to use it. Greatly expand
+  test_debugger.
+
+C API
+-----
+
+- gh-issue-112438: Fix support of format units "es", "et", "es#", and "et#"
+  in nested tuples in :c:func:`PyArg_ParseTuple`-like functions.
+
+- gh-issue-109521: :c:func:`PyImport_GetImporter` now sets RuntimeError if
+  it fails to get :data:`sys.path_hooks` or :data:`sys.path_importer_cache`
+  or they are not list and dict correspondingly. Previously it could return
+  NULL without setting error in obscure cases, crash or raise SystemError if
+  these attributes have wrong type.
+
+
 What's New in Python 3.11.6 final?
 ==================================
 
@@ -573,8 +877,8 @@ Tools/Demos
   OpenSSL 1.1.1v, 3.0.10, and 3.1.2.
 
 - gh-issue-95065: Argument Clinic now supports overriding automatically
-  generated signature by using directive ``@text_signature``. See
-  :ref:`clinic-howto-override-signature`.
+  generated signature by using directive ``@text_signature``. See `the
+  Argument Clinic docs <devguide.python.org/development-tools/clinic/>`__.
 
 - gh-issue-106970: Fix bugs in the Argument Clinic ``destination <name>
   clear`` command; the destination buffers would never be cleared, and the
@@ -7523,7 +7827,7 @@ Library
 
 - bpo-20499: Improve the speed and accuracy of statistics.pvariance().
 
-- bpo-45132: Remove :meth:`__getitem__` methods of
+- bpo-45132: Remove :meth:`~object.__getitem__` methods of
   :class:`xml.dom.pulldom.DOMEventStream`, :class:`wsgiref.util.FileWrapper`
   and :class:`fileinput.FileInput`, deprecated since Python 3.9.
 
@@ -9586,8 +9890,8 @@ Core and Builtins
 
 - bpo-29988: Only handle asynchronous exceptions and requests to drop the
   GIL when returning from a call or on the back edges of loops. Makes sure
-  that :meth:`__exit__` is always called in with statements, even for
-  interrupts.
+  that :meth:`~object.__exit__` is always called in with statements, even
+  for interrupts.
 
 Library
 -------
@@ -20264,7 +20568,7 @@ Library
   in the context manager mode. A DeprecationWarning was raised in these
   cases since Python 3.5.
 
-- bpo-9372: Deprecate :meth:`__getitem__` methods of
+- bpo-9372: Deprecate :meth:`~object.__getitem__` methods of
   :class:`xml.dom.pulldom.DOMEventStream`, :class:`wsgiref.util.FileWrapper`
   and :class:`fileinput.FileInput`.
 
