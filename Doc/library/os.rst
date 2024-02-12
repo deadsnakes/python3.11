@@ -1141,8 +1141,8 @@ as internal buffering of data.
       :meth:`~file.read` and :meth:`~file.write` methods (and many more).  To
       wrap a file descriptor in a file object, use :func:`fdopen`.
 
-   .. versionadded:: 3.3
-      The *dir_fd* argument.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.5
       If the system call is interrupted and the signal handler does not raise an
@@ -1873,7 +1873,7 @@ features:
 
    .. audit-event:: os.chdir path os.chdir
 
-   .. versionadded:: 3.3
+   .. versionchanged:: 3.3
       Added support for specifying *path* as a file descriptor
       on some platforms.
 
@@ -1905,8 +1905,8 @@ features:
 
    .. availability:: Unix, not Emscripten, not WASI.
 
-   .. versionadded:: 3.3
-      The *follow_symlinks* argument.
+   .. versionchanged:: 3.3
+      Added the *follow_symlinks* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2045,9 +2045,12 @@ features:
    for possible values of *mode*.  As of Python 3.3, this is equivalent to
    ``os.chmod(path, mode, follow_symlinks=False)``.
 
+   ``lchmod()`` is not part of POSIX, but Unix implementations may have it if
+   changing the mode of symbolic links is supported.
+
    .. audit-event:: os.chmod path,mode,dir_fd os.lchmod
 
-   .. availability:: Unix.
+   .. availability:: Unix, not Linux, FreeBSD >= 1.3, NetBSD >= 1.3, not OpenBSD
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2081,8 +2084,8 @@ features:
    .. versionchanged:: 3.2
       Added Windows support.
 
-   .. versionadded:: 3.3
-      Added the *src_dir_fd*, *dst_dir_fd*, and *follow_symlinks* arguments.
+   .. versionchanged:: 3.3
+      Added the *src_dir_fd*, *dst_dir_fd*, and *follow_symlinks* parameters.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object` for *src* and *dst*.
@@ -2183,8 +2186,8 @@ features:
 
    .. audit-event:: os.mkdir path,mode,dir_fd os.mkdir
 
-   .. versionadded:: 3.3
-      The *dir_fd* argument.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2217,8 +2220,8 @@ features:
 
    .. audit-event:: os.mkdir path,mode,dir_fd os.makedirs
 
-   .. versionadded:: 3.2
-      The *exist_ok* parameter.
+   .. versionchanged:: 3.2
+      Added the *exist_ok* parameter.
 
    .. versionchanged:: 3.4.1
 
@@ -2251,8 +2254,8 @@ features:
 
    .. availability:: Unix, not Emscripten, not WASI.
 
-   .. versionadded:: 3.3
-      The *dir_fd* argument.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2273,8 +2276,8 @@ features:
 
    .. availability:: Unix, not Emscripten, not WASI.
 
-   .. versionadded:: 3.3
-      The *dir_fd* argument.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2354,8 +2357,8 @@ features:
    .. versionchanged:: 3.2
       Added support for Windows 6.0 (Vista) symbolic links.
 
-   .. versionadded:: 3.3
-      The *dir_fd* argument.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object` on Unix.
@@ -2385,8 +2388,8 @@ features:
 
    .. audit-event:: os.remove path,dir_fd os.remove
 
-   .. versionadded:: 3.3
-      The *dir_fd* argument.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2436,8 +2439,8 @@ features:
 
    .. audit-event:: os.rename src,dst,src_dir_fd,dst_dir_fd os.rename
 
-   .. versionadded:: 3.3
-      The *src_dir_fd* and *dst_dir_fd* arguments.
+   .. versionchanged:: 3.3
+      Added the *src_dir_fd* and *dst_dir_fd* parameters.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object` for *src* and *dst*.
@@ -2492,8 +2495,8 @@ features:
 
    .. audit-event:: os.rmdir path,dir_fd os.rmdir
 
-   .. versionadded:: 3.3
-      The *dir_fd* parameter.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2567,7 +2570,7 @@ features:
 
    .. versionadded:: 3.5
 
-   .. versionadded:: 3.6
+   .. versionchanged:: 3.6
       Added support for the :term:`context manager` protocol and the
       :func:`~scandir.close()` method.  If a :func:`scandir` iterator is neither
       exhausted nor explicitly closed a :exc:`ResourceWarning` will be emitted
@@ -2764,9 +2767,9 @@ features:
 
       :func:`fstat` and :func:`lstat` functions.
 
-   .. versionadded:: 3.3
-      Added the *dir_fd* and *follow_symlinks* arguments, specifying a file
-      descriptor instead of a path.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* and *follow_symlinks* parameters,
+      specifying a file descriptor instead of a path.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -2845,10 +2848,14 @@ features:
 
       Time of most recent access expressed in nanoseconds as an integer.
 
+      .. versionadded: 3.3
+
    .. attribute:: st_mtime_ns
 
       Time of most recent content modification expressed in nanoseconds as an
       integer.
+
+      .. versionadded: 3.3
 
    .. attribute:: st_ctime_ns
 
@@ -2857,6 +2864,8 @@ features:
       * the time of most recent metadata change on Unix,
       * the time of creation on Windows, expressed in nanoseconds as an
         integer.
+
+      .. versionadded: 3.3
 
    .. note::
 
@@ -2940,6 +2949,8 @@ features:
       See the :const:`!FILE_ATTRIBUTE_* <stat.FILE_ATTRIBUTE_ARCHIVE>`
       constants in the :mod:`stat` module.
 
+      .. versionadded:: 3.5
+
    .. attribute:: st_reparse_tag
 
       When :attr:`st_file_attributes` has the :const:`~stat.FILE_ATTRIBUTE_REPARSE_POINT`
@@ -2959,13 +2970,6 @@ features:
    :attr:`st_mtime`, :attr:`st_ctime`. More items may be added at the end by
    some implementations. For compatibility with older Python versions,
    accessing :class:`stat_result` as a tuple always returns integers.
-
-   .. versionadded:: 3.3
-      Added the :attr:`st_atime_ns`, :attr:`st_mtime_ns`, and
-      :attr:`st_ctime_ns` members.
-
-   .. versionadded:: 3.5
-      Added the :attr:`st_file_attributes` member on Windows.
 
    .. versionchanged:: 3.5
       Windows now returns the file index as :attr:`st_ino` when
@@ -3012,7 +3016,7 @@ features:
    .. versionchanged:: 3.2
       The :const:`ST_RDONLY` and :const:`ST_NOSUID` constants were added.
 
-   .. versionadded:: 3.3
+   .. versionchanged:: 3.3
       Added support for specifying *path* as an open file descriptor.
 
    .. versionchanged:: 3.4
@@ -3024,8 +3028,8 @@ features:
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
 
-   .. versionadded:: 3.7
-      Added :attr:`f_fsid`.
+   .. versionchanged:: 3.7
+      Added the :attr:`f_fsid` attribute.
 
 
 .. data:: supports_dir_fd
@@ -3149,8 +3153,8 @@ features:
    .. versionchanged:: 3.2
       Added support for Windows 6.0 (Vista) symbolic links.
 
-   .. versionadded:: 3.3
-      Added the *dir_fd* argument, and now allow *target_is_directory*
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter, and now allow *target_is_directory*
       on non-Windows platforms.
 
    .. versionchanged:: 3.6
@@ -3198,8 +3202,8 @@ features:
 
    .. audit-event:: os.remove path,dir_fd os.unlink
 
-   .. versionadded:: 3.3
-      The *dir_fd* parameter.
+   .. versionchanged:: 3.3
+      Added the *dir_fd* parameter.
 
    .. versionchanged:: 3.6
       Accepts a :term:`path-like object`.
@@ -3237,7 +3241,7 @@ features:
 
    .. audit-event:: os.utime path,times,ns,dir_fd os.utime
 
-   .. versionadded:: 3.3
+   .. versionchanged:: 3.3
       Added support for specifying *path* as an open file descriptor,
       and the *dir_fd*, *follow_symlinks*, and *ns* parameters.
 
@@ -3728,7 +3732,7 @@ to be ignored.
    The "l" and "v" variants of the :func:`exec\* <execl>` functions differ in how
    command-line arguments are passed.  The "l" variants are perhaps the easiest
    to work with if the number of parameters is fixed when the code is written; the
-   individual parameters simply become additional parameters to the :func:`execl\*`
+   individual parameters simply become additional parameters to the :func:`!execl\*`
    functions.  The "v" variants are good when the number of parameters is
    variable, with the arguments being passed in a list or tuple as the *args*
    parameter.  In either case, the arguments to the child process should start with
@@ -3760,7 +3764,7 @@ to be ignored.
 
    .. availability:: Unix, Windows, not Emscripten, not WASI.
 
-   .. versionadded:: 3.3
+   .. versionchanged:: 3.3
       Added support for specifying *path* as an open file descriptor
       for :func:`execve`.
 
@@ -3925,6 +3929,11 @@ written in Python, such as a mail server's external command delivery program.
 
    .. audit-event:: os.fork "" os.fork
 
+   .. warning::
+
+      On macOS the use of this function is unsafe when mixed with using
+      higher-level system APIs, and that includes using :mod:`urllib.request`.
+
    .. versionchanged:: 3.8
       Calling ``fork()`` in a subinterpreter is no longer supported
       (:exc:`RuntimeError` is raised).
@@ -3945,6 +3954,11 @@ written in Python, such as a mail server's external command delivery program.
    :mod:`pty` module.  If an error occurs :exc:`OSError` is raised.
 
    .. audit-event:: os.forkpty "" os.forkpty
+
+   .. warning::
+
+      On macOS the use of this function is unsafe when mixed with using
+      higher-level system APIs, and that includes using :mod:`urllib.request`.
 
    .. versionchanged:: 3.8
       Calling ``forkpty()`` in a subinterpreter is no longer supported
@@ -3976,8 +3990,8 @@ written in Python, such as a mail server's external command delivery program.
 
    .. availability:: Unix, Windows, not Emscripten, not WASI.
 
-   .. versionadded:: 3.2
-      Windows support.
+   .. versionchanged:: 3.2
+      Added Windows support.
 
 
 .. function:: killpg(pgid, sig, /)
@@ -4228,7 +4242,7 @@ written in Python, such as a mail server's external command delivery program.
    command-line arguments are passed.  The "l" variants are perhaps the easiest
    to work with if the number of parameters is fixed when the code is written; the
    individual parameters simply become additional parameters to the
-   :func:`spawnl\*` functions.  The "v" variants are good when the number of
+   :func:`!spawnl\*` functions.  The "v" variants are good when the number of
    parameters is variable, with the arguments being passed in a list or tuple as
    the *args* parameter.  In either case, the arguments to the child process must
    start with the name of the command being run.
@@ -4278,7 +4292,7 @@ written in Python, such as a mail server's external command delivery program.
           P_NOWAITO
 
    Possible values for the *mode* parameter to the :func:`spawn\* <spawnl>` family of
-   functions.  If either of these values is given, the :func:`spawn\*` functions
+   functions.  If either of these values is given, the :func:`spawn\* <spawnl>` functions
    will return as soon as the new process has been created, with the process id as
    the return value.
 
@@ -4288,7 +4302,7 @@ written in Python, such as a mail server's external command delivery program.
 .. data:: P_WAIT
 
    Possible value for the *mode* parameter to the :func:`spawn\* <spawnl>` family of
-   functions.  If this is given as *mode*, the :func:`spawn\*` functions will not
+   functions.  If this is given as *mode*, the :func:`spawn\* <spawnl>` functions will not
    return until the new process has run to completion and will return the exit code
    of the process the run is successful, or ``-signal`` if a signal kills the
    process.
@@ -4466,6 +4480,9 @@ written in Python, such as a mail server's external command delivery program.
    that could be waited for, :exc:`ChildProcessError` is raised.
 
    .. availability:: Unix, not Emscripten, not WASI.
+
+   .. note::
+      This function is not available on macOS.
 
    .. versionadded:: 3.3
 
