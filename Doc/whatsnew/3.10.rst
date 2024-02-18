@@ -399,10 +399,14 @@ PEP 626: Precise line numbers for debugging and other tools
 PEP 626 brings more precise and reliable line numbers for debugging, profiling and coverage tools.
 Tracing events, with the correct line number, are generated for all lines of code executed and only for lines of code that are executed.
 
-The ``f_lineno`` attribute of frame objects will always contain the expected line number.
+The :attr:`~frame.f_lineno` attribute of frame objects will always contain the
+expected line number.
 
-The ``co_lnotab`` attribute of code objects is deprecated and will be removed in 3.12.
-Code that needs to convert from offset to line number should use the new ``co_lines()`` method instead.
+The :attr:`~codeobject.co_lnotab` attribute of
+:ref:`code objects <code-objects>` is deprecated and
+will be removed in 3.12.
+Code that needs to convert from offset to line number should use the new
+:meth:`~codeobject.co_lines` method instead.
 
 PEP 634: Structural Pattern Matching
 ------------------------------------
@@ -1311,8 +1315,8 @@ pyclbr
 ------
 
 Add an ``end_lineno`` attribute to the ``Function`` and ``Class``
-objects in the tree returned by :func:`pyclbr.readline` and
-:func:`pyclbr.readline_ex`.  It matches the existing (start) ``lineno``.
+objects in the tree returned by :func:`pyclbr.readmodule` and
+:func:`pyclbr.readmodule_ex`.  It matches the existing (start) ``lineno``.
 (Contributed by Aviral Srivastava in :issue:`38307`.)
 
 shelve
@@ -1958,11 +1962,11 @@ Changes in the C API
        source_buf = PyBytes_AsString(source_bytes_object);
        code = Py_CompileString(source_buf, filename, Py_file_input);
 
-  * For ``FrameObject`` objects, the ``f_lasti`` member now represents a wordcode
+  * For ``FrameObject`` objects, the :attr:`~frame.f_lasti` member now represents a wordcode
     offset instead of a simple offset into the bytecode string. This means that this
     number needs to be multiplied by 2 to be used with APIs that expect a byte offset
     instead (like :c:func:`PyCode_Addr2Line` for example). Notice as well that the
-    ``f_lasti`` member of ``FrameObject`` objects is not considered stable: please
+    :attr:`!f_lasti` member of ``FrameObject`` objects is not considered stable: please
     use :c:func:`PyFrame_GetLineNumber` instead.
 
 CPython bytecode changes

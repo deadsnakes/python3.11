@@ -541,6 +541,11 @@ retained), except that three unescaped quotes in a row terminate the literal.  (
    single: \u; escape sequence
    single: \U; escape sequence
 
+.. _escape-sequences:
+
+Escape sequences
+^^^^^^^^^^^^^^^^
+
 Unless an ``'r'`` or ``'R'`` prefix is present, escape sequences in string and
 bytes literals are interpreted according to rules similar to those used by
 Standard C.  The recognized escape sequences are:
@@ -690,10 +695,12 @@ and formatted string literals may be concatenated with plain string literals.
    single: ! (exclamation); in formatted string literal
    single: : (colon); in formatted string literal
    single: = (equals); for help in debugging using string literals
-.. _f-strings:
 
-Formatted string literals
--------------------------
+.. _f-strings:
+.. _formatted-string-literals:
+
+f-strings
+---------
 
 .. versionadded:: 3.6
 
