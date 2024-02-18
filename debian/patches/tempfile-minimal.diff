@@ -9,7 +9,7 @@ Subject: tempfile-minimal
  1 file changed, 141 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/tempfile.py b/Lib/tempfile.py
-index 480c172..79670f9 100644
+index abb5f45..c23894f 100644
 --- a/Lib/tempfile.py
 +++ b/Lib/tempfile.py
 @@ -40,7 +40,146 @@ import functools as _functools
@@ -157,10 +157,10 @@ index 480c172..79670f9 100644
 +    else:
 +        return _rmtree_unsafe(path, onerror)
 +
+ import stat as _stat
  import errno as _errno
  from random import Random as _Random
- import sys as _sys
-@@ -887,7 +1026,7 @@ class TemporaryDirectory:
+@@ -926,7 +1065,7 @@ class TemporaryDirectory:
                  if not ignore_errors:
                      raise
  
