@@ -366,7 +366,7 @@ Miscellaneous options
 
    Hash randomization is intended to provide protection against a
    denial-of-service caused by carefully chosen inputs that exploit the worst
-   case performance of a dict construction, O(n\ :sup:`2`) complexity.  See
+   case performance of a dict construction, *O*\ (*n*\ :sup:`2`) complexity.  See
    http://ocert.org/advisories/ocert-2011-003.html for details.
 
    :envvar:`PYTHONHASHSEED` allows you to set a fixed value for the hash
@@ -569,9 +569,7 @@ Miscellaneous options
 
    .. versionadded:: 3.10
       The ``-X warn_default_encoding`` option.
-
-   .. deprecated-removed:: 3.9 3.10
-      The ``-X oldparser`` option.
+      Removed the ``-X oldparser`` option.
 
    .. versionadded:: 3.11
       The ``-X no_debug_ranges`` option.
@@ -797,8 +795,8 @@ conflict.
 
    Defines the :data:`user base directory <site.USER_BASE>`, which is used to
    compute the path of the :data:`user site-packages directory <site.USER_SITE>`
-   and :ref:`Distutils installation paths <inst-alt-install-user>` for
-   ``python setup.py install --user``.
+   and :ref:`installation paths <sysconfig-user-scheme>` for
+   ``python -m pip install --user``.
 
    .. seealso::
 
