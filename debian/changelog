@@ -1,3 +1,9 @@
+python3.11 (3.11.8-1+jammy1) jammy; urgency=medium
+
+  * Python 3.11.8 release.
+
+ -- Anthony Sottile <asottile@umich.edu>  Sun, 18 Feb 2024 18:51:26 +0000
+
 python3.11 (3.11.7-1+jammy1) jammy; urgency=medium
 
   * Python 3.11.7 release.
