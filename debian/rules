@@ -1042,7 +1042,7 @@ endif
 
 	: # IDLE has its own changelogs, docs...
 	dh_installchangelogs -p$(p_idle) Lib/idlelib/ChangeLog
-	dh_installdocs -p$(p_idle) Lib/idlelib/{NEWS,README,TODO,extend}.txt
+	dh_installdocs -p$(p_idle) Lib/idlelib/{News3,README,TODO,extend}.txt
 
 	mkdir -p $(d_idle)/usr/share/applications
 	cp -p debian/idle.desktop \
