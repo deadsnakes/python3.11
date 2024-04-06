@@ -1,3 +1,9 @@
+python3.11 (3.11.9-1+focal1) focal; urgency=medium
+
+  * Python 3.11.9 release.
+
+ -- Anthony Sottile (deadsnakes) <asottile+deadsnakes@umich.edu>  Sat, 06 Apr 2024 17:59:24 +0000
+
 python3.11 (3.11.8-1+focal2) focal; urgency=medium
 
   * Update idlelib's NEWS filename.
