@@ -1,3 +1,9 @@
+python3.11 (3.11.9-1+noble2) noble; urgency=medium
+
+  * Repackage for ubuntu noble.
+
+ -- Anthony Sottile <asottile@umich.edu>  Sat, 27 Apr 2024 15:11:32 -0400
+
 python3.11 (3.11.9-1+focal1) focal; urgency=medium
 
   * Python 3.11.9 release.
