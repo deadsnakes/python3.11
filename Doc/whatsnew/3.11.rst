@@ -769,6 +769,21 @@ functools
   (Contributed by Yurii Karabas in :issue:`46014`.)
 
 
+.. _whatsnew311-gzip:
+
+gzip
+----
+
+* The :func:`gzip.compress` function is now faster when used with the
+  **mtime=0** argument as it delegates the compression entirely to a single
+  :func:`zlib.compress` operation. There is one side effect of this change: The
+  gzip file header contains an "OS" byte in its header. That was traditionally
+  always set to a value of 255 representing "unknown" by the :mod:`gzip`
+  module. Now, when using :func:`~gzip.compress` with **mtime=0**, it may be
+  set to a different value by the underlying zlib C library Python was linked
+  against.
+  (See :gh:`112346` for details on the side effect.)
+
 .. _whatsnew311-hashlib:
 
 hashlib
@@ -898,6 +913,13 @@ os
 * On Windows, :func:`os.urandom` now uses ``BCryptGenRandom()``,
   instead of ``CryptGenRandom()`` which is deprecated.
   (Contributed by Donghee Na in :issue:`44611`.)
+
+* As of 3.11.10, :func:`os.mkdir` and :func:`os.makedirs` on Windows
+  now support passing a *mode* value of ``0o700`` to apply access
+  control to the new directory. This implicitly affects
+  :func:`tempfile.mkdtemp` and is a mitigation for CVE-2024-4030.
+  Other values for *mode* continue to be ignored.
+  (Contributed by Steve Dower in :gh:`118486`.)
 
 
 .. _whatsnew311-pathlib:
@@ -1058,6 +1080,11 @@ tempfile
   This lets them work correctly with APIs that expect file-like objects,
   such as compression modules.
   (Contributed by Carey Metcalfe in :gh:`70363`.)
+
+* As of 3.11.10 on Windows, the default mode ``0o700`` used by
+  :func:`tempfile.mkdtemp` now limits access to the new directory due to
+  changes to :func:`os.mkdir`. This is a mitigation for CVE-2024-4030.
+  (Contributed by Steve Dower in :gh:`118486`.)
 
 
 .. _whatsnew311-threading:
@@ -2727,3 +2754,35 @@ OpenSSL
 * Windows builds and macOS installers from python.org now use OpenSSL 3.0.
 
 .. _libb2: https://www.blake2.net/
+
+
+Notable changes in 3.11.10
+==========================
+
+ipaddress
+---------
+
+* Fixed ``is_global`` and ``is_private`` behavior in ``IPv4Address``,
+  ``IPv6Address``, ``IPv4Network`` and ``IPv6Network``.
+
+email
+-----
+
+* Headers with embedded newlines are now quoted on output.
+
+  The :mod:`~email.generator` will now refuse to serialize (write) headers
+  that are improperly folded or delimited, such that they would be parsed as
+  multiple headers or joined with adjacent data.
+  If you need to turn this safety feature off,
+  set :attr:`~email.policy.Policy.verify_generated_headers`.
+  (Contributed by Bas Bloemsaat and Petr Viktorin in :gh:`121650`.)
+
+* :func:`email.utils.getaddresses` and :func:`email.utils.parseaddr` now return
+  ``('', '')`` 2-tuples in more situations where invalid email addresses are
+  encountered, instead of potentially inaccurate values.
+  An optional *strict* parameter was added to these two functions:
+  use ``strict=False`` to get the old behavior, accepting malformed inputs.
+  ``getattr(email.utils, 'supports_strict_parsing', False)`` can be used to
+  check if the *strict* paramater is available.
+  (Contributed by Thomas Dwyer and Victor Stinner for :gh:`102988` to improve
+  the CVE-2023-27043 fix.)
