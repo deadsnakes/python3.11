@@ -1,3 +1,9 @@
+# archived
+
+moved to [py3.11](https://github.com/deadsnakes/py3.11)
+
+___
+
 python3.11
 ==========
 
